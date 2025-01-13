@@ -45,15 +45,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-              <form action="/api/clear" className="absolute top-5 right-5 m-4 z-50 bg-blue-600 text-white p-2 rounded-md">
+        {/* <form action="/api/clear" className="absolute top-5 right-5 m-4 z-50 bg-blue-600 text-white p-2 rounded-md">
                 <button type="submit">Clear</button>
               
-              </form>          
+              </form>           */}
         <ReactQueryProvider>
           {" "}
-          <ViewTransitions>
-            {children}
-            </ViewTransitions>
+          <ViewTransitions>{children}</ViewTransitions>
         </ReactQueryProvider>
 
         <Toaster />

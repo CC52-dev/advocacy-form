@@ -2,10 +2,12 @@ import express, { urlencoded, json } from "express";
 import { notFound } from "./middleware/not-found.js";
 import { error } from "./middleware/error.js";
 import { request } from "./middleware/request.js";
+import helmet from "helmet";
 
 const app = express();
 app.use(urlencoded({ extended: true }));
 app.use(json());
+app.use(helmet());
 app.use(request);
 
 app.get('/', (req, res) => {

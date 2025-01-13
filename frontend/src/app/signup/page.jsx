@@ -53,6 +53,11 @@ function MyForm() {
           if (!response.data.result) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
+              message: "Your Application is being reviewed, please check your inbox for a confirmation email and updates regarding your application status. If you would like to edit your application, please Sign In.",
+            });
+          } if (response.data.result === "sign") {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
               message: "Email is already being used, Sign in instead?",
             });
           }
@@ -108,16 +113,30 @@ function MyForm() {
   }
 
   const nextStep = async () => {
+    try {
+    setDisabled(true);
     let isValid = false;
     if (step === 1) {
       isValid = await form.trigger(["email", "firstname", "lastname", "phone"]);
     } else if (step === 2) {
       isValid = await form.trigger(["location", "addr", "city", "zip"]);
     }
-
+    
+    setDisabled(false);
     if (isValid) {
       setStep(step + 1);
     }
+  }
+  catch (error) {
+    toast({
+      title: "Error",
+      description: "Something went wrong. Please try again later.",
+      duration: 10000,
+    });
+    setDisabled(false);
+  }
+
+
   };
 
   const prevStep = () => {
@@ -205,8 +224,18 @@ function MyForm() {
                   </FormItem>
                 )}
               />
-              <Button type="button" onClick={nextStep}>
-                Next
+              <Button type="button" onClick={nextStep} disabled={disabled}>
+                {disabled ? (
+                  <>
+                    {" "}
+
+                    Next
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+
+                  </>
+                ) : (
+                  "Next"
+                )}
               </Button>
             </>
           )}
@@ -309,11 +338,20 @@ function MyForm() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <Button type="button" onClick={prevStep}>
-                  Previous
+                <Button type="button" onClick={prevStep} disabled={disabled}>
+                Previous
                 </Button>
-                <Button type="button" onClick={nextStep}>
-                  Next
+                <Button type="button" onClick={nextStep} disabled = {disabled}>
+                {disabled ? (
+                  <>
+                    {" "}
+                    Next
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+
+                  </>
+                ) : (
+                  "Next"
+                )}
                 </Button>
               </div>
             </>
@@ -381,8 +419,9 @@ function MyForm() {
                 <Button type="submit" disabled={disabled}>
                   {disabled ? (
                     <>
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                       Submitting...
+                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+
                     </>
                   ) : (
                     "Submit"
