@@ -53,9 +53,8 @@ function MyForm() {
           if (!response.data.result) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: "Your Application is being reviewed, please check your inbox for a confirmation email and updates regarding your application status. If you would like to edit your application, please Sign In.",
-            });
-          } if (response.data.result === "sign") {
+                          message: "Your Application is being reviewed, please check your inbox for a confirmation email and updates regarding your application status. If you would like to edit your application, please Sign In.",
+                        });
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: "Email is already being used, Sign in instead?",

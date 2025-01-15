@@ -1,4 +1,4 @@
-import { boolean, pgTable, varchar, uuid, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, varchar, uuid, timestamp, text } from "drizzle-orm/pg-core";
 export const applicantsTable = pgTable('applicants', {
   id: uuid("id").defaultRandom().primaryKey(),
   firstname: varchar('firstname'),
@@ -27,6 +27,19 @@ export const usersTable = pgTable('users', {
   over16: boolean('over16'),
   acceptedAt: timestamp('accepted_at').defaultNow(),
 });
+export const sessionTable = pgTable("session", {
+	id: text("id").primaryKey(),
+	userId: uuid("user_id")
+		.notNull()
+		.references(() => usersTable.id),
+	expiresAt: timestamp("expires_at", {
+		withTimezone: true,
+		mode: "date"
+	}).notNull()
+});
+export type Applicant = typeof applicantsTable.$inferInsert;
+export type User = typeof usersTable.$inferInsert;
+export type Session = typeof sessionTable.$inferInsert;
 // {
 //     firstname: 'Balaji',
 //     lastname: 'Yogesh',
