@@ -6,10 +6,16 @@
   "scripts": {
     "dev": "npx tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/bin/www.js\"s",
     "build": "npx tsc",
-    "start": "node --env-file=.env dist/index.js"
-  },
-  "keywords": [],
-  "author": "",
+    "start": "node --env-file=.env dist/src/index.js",
+  "db:generate": "npx drizzle-kit generate",
+  "db:migrate": "npx drizzle-kit migrate",
+  "db:push": "npx drizzle-kit push",
+  "db:pull": "npx drizzle-kit pull",
+  "db:check": "npx drizzle-kit check",
+  "db:up": "npx drizzle-kit up",
+  "db:all": "npx drizzle-kit generate && npx drizzle-kit migrate && npx drizzle-kit push && npx drizzle-kit pull && npx drizzle-kit check && npx drizzle-kit up"
+},
+"keywords": [],  "author": "",
   "license": "ISC",
   "dependencies": {
     "@libsql/client": "^0.14.0",

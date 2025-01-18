@@ -5,8 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1736717591825,
-      "tag": "0000_square_gladiator",
+      "when": 1737157290340,
+      "tag": "0000_vengeful_golden_guardian",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1737157413826,
+      "tag": "0001_fair_madelyne_pryor",
       "breakpoints": true
     }
   ]

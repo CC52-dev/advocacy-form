@@ -1,11 +1,11 @@
 {
-  "id": "bf70be18-4c29-459f-b984-6df797e90dfd",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "fdd9f9d7-9848-447e-96a5-202af7d76425",
+  "prevId": "bf70be18-4c29-459f-b984-6df797e90dfd",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.session": {
-      "name": "session",
+    "public.applicantSession": {
+      "name": "applicantSession",
       "schema": "",
       "columns": {
         "id": {
@@ -14,8 +14,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
+        "applicant_id": {
+          "name": "applicant_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -29,12 +29,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "session_user_id_users_id_fk": {
-          "name": "session_user_id_users_id_fk",
-          "tableFrom": "session",
-          "tableTo": "users",
+        "applicantSession_applicant_id_applicants_id_fk": {
+          "name": "applicantSession_applicant_id_applicants_id_fk",
+          "tableFrom": "applicantSession",
+          "tableTo": "applicants",
           "columnsFrom": [
-            "user_id"
+            "applicant_id"
           ],
           "columnsTo": [
             "id"
@@ -132,6 +132,51 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_user_id_users_id_fk": {
+          "name": "session_user_id_users_id_fk",
+          "tableFrom": "session",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

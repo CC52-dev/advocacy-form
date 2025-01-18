@@ -19,7 +19,9 @@ app.get('/api/clear', (req, res) => {
 
 });
 import formRouter from './routes/form.js';
+import authRouter from './routes/auth.js';
 app.use('/api/form', formRouter);
+app.use('/api/auth', authRouter);
 
 
 
