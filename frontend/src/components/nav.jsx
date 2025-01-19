@@ -38,7 +38,7 @@ export default function Nav({ activeItem = "home" }) {
           <Link
             href="https://satsankalpa.org"
             className={cn(
-              "text-black hover:text-black/70 p-2 bg-none",
+              "text-black hover:text-black/70 p-2 bg-none hidden",
             )}
           >
             Satsankalpa.org ↗

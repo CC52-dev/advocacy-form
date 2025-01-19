@@ -69,7 +69,15 @@ export const applicantsSessionTable = pgTable("applicantSession", {
     mode: "date",
   }).notNull(),
 });
+
+export const otpTable = pgTable("otp", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: varchar("email"),
+  otp: varchar("otp"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 export type Applicant = typeof applicantsTable.$inferInsert;
+export type Otp = typeof otpTable.$inferInsert;
 export type User = typeof usersTable.$inferInsert;
 export type Session = typeof sessionTable.$inferInsert;
 export type ApplicantSession = typeof applicantsSessionTable.$inferInsert;

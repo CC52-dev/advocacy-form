@@ -10,7 +10,7 @@ import { checkEmail } from "../lib/checkEmail.js";
 import { handleNewForm } from "../handlers/formHandler.js";
 
 router.post("/checkemail/:user", async (req: Request, res: Response) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
   const email: string = req.params.user;
   const result = await checkEmail(email);
   if (result === true) {

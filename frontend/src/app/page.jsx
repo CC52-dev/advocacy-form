@@ -12,7 +12,7 @@ export default function Home() {
     <>
       <Nav />
       <section className="flex min-h-screen items-center justify-center space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-        <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+        <div className="container flex max-w-7xl flex-col items-center gap-4 text-center px-5">
           <Link
             href="https://www.facebook.com/satsankalpafoundation/"
             className="rounded-2xl bg-muted px-4 py-1.5 text-sm font-medium"

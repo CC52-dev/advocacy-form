@@ -38,6 +38,7 @@ function MyForm() {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(false);
+  // REMINDER: Update the Schema in the bakcend as well and in the DB schema
   const formSchema = z.object({
     firstname: z.string().min(1, "First name is required"),
     lastname: z.string().min(1, "Last name is required"),
@@ -46,7 +47,7 @@ function MyForm() {
       .string()
       .email("Invalid email address")
       .superRefine(async (val, ctx) => {
-        if (val) {
+        if (val && step === 1) {
           const response = await axios.post(
             `/api/form/checkemail/${String(val)}`
           );
@@ -73,9 +74,14 @@ function MyForm() {
   });
   const mutate = useMutation({
     mutationFn: async (data) => {
+      try {
       const response = await axios.post("/api/form/new", data);
       return response.data;
-    },
+    }
+      catch (error) {
+      console.error
+      }
+    }
   });
 
   const form = useForm({
@@ -97,7 +103,7 @@ function MyForm() {
 
   async function onSubmit(values) {
     try {
-      setDisabled(true);
+      // setDisabled(true);
       await mutate.mutateAsync(values);
       toast({
         title: "Success",
@@ -144,6 +150,7 @@ function MyForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setDisabled(true);
     const isValid = await form.trigger(["interest", "over16"]);
     if (isValid) {
       form.handleSubmit(onSubmit)(e);

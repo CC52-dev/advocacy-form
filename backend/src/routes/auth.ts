@@ -11,9 +11,9 @@ import "dotenv/config";
 
 router.post("/login/:email", async (req: Request, res: Response) => {
   const email: string = req.params.email;
-  const message = await authenticate(email);
+  const message = await authenticate(email, res);
   console.log(message);
-  res.status(200).json({ message: message});
+  // res.status(200).json({ message: message});
 });
 
 

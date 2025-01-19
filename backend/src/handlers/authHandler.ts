@@ -10,8 +10,9 @@ import {
   usersTable,
   applicantsSessionTable,
   applicantsTable,
+  otpTable,
 } from "../db/schema.js";
-import type { User, Session } from "../db/schema.js";
+import type { User, Session, Otp } from "../db/schema.js";
 import {
   createSession,
   validateSessionToken,
@@ -24,8 +25,9 @@ import {
   invalidateApplicantSession,
 } from "../lib/applicantSession.js";
 import type { ApplicantSessionValidationResult } from "../lib/applicantSession.js";
+import type { Response } from "express";
 
-export async function authenticate(email: string) {
+export async function authenticate(email: string, res: Response) {
   const user: User = await db
     .select()
     .from(usersTable)
@@ -41,11 +43,24 @@ export async function authenticate(email: string) {
       .then((rows) => rows[0]);
     if (!applicant) {
       message = "User not found";
+      res.status(404).json({ message: message });
     } else {
-      message = applicant;
+      message = "applicant";
+      res.status(200).json({ message: message });
     }
   } else {
-    message = user;
+    message = "user";
+    res.status(200).json({ message: message });
   }
   return message;
 }
+
+// export async function verifyOTP(
+//   email: string,
+//   otp: string,
+//   res: Response): Promise<SessionValidationResult | ApplicantSessionValidationResult> {
+
+//   }
+
+// export async function resendOTP(email: string, res: Response) {
+// }
