@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown, X } from "lucide-react"
 import React, { useState } from "react"
 
+
 const MultiSelect = ({
   options,
   selected,
@@ -45,18 +46,19 @@ const MultiSelect = ({
     setSearchQuery("")
   }
 
+  const maxVisibleBadges = 2
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
           aria-expanded={open}
           className={cn("w-full justify-between", className)}
         >
           <div className="flex gap-1 flex-wrap">
             {selected.length === 0 && <span className="text-muted-foreground">{placeholder}</span>}
-            {selected.map((item) => (
+            {selected.slice(0, maxVisibleBadges).map((item) => (
               <Badge
                 variant="secondary"
                 key={item}
@@ -70,6 +72,11 @@ const MultiSelect = ({
                 <X className="ml-1 h-3 w-3 hover:text-destructive" />
               </Badge>
             ))}
+            {selected.length > maxVisibleBadges && (
+              <Badge variant="secondary" className="mr-1 mb-1">
+                +{selected.length - maxVisibleBadges} more
+              </Badge>
+            )}
           </div>
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -94,9 +101,9 @@ const MultiSelect = ({
                   onCheckedChange={() => handleSelect(option)}
                 />
                 {option}
-                {selected.includes(option) && (
+                {/* {selected.includes(option) && (
                   <Check className="ml-auto h-4 w-4" />
-                )}
+                )} */}
               </CommandItem>
             ))}
           </CommandList>

@@ -1,10 +1,6 @@
 import express from "express";
 import type { Response, Request, NextFunction } from "express";
 const router = express.Router();
-import { z } from "zod";
-import db from "../db/db.js";
-import { applicantsTable, usersTable } from "../db/schema.js";
-import { eq } from "drizzle-orm";
 import "dotenv/config";
 import { checkEmail } from "../lib/checkEmail.js";
 import { handleNewForm } from "../handlers/formHandler.js";

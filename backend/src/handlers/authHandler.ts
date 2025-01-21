@@ -1,66 +1,139 @@
 import db from "../db/db.js";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase,
 } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
-import {
-  sessionTable,
-  usersTable,
-  applicantsSessionTable,
-  applicantsTable,
-  otpTable,
-} from "../db/schema.js";
+import { sessionTable, usersTable, otpTable } from "../db/schema.js";
 import type { User, Session, Otp } from "../db/schema.js";
 import {
   createSession,
+  generateSessionToken,
   validateSessionToken,
   invalidateSession,
 } from "../lib/session.js";
 import type { SessionValidationResult } from "../lib/session.js";
-import {
-  createApplicantSession,
-  validateApplicantSessionToken,
-  invalidateApplicantSession,
-} from "../lib/applicantSession.js";
-import type { ApplicantSessionValidationResult } from "../lib/applicantSession.js";
 import type { Response } from "express";
 
 export async function authenticate(email: string, res: Response) {
   const user: User = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.email, email))
-    .then((rows) => rows[0]);
-  type message = object | string;
-  let message: message = null;
-  if (!user) {
-    const applicant = await db
-      .select()
-      .from(applicantsTable)
-      .where(eq(applicantsTable.email, email))
-      .then((rows) => rows[0]);
-    if (!applicant) {
-      message = "User not found";
-      res.status(404).json({ message: message });
-    } else {
-      message = "applicant";
-      res.status(200).json({ message: message });
-    }
-  } else {
-    message = "user";
-    res.status(200).json({ message: message });
+    .where(eq(usersTable.email, email));
+  if (!user[0]) {
+    res.status(400).json({
+      message: "User not found",
+    });
+    return;
   }
-  return message;
+  const otp: Otp[] = await db
+    .select()
+    .from(otpTable)
+    .where(eq(otpTable.email, email));
+  if (otp.length > 0) {
+    const createdAt = new Date(otp[0].createdAt);
+    const currentTime = new Date();
+    const timeDifference = currentTime.getTime() - createdAt.getTime();
+    const minutesDifference = timeDifference / (1000 * 60);
+
+    if (minutesDifference > 30) {
+      await db.delete(otpTable).where(eq(otpTable.id, otp[0].id));
+    } else {
+      res.status(200).json({
+        message: otp[0].otp,
+      });
+      return;
+    }
+  }
+  const newOtp: Otp[] = await db
+    .insert(otpTable)
+    .values({
+      email: user[0].email,
+      userId: user[0].id,
+    })
+    .returning();
+  res.status(200).json({
+    message: newOtp[0].otp,
+  });
 }
 
-// export async function verifyOTP(
-//   email: string,
-//   otp: string,
-//   res: Response): Promise<SessionValidationResult | ApplicantSessionValidationResult> {
+export async function verifyOTP(
+  email: string,
+  incomingOtp: string,
+  res: Response
+) {
+  console.log(email, incomingOtp);
+  const otp: Otp[] = await db
+    .select()
+    .from(otpTable)
+    .where(and(eq(otpTable.email, email), eq(otpTable.otp, incomingOtp)));
+  // .where(eq(otpTable.otp, incomingOtp));
+  console.log(otp);
+  if (otp.length > 0) {
+    const createdAt = new Date(otp[0].createdAt);
+    const currentTime = new Date();
+    const timeDifference = currentTime.getTime() - createdAt.getTime();
+    const minutesDifference = timeDifference / (1000 * 60);
+    if (minutesDifference > 30) {
+      await db.delete(otpTable).where(eq(otpTable.id, otp[0].id));
+      res.status(400).json({
+        message: "OTP expired",
+      });
+      return;
+    }
+    await db.delete(otpTable).where(eq(otpTable.id, otp[0].id));
+    const token = generateSessionToken();
+    const user: User = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email));
+    const { expiresAt } = await createSession(token, user[0].id);
 
-//   }
+    res
+      .cookie("session_token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        expires: expiresAt,
+      })
+      .status(200)
+      .json({
+        message: "OTP verified",
+      });
+    return;
+  }
+  res.status(400).json({
+    message: "OTP not found",
+  });
+}
 
-// export async function resendOTP(email: string, res: Response) {
-// }
+export async function resendOTP(email: string, res: Response) {
+  const user = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, email));
+
+  if (user.length === 0) {
+    res.status(400).json({
+      message: "User not found",
+    });
+    return;
+  }
+
+  // Delete any existing OTP for this user
+  await db.delete(otpTable).where(eq(otpTable.email, email));
+
+  // Create new OTP
+  const newOtp: Otp[] = await db
+    .insert(otpTable)
+    .values({
+      email: user[0].email,
+      userId: user[0].id,
+    })
+    .returning();
+
+  res.status(200).json({
+    message: newOtp[0].otp,
+  });
+}

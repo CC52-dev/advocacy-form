@@ -48,9 +48,11 @@ function MyForm() {
       .email("Invalid email address")
       .superRefine(async (val, ctx) => {
         if (val && step === 1) {
+          try {
           const response = await axios.post(
             `/api/form/checkemail/${String(val)}`
           );
+        
           if (!response.data.result) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
@@ -60,9 +62,19 @@ function MyForm() {
               code: z.ZodIssueCode.custom,
               message: "Email is already being used, Sign in instead?",
             });
-          }
+          } 
+        } catch (error) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "API Error: Please try again later",
+          });
+          toast({
+            title: "Error",
+            description: "API Error: Please try again later",
+            variant: "destructive",
+          });
         }
-      }),
+      }}),
     location: z.array(z.string()).min(2, "Both country and state are required"),
     addr: z.string().min(1, "Street address is required"),
     city: z.string().min(1, "City is required"),
@@ -74,14 +86,26 @@ function MyForm() {
   });
   const mutate = useMutation({
     mutationFn: async (data) => {
-      try {
       const response = await axios.post("/api/form/new", data);
       return response.data;
-    }
-      catch (error) {
-      console.error
+    },
+    onError: (error) => {
+      if (error.response?.status === 400) {
+        toast({
+          title: "Submission Error",
+          description: error.response.data.message,
+          duration: 10000,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Something went wrong. Please try again later.",
+          duration: 10000,
+          variant: "destructive",
+        });
       }
-    }
+    },
   });
 
   const form = useForm({
@@ -137,6 +161,7 @@ function MyForm() {
       title: "Error",
       description: "Something went wrong. Please try again later.",
       duration: 10000,
+      variant: "destructive",
     });
     setDisabled(false);
   }

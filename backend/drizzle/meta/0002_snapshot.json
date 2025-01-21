@@ -1,143 +1,9 @@
 {
-  "id": "ca8717dd-2bd5-4659-8177-cbd5c3bc409d",
-  "prevId": "fdd9f9d7-9848-447e-96a5-202af7d76425",
+  "id": "684a2299-c664-4a65-bf11-8a83c1a7872c",
+  "prevId": "42376163-eec0-45b6-b7d1-462f98e81e5e",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.applicantSession": {
-      "name": "applicantSession",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "applicant_id": {
-          "name": "applicant_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "applicantSession_applicant_id_applicants_id_fk": {
-          "name": "applicantSession_applicant_id_applicants_id_fk",
-          "tableFrom": "applicantSession",
-          "tableTo": "applicants",
-          "columnsFrom": [
-            "applicant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.applicants": {
-      "name": "applicants",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "firstname": {
-          "name": "firstname",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lastname": {
-          "name": "lastname",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "phone": {
-          "name": "phone",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "location": {
-          "name": "location",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "ARRAY[]::text[]"
-        },
-        "addr": {
-          "name": "addr",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "city": {
-          "name": "city",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "zip": {
-          "name": "zip",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "interest": {
-          "name": "interest",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "ARRAY[]::text[]"
-        },
-        "over16": {
-          "name": "over16",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "applied_at": {
-          "name": "applied_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.otp": {
       "name": "otp",
       "schema": "",
@@ -153,13 +19,20 @@
           "name": "email",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
         },
         "otp": {
           "name": "otp",
-          "type": "varchar",
+          "type": "varchar(6)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "floor(random() * (999999 - 100000 + 1) + 100000)::text"
         },
         "created_at": {
           "name": "created_at",
@@ -170,7 +43,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "otp_email_users_email_fk": {
+          "name": "otp_email_users_email_fk",
+          "tableFrom": "otp",
+          "tableTo": "users",
+          "columnsFrom": [
+            "email"
+          ],
+          "columnsTo": [
+            "email"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "otp_user_id_users_id_fk": {
+          "name": "otp_user_id_users_id_fk",
+          "tableFrom": "otp",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -293,14 +193,30 @@
           "name": "over16",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": false
+        },
+        "applied_at": {
+          "name": "applied_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         },
         "accepted_at": {
           "name": "accepted_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
-          "default": "now()"
+          "default": "NULL"
+        },
+        "type": {
+          "name": "type",
+          "type": "type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'applicant'"
         }
       },
       "indexes": {},
@@ -312,7 +228,18 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.type": {
+      "name": "type",
+      "schema": "public",
+      "values": [
+        "admin",
+        "user",
+        "applicant",
+        "disabled"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

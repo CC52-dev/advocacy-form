@@ -1,6 +1,6 @@
 import { z } from "zod";
 import db from "../db/db.js";
-import { applicantsTable } from "../db/schema.js";
+import { usersTable } from "../db/schema.js";
 import { checkEmail } from "../lib/checkEmail.js";
 
 const formSchema = z.object({
@@ -37,7 +37,7 @@ export async function handleNewForm(formdata: object) {
     return { result: parseResult.error.issues };
   }
 
-  await db.insert(applicantsTable).values(formdata);
+  await db.insert(usersTable).values(formdata);
   return { result: true };
 }
 // const router = express.Router();

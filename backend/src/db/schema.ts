@@ -7,27 +7,11 @@ import {
   timestamp,
   text,
   PgArray,
+  pgEnum
 } from "drizzle-orm/pg-core";
-export const applicantsTable = pgTable("applicants", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  firstname: varchar("firstname"),
-  lastname: varchar("lastname"),
-  phone: varchar("phone"),
-  email: varchar("email"),
-  location: text("location")
-    .array()
-    .notNull()
-    .default(sql`ARRAY[]::text[]`),
-  addr: varchar("addr"),
-  city: varchar("city"),
-  zip: varchar("zip"),
-  interest: text("interest")
-    .array()
-    .notNull()
-    .default(sql`ARRAY[]::text[]`),
-  over16: boolean("over16"),
-  appliedAt: timestamp("applied_at").defaultNow(),
-});
+
+export const userEnum = pgEnum("type", ["admin", "user", "applicant", "disabled"]);
+
 export const usersTable = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   firstname: varchar("firstname"),
@@ -45,8 +29,13 @@ export const usersTable = pgTable("users", {
     .array()
     .notNull()
     .default(sql`ARRAY[]::text[]`),
-  over16: boolean("over16"),
-  acceptedAt: timestamp("accepted_at").defaultNow(),
+  over16: boolean("over16")
+    .notNull()
+    .default(false),
+  appliedAt: timestamp("applied_at").defaultNow(),
+  acceptedAt: timestamp("accepted_at")
+  .default(sql`NULL`),
+  type: userEnum().default("applicant"),
 });
 export const sessionTable = pgTable("session", {
   id: text("id").primaryKey(),
@@ -59,28 +48,23 @@ export const sessionTable = pgTable("session", {
   }).notNull(),
 });
 
-export const applicantsSessionTable = pgTable("applicantSession", {
-  id: text("id").primaryKey(),
-  applicantId: uuid("applicant_id")
-    .notNull()
-    .references(() => applicantsTable.id),
-  expiresAt: timestamp("expires_at", {
-    withTimezone: true,
-    mode: "date",
-  }).notNull(),
-});
+
 
 export const otpTable = pgTable("otp", {
   id: uuid("id").defaultRandom().primaryKey(),
-  email: varchar("email"),
-  otp: varchar("otp"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-export type Applicant = typeof applicantsTable.$inferInsert;
-export type Otp = typeof otpTable.$inferInsert;
+  email: varchar("email")
+  .notNull()
+  .references(() => usersTable.email),
+  userId: uuid("user_id")
+  .notNull()
+  .references(() => usersTable.id),
+  otp: varchar("otp", { length: 6 }).notNull().default(sql`floor(random() * (999999 - 100000 + 1) + 100000)::text`)
+  .notNull(),
+  createdAt: timestamp("created_at").defaultNow(),});
+
+export type Otp = typeof otpTable.$inferSelect;
 export type User = typeof usersTable.$inferInsert;
 export type Session = typeof sessionTable.$inferInsert;
-export type ApplicantSession = typeof applicantsSessionTable.$inferInsert;
 // {
 //     firstname: 'Balaji',
 //     lastname: 'Yogesh',

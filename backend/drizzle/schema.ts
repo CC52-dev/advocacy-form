@@ -1,21 +1,21 @@
-import { pgTable, uuid, varchar, boolean, timestamp, foreignKey, text } from "drizzle-orm/pg-core"
+import { pgTable, uuid, varchar, timestamp, text, boolean, pgEnum } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
+export const type = pgEnum("type", ['admin', 'user', 'applicant', 'disabled'])
 
 
-export const applicants = pgTable("applicants", {
+export const otp = pgTable("otp", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
-	firstname: varchar(),
-	lastname: varchar(),
-	phone: varchar(),
-	email: varchar(),
-	location: varchar(),
-	addr: varchar(),
-	city: varchar(),
-	zip: varchar(),
-	interest: varchar(),
-	over16: boolean(),
-	appliedAt: timestamp("applied_at", { mode: 'string' }).defaultNow(),
+	email: varchar().notNull(),
+	userId: uuid("user_id").notNull(),
+	otp: varchar({ length: 6 }).default((floor(((random() * (((999999 - 100000) + 1))).notNull(),
+	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
+});
+
+export const session = pgTable("session", {
+	id: text().primaryKey().notNull(),
+	userId: uuid("user_id").notNull(),
+	expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'string' }).notNull(),
 });
 
 export const users = pgTable("users", {
@@ -24,29 +24,13 @@ export const users = pgTable("users", {
 	lastname: varchar(),
 	phone: varchar(),
 	email: varchar(),
-	location: varchar(),
+	location: text().array().default(["RAY"]).notNull(),
 	addr: varchar(),
 	city: varchar(),
 	zip: varchar(),
-	interest: varchar(),
-	over16: boolean(),
-	acceptedAt: timestamp("accepted_at", { mode: 'string' }).defaultNow(),
-});
-
-export const session = pgTable("session", {
-	id: text().primaryKey().notNull(),
-	userId: uuid("user_id").notNull(),
-	expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'string' }).notNull(),
-}, (table) => [
-	foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "session_user_id_users_id_fk"
-		}),
-]);
-
-export const applicantSession = pgTable("applicantSession", {
-	id: text().primaryKey().notNull(),
-	applicantId: uuid("applicant_id").notNull(),
-	expiresAt: timestamp("expires_at", { withTimezone: true, mode: 'string' }).notNull(),
+	interest: text().array().default(["RAY"]).notNull(),
+	over16: boolean().default(false).notNull(),
+	appliedAt: timestamp("applied_at", { mode: 'string' }).defaultNow(),
+	acceptedAt: timestamp("accepted_at", { mode: 'string' }),
+	type: type().default('applicant'),
 });

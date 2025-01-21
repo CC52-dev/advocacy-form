@@ -103,24 +103,28 @@ export default function LoginPage() {
       setResendTimer(30);
       console.log(response);
     } catch (error) {
-      console.error("Login error", error);
       if (error.response?.status === 400) {
         form.setError("email", { message: "User Not Found" });
+        toast({
+          title: "User Not Found",
+          description: error.response.data.message,
+          duration: 10000,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          duration: 10000,
+          variant: "destructive",
+        });
       }
-      toast({
-        title: "Error",
-        description: error.message,
-        duration: 10000,
-        variant: "destructive",
-      });
     }
   };
 
   const otpMutate = useMutation({
     mutationFn: async (data) => {
-      // const response = await axios.post(`/api/auth/login/${data.otp}`);
-      const response = { data: data };
-      // throw new Error("Invalid OTP");
+      const response = await axios.post('/api/auth/verify/otp', { email: form.getValues().email, otp: data.otp });
       return response.data;
     },
   });
@@ -130,52 +134,63 @@ export default function LoginPage() {
       const response = await otpMutate.mutateAsync(data);
       toast({
         title: "Login successful",
-        description: JSON.stringify(data, null, 2),
+        description: response.message,
         duration: 10000,
       });
-      // console.log(response);
     } catch (error) {
-      console.error("Login error", error);
       if (error.response?.status === 400) {
-        otpForm.setError("otp", { message: "Invalid OTP" });
+        otpForm.setError("otp", { message: error.response.data.message });
+        toast({
+          title: "Invalid OTP",
+          description: error.response.data.message,
+          duration: 10000,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          duration: 10000,
+          variant: "destructive",
+        });
       }
-      otpForm.setError("otp", { message: error.message });
-      toast({
-        title: "Error",
-        description: error.message,
-        duration: 10000,
-        variant: "destructive",
-      });
     }
   };
 
   const resendOtpMutate = useMutation({
     mutationFn: async () => {
-      // Simulate API call
-      // throw new Error("Invalid OTP");
-      return true;
+      const response = await axios.post(`/api/auth/verify/otp/resend/${form.getValues().email}`);
+      return response.data;
     },
   });
 
   const handleResendOtp = async () => {
     try {
-      await resendOtpMutate.mutateAsync();
+      const response = await resendOtpMutate.mutateAsync();
       toast({
         title: "OTP Resent",
-        description: "A new OTP has been sent to your email.",
+        description: response.message,
         duration: 10000,
       });
       setResendTimer(30);
       otpForm.setValue("otp", "");
     } catch (error) {
-      console.error("Resend OTP error", error);
-      otpForm.setError("otp", { message: error.message });
-      toast({
-        title: "Error",
-        description: error.message,
-        duration: 10000,
-        variant: "destructive",
-      });
+      if (error.response?.status === 400) {
+        otpForm.setError("otp", { message: error.response.data.message });
+        toast({
+          title: "Resend OTP Error",
+          description: error.response.data.message,
+          duration: 10000,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          duration: 10000,
+          variant: "destructive",
+        });
+      }
     }
   };
 
