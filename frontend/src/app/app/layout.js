@@ -38,7 +38,7 @@ export default async function Layout({ children }) {
           <SidebarInset>
             <AppHeader />
 
-            <main className="">{children}</main>
+            <main className="w-screen md:w-full">{children}</main>
           </SidebarInset>
         </SidebarProvider>
         </TooltipProvider>
