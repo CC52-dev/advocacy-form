@@ -395,92 +395,39 @@ export const columns = [
     filterFn: "interestFilter",
     cell: ({ row }) => {
       return (
-        <div className="flex flex-wrap gap-2 min-w-fit">
-          {row.original.interest.length > 2 ? (
-            <div className="flex items-center gap-2 whitespace-nowrap">
-              <div className="hidden md:block">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant="primary" key="first">
-                      {row.original.interest[0].length > 15
-                        ? `${row.original.interest[0].substring(0, 15)}...`
-                        : row.original.interest[0]}
-                    </Badge>
-                    <Badge variant="primary" key="more">
-                      +{row.original.interest.length - 1} more
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <div className="whitespace-pre-line">
-                      {row.original.interest.join("\n")}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <div className="md:hidden">
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <Badge variant="primary" key="first">
-                      {row.original.interest[0].length > 15
-                        ? `${row.original.interest[0].substring(0, 15)}...`
-                        : row.original.interest[0]}
-                    </Badge>
-                    <Badge variant="primary" key="more">
-                      +{row.original.interest.length - 1} more
-                    </Badge>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <div className="whitespace-pre-line">
-                      {row.original.interest.join("\n")}
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          ) : (
-            row.original.interest.map((interest, index) => {
-              const isTruncated = interest.length > 30;
-              const content = isTruncated
-                ? `${interest.substring(0, 30)}...`
-                : interest;
-              return isTruncated ? (
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                <div key={index}>
-                  <div className="hidden md:block">
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Badge variant="primary">{content}</Badge>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <div className="whitespace-pre-line">{interest}</div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <div className="md:hidden">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Badge variant="primary">{content}</Badge>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <div className="whitespace-pre-line">{interest}</div>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              ) : (
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                <Badge variant="primary" key={index}>
-                  {content}
+        <div className="flex whitespace-nowrap">
+          <div className="hidden md:block">
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge variant="primary">
+                  {row.original.interest.length} Interests
                 </Badge>
-              );
-            })
-          )}
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="whitespace-pre-line">
+                  {row.original.interest.join("\n")}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Badge variant="primary">
+                  {row.original.interest.length} Interests
+                </Badge>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <div className="whitespace-pre-line">
+                  {row.original.interest.join("\n")}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       );
     },
-  },
-  {
-    accessorKey: "appliedAt",
+  },  {    accessorKey: "appliedAt",
     header: "Applied Date",
     sortingFn: (rowA, rowB) => {
       const dateA = new Date(rowA.original.applied_at);
@@ -588,29 +535,29 @@ export const columns = [
       );
     },
   },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(row.original.id)}
-            >
-              Copy Applicant ID
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal className="h-4 w-4" />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //           <DropdownMenuItem
+  //             onClick={() => navigator.clipboard.writeText(row.original.id)}
+  //           >
+  //             Copy Applicant ID
+  //           </DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     );
+  //   },
+  // },
 ];
 
 const data = [
@@ -677,6 +624,10 @@ export function DataTableApplicants() {
   const table = useReactTable({
     data,
     columns,
+    defaultColumn: {
+      minSize: 60,
+      maxSize: 800,
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

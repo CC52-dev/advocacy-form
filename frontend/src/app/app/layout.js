@@ -35,10 +35,11 @@ export default async function Layout({ children }) {
         <TooltipProvider>
         <SidebarProvider defaultOpen={defaultOpen}>
           <AppSidebar />
-          <SidebarInset>
+          <SidebarInset >
+            <div className="w-full absolute">
             <AppHeader />
 
-            <main className="w-screen md:w-full">{children}</main>
+            <main >{children}</main></div>
           </SidebarInset>
         </SidebarProvider>
         </TooltipProvider>

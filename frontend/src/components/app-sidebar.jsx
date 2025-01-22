@@ -78,7 +78,7 @@ export function AppSidebar({ ...props }) {
                 <span className="truncate font-semibold">
                   Satsankalpa Advocacy
                 </span>
-                <span className="truncate text-xs">User</span>
+                <span className="truncate text-xs">Admin</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
