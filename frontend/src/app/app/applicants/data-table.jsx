@@ -96,8 +96,10 @@ import {
   AlertDialogTrigger,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import axios from "axios";
 
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 export const columns = [
   {
     id: "select",
@@ -427,15 +429,17 @@ export const columns = [
         </div>
       );
     },
-  },  {    accessorKey: "appliedAt",
+  },
+  {
+    accessorKey: "appliedAt",
     header: "Applied Date",
     sortingFn: (rowA, rowB) => {
-      const dateA = new Date(rowA.original.applied_at);
-      const dateB = new Date(rowB.original.applied_at);
+      const dateA = new Date(rowA.original.appliedAt);
+      const dateB = new Date(rowB.original.appliedAt);
       return dateA.getTime() - dateB.getTime();
     },
     cell: ({ row }) => {
-      const date = new Date(row.original.applied_at);
+      const date = new Date(row.original.appliedAt);
       const formattedDate = date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
@@ -450,16 +454,39 @@ export const columns = [
     id: "approve/deny",
     cell: ({ row }) => {
       const [intrest, setIntrest] = React.useState(row.original.interest);
+      const queryClient = useQueryClient();
+      const [isOpenDialog, setIsOpenDialog] = React.useState(false);
+      const [isOpenAlert, setIsOpenAlert] = React.useState(false);
+      const approve = useMutation({
+        mutationFn: async (applicantId) => {
+          const response = await axios.post(
+            `/api/applicants/approveApplicant/${applicantId}`,
+            {
+              interests: intrest,
+            }
+          );
+          return response.data;
+        },
+        mutationKey: ["approveApplicant"],
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["applicants"] });
+        },
+      });
+      const deny = useMutation({
+        mutationFn: async (applicantId) => {
+          const response = await axios.post(
+            `/api/applicants/denyApplicant/${applicantId}`
+          );
+          return response.data;
+        },
+        mutationKey: ["denyApplicant"],
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["applicants"] });
+        },
+      });
       return (
         <div className="flex  gap-2 min-w-fit ">
-          <Dialog
-          //   onOpenChange=
-          //   {(open) => {
-          //     if (!open) {
-          //       setIntrest(row.original.interest)
-          //     }
-          //   }}
-          >
+          <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
             <ForcedDialogContent>
               <DialogTitle>
                 Approve {row.original.firstname} {row.original.lastname}
@@ -493,7 +520,15 @@ export const columns = [
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button className=" ">Confirm</Button>
+                <Button
+                  className=" "
+                  onClick={() => {
+                    approve.mutate(row.original.id);
+                    setIsOpenDialog(false);
+                  }}
+                >
+                  Confirm
+                </Button>
               </DialogFooter>
             </ForcedDialogContent>
             <DialogTrigger asChild>
@@ -506,7 +541,7 @@ export const columns = [
               </Button>
             </DialogTrigger>
           </Dialog>
-          <AlertDialog>
+          <AlertDialog open={isOpenAlert} onOpenChange={setIsOpenAlert}>
             <AlertDialogContent>
               <AlertDialogTitle>
                 Deny {row.original.firstname} {row.original.lastname}
@@ -519,7 +554,13 @@ export const columns = [
                 <AlertDialogCancel asChild>
                   <Button variant="outline">Cancel</Button>
                 </AlertDialogCancel>
-                <Button variant="destructive" size="sm">
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    deny.mutate(row.original.id);
+                    setIsOpenAlert(false);
+                  }}
+                >
                   Confirm
                 </Button>
               </AlertDialogFooter>
@@ -560,59 +601,6 @@ export const columns = [
   // },
 ];
 
-const data = [
-  {
-    id: "2eb7fea3-3391-4a3e-a7d2-1394edbf9484",
-    firstname: "Balaji",
-    lastname: "Yogesh",
-    phone: "+16128105922",
-    email: "balaji.yogesh@gmail.com",
-    location: ["United States", "Wisconsin"],
-    addr: "w239n2377 Hawks Meadow CT",
-    city: "Waukesha ",
-    zip: "53072",
-    interest: [
-      "Content Management (Global Shared Services)",
-      "Vedic Worship (USA)",
-    ],
-    over16: true,
-    applied_at: "2025-01-19 19:42:24.598268",
-    accepted_at: "null",
-    type: "applicant",
-  },
-  {
-    id: "3eb7fea3-3391-4a3e-a7d2-1394edbf9485",
-    firstname: "John",
-    lastname: "Doe",
-    phone: "+16128105923",
-    email: "john.doe@gmail.com",
-    location: ["United States", "Minnesota"],
-    addr: "123 Main Street",
-    city: "Minneapolis",
-    zip: "55401",
-    interest: ["Temple Services"],
-    over16: true,
-    applied_at: "2025-01-18 15:30:24.598268",
-    accepted_at: "2025-01-19 10:00:00.000000",
-    type: "applicant",
-  },
-  {
-    id: "4eb7fea3-3391-4a3e-a7d2-1394edbf9486",
-    firstname: "Jane",
-    lastname: "Smith",
-    phone: "+16128105924",
-    email: "jane.smith@gmail.com",
-    location: ["United States", "Illinois"],
-    addr: "456 Oak Avenue",
-    city: "Chicago",
-    zip: "60601",
-    interest: ["Community Events"],
-    over16: true,
-    applied_at: "2025-01-17 09:15:24.598268",
-    accepted_at: null,
-    type: "applicant",
-  },
-];
 
 export function DataTableApplicants() {
   const [sorting, setSorting] = React.useState([]);
@@ -620,9 +608,22 @@ export function DataTableApplicants() {
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [filterValue, setFilterValue] = React.useState("");
+  const { data, isLoading, isFetching, error } = useQuery({
+    queryKey: ["applicants"],
+    queryFn: async () => {
+      const response = await axios.post("/api/applicants/getAllApplicants");
+      return response.data;
+    },
+    staleTime: 60000,
+    cacheTime: 300000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+  });
+
+
 
   const table = useReactTable({
-    data,
+    data: data?.message,
     columns,
     defaultColumn: {
       minSize: 60,
@@ -642,6 +643,7 @@ export function DataTableApplicants() {
       columnVisibility,
       rowSelection,
     },
+
     filterFns: {
       interestFilter: (row, columnId, filterValues) => {
         if (!filterValues?.length) return true;
@@ -671,10 +673,19 @@ export function DataTableApplicants() {
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(filterValue.toLowerCase())
   );
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  if (isLoading && isFetching){
+    return <Skeleton className="h-[70vh] w-full bg-gray-300" />
+} 
+  
 
   return (
-    <div className="w-full ">
-      <div className="flex items-center py-4">
+    
+    <div className="w-full">
+      <div className="flex md:items-center items-start py-4 flex-col md:flex-row">
         <Input
           placeholder="Filter emails..."
           value={table.getColumn("email")?.getFilterValue() ?? ""}
@@ -820,6 +831,19 @@ export function DataTableApplicants() {
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
+          <Button
+            className="border-dashed ml-2"
+            size="sm"
+            onClick={() => {
+              table.getColumn("location")?.toggleVisibility();
+              table.getColumn("addr")?.toggleVisibility();
+              table.getColumn("city")?.toggleVisibility();
+              table.getColumn("zip")?.toggleVisibility();
+            }}
+          >
+            Toggle Location
+          </Button>
+
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
@@ -841,25 +865,25 @@ export function DataTableApplicants() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border ">
+      <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
+          <TableHeader className="">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="">
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id} className="">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
@@ -911,7 +935,7 @@ export function DataTableApplicants() {
                 />
               </SelectTrigger>
               <SelectContent side="top">
-                {[10, 20, 30, 40, 50].map((pageSize) => (
+                {[1, 10, 20, 30, 40, 50].map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
                   </SelectItem>

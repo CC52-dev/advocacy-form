@@ -63,13 +63,11 @@ export async function verifyOTP(
   incomingOtp: string,
   res: Response
 ) {
-  console.log(email, incomingOtp);
   const otp: Otp[] = await db
     .select()
     .from(otpTable)
     .where(and(eq(otpTable.email, email), eq(otpTable.otp, incomingOtp)));
   // .where(eq(otpTable.otp, incomingOtp));
-  console.log(otp);
   if (otp.length > 0) {
     const createdAt = new Date(otp[0].createdAt);
     const currentTime = new Date();
@@ -92,15 +90,16 @@ export async function verifyOTP(
 
     res
       .cookie("session_token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
+        // httpOnly: true,
+        // secure: true,
+        // sameSite: "strict",
         expires: expiresAt,
       })
       .status(200)
       .json({
         message: "OTP verified",
       });
+      console.log({ message: token });
     return;
   }
   res.status(400).json({

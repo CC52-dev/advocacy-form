@@ -2,7 +2,7 @@
 
 import Nav from "@/components/nav";
 import Footer from "@/components/footer";
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -31,6 +31,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useAuthStore } from "@/stores/authStore";
+import {useRouter} from "next/navigation";
 
 function MyForm() {
   const [countryName, setCountryName] = useState("");
@@ -516,6 +518,13 @@ function MyForm() {
 }
 
 export default function Signup() {
+  const isLogggedIn = useAuthStore((state) => state.isLoggedIn);
+  const router = useRouter();
+  useEffect(() => {
+    if (isLogggedIn) {
+      router.push("/app");
+    }
+  }, [isLogggedIn, router]);
   return (
     <>
       <Nav activeItem="signup" />

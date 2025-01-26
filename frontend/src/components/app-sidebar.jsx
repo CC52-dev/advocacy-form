@@ -54,16 +54,37 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { User2 } from "lucide-react";
-import { usePathname } from 'next/navigation';
-
-
+import { usePathname } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
+import { Skeleton } from "./ui/skeleton";
+import { cn } from "@/lib/utils";
 export function AppSidebar({ ...props }) {
   const pathname = usePathname();
-
+  const firstname = useAuthStore((state) => state.firstname);
+  const lastname = useAuthStore((state) => state.lastname);
+  const email = useAuthStore((state) => state.email);
+  const typelowercase = useAuthStore((state) => state.type);
+  const type =
+    String(typelowercase)?.charAt(0)?.toUpperCase() +
+    String(typelowercase)?.slice(1);
   const { isMobile } = useSidebar();
 
+  const InfoDisplay = ({ data, className }) => {
+    if (
+      !data ||
+      data === "" ||
+      (Array.isArray(data) && data.length === 0) ||
+      data === " "
+    ) {
+      return (
+        <Skeleton className={cn("h-full w-full bg-gray-300", className)} />
+      );
+    }
+    return data;
+  };
+
   return (
-    <Sidebar collapsible="icon" {...props} variant="inset">
+    <Sidebar collapsible="icon" {...props} variant="floating">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -78,7 +99,9 @@ export function AppSidebar({ ...props }) {
                 <span className="truncate font-semibold">
                   Satsankalpa Advocacy
                 </span>
-                <span className="truncate text-xs">Admin</span>
+                <span className="truncate text-xs h-4 w-16 ">
+                  <InfoDisplay data={type} />
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -175,17 +198,21 @@ export function AppSidebar({ ...props }) {
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage
-                      src="https://avatar.vercel.sh/eshwarbalajiyogesh"
-                      alt="Eshwar Balaji Yogesh"
+                      src={`https://avatar.vercel.sh/${firstname?.[0]}${lastname?.[0]}`}
+                      alt="Avatar"
                     />
-                    <AvatarFallback className="rounded-lg">EB</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      Eshwar Balaji Yogesh
+                    <AvatarFallback className="rounded-lg">
+                      {firstname?.[0] && lastname?.[0]
+                        ? `${firstname[0]}${lastname[0]}`
+                        : "EB"}
+                    </AvatarFallback>
+                  </Avatar>{" "}
+                  <div className="grid flex-1 text-left text-sm leading-tight gap-1">
+                    <span className="truncate font-semibold h-4 w-full ">
+                      <InfoDisplay data={`${firstname} ${lastname}`} />
                     </span>
-                    <span className="truncate text-xs">
-                      balaji.yogesh@gmail.com
+                    <span className="truncate text-xs h-4">
+                      <InfoDisplay data={email} className="w-1/2" />
                     </span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
@@ -200,19 +227,22 @@ export function AppSidebar({ ...props }) {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src="https://avatar.vercel.sh/eshwarbalajiyogesh"
-                        alt="Eshwar Balaji Yogesh"
-                      />
-                      <AvatarFallback className="rounded-lg">EB</AvatarFallback>
-                    </Avatar>
+                    <AvatarImage
+                      src={`https://avatar.vercel.sh/${firstname?.[0]}${lastname?.[0]}`}
+                      alt="Avatar"
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      {firstname?.[0] && lastname?.[0]
+                        ? `${firstname[0]}${lastname[0]}`
+                        : "EB"}
+                    </AvatarFallback>                    </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        Eshwar Balaji Yogesh
-                      </span>
-                      <span className="truncate text-xs">
-                        balaji.yogesh@gmail.com
-                      </span>
+                    <span className="truncate font-semibold h-4 w-full ">
+                      <InfoDisplay data={`${firstname} ${lastname}`} />
+                    </span>
+                    <span className="truncate text-xs h-4">
+                      <InfoDisplay data={email} className="w-1/2" />
+                    </span>
                     </div>
                   </div>
                 </DropdownMenuLabel>

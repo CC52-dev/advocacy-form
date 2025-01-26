@@ -48,6 +48,8 @@ import { Label } from "@/components/ui/label";
 import { Link } from "next-view-transitions";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -61,6 +63,13 @@ const otpSchema = z.object({
 });
 
 export default function LoginPage() {
+    const isLogggedIn = useAuthStore((state) => state.isLoggedIn);
+    const router = useRouter();
+    useEffect(() => {
+      if (isLogggedIn) {
+        router.push("/app");
+      }
+    }, [isLogggedIn, router]);
   const [step, setStep] = useState(0);
   const [resendTimer, setResendTimer] = useState(30);
   const { toast } = useToast();
@@ -101,7 +110,6 @@ export default function LoginPage() {
       });
       setStep(1);
       setResendTimer(30);
-      console.log(response);
     } catch (error) {
       if (error.response?.status === 400) {
         form.setError("email", { message: "User Not Found" });
@@ -137,6 +145,9 @@ export default function LoginPage() {
         description: response.message,
         duration: 10000,
       });
+      setTimeout(() => {
+        router.push("/app");
+      }, 1000);
     } catch (error) {
       if (error.response?.status === 400) {
         otpForm.setError("otp", { message: error.response.data.message });

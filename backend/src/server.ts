@@ -20,9 +20,12 @@ app.get('/api/clear', (req, res) => {
 });
 import formRouter from './routes/form.js';
 import authRouter from './routes/auth.js';
+import userRouter from './routes/user.js';
+import applicantRouter from './routes/applicant.js';
 app.use('/api/form', formRouter);
 app.use('/api/auth', authRouter);
-
+app.use('/api/user', userRouter);
+app.use('/api/applicants', applicantRouter);
 
 
 app.use(notFound);

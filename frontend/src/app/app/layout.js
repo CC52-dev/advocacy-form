@@ -11,10 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 import ReactQueryProvider from "@/lib/ReactQueryProvider";
 import { ViewTransitions } from "next-view-transitions";
-import {
-    TooltipProvider,
-  } from "@/components/ui/tooltip"
-  
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 import {
   SidebarInset,
   SidebarProvider,
@@ -22,10 +20,10 @@ import {
 } from "@/components/ui/sidebar";
 import { cookies, headers } from "next/headers";
 import AppHeader from "@/components/app-header";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import AuthStoreProvider from "@/lib/authMiddleware";
 
 export default async function Layout({ children }) {
-
-
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
 
@@ -33,19 +31,25 @@ export default async function Layout({ children }) {
     <ReactQueryProvider>
       <ViewTransitions>
         <TooltipProvider>
-        <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar />
-          <SidebarInset >
-            <div className="w-full absolute">
-            <AppHeader />
+          <AuthStoreProvider>
+            <SidebarProvider defaultOpen={defaultOpen}>
+              <AppSidebar />
+              <SidebarInset>
+                <div className="w-full absolute">
+                  <AppHeader />
+                  {/* <div className="max-h-screen overflow-y-auto"> */}
 
-            <main >{children}</main></div>
-          </SidebarInset>
-        </SidebarProvider>
+                  <main>{children}</main>
+                  {/* </div> */}
+                </div>
+              </SidebarInset>
+            </SidebarProvider>
+          </AuthStoreProvider>
         </TooltipProvider>
 
         <Toaster />
       </ViewTransitions>
+      <ReactQueryDevtools initialIsOpen={false} />
     </ReactQueryProvider>
   );
 }
