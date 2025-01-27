@@ -81,12 +81,14 @@ import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { columns } from "./columns";
+import { useRouter } from "next/navigation";
 
 export function DataTableApplicants() {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const router = useRouter();
   const [filterValue, setFilterValue] = React.useState("");
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["applicants"],
@@ -152,6 +154,7 @@ export function DataTableApplicants() {
     option.toLowerCase().includes(filterValue.toLowerCase())
   );
   if (error) {
+    router.refresh();
     return <div>Error: {error.message}</div>;
   }
 

@@ -97,6 +97,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -453,6 +454,7 @@ export const columns = [
     {
       id: "approve/deny",
       cell: ({ row }) => {
+        const {toast} = useToast();
         const [intrest, setIntrest] = React.useState(row.original.interest);
         const queryClient = useQueryClient();
         const [isOpenDialog, setIsOpenDialog] = React.useState(false);
@@ -470,7 +472,24 @@ export const columns = [
           mutationKey: ["approveApplicant"],
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["applicants"] });
+            toast({
+              title: "Applicant approved successfully",
+              description: "Applicant approved successfully",
+              variant: "default",
+              duration: 3000,
+            })
+       
+            // toast.success("Applicant approved successfully");
           },
+          onError: () => {
+            toast({
+              title: "An error occurred",
+              description: "An error occurred",
+              variant: "destructive",
+              duration: 3000,
+            })
+            // toast.error("An error occurred");
+          }
         });
         const deny = useMutation({
           mutationFn: async (applicantId) => {
@@ -482,9 +501,24 @@ export const columns = [
           mutationKey: ["denyApplicant"],
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["applicants"] });
+            toast({
+              title: "Applicant denied successfully",
+              description: "Applicant denied successfully",
+              variant: "default",
+              duration: 3000,
+            })
+            // toast.success("Applicant denied successfully");
           },
-        });
-        return (
+          onError: () => {
+            toast({
+              title: "An error occurred",
+              description: "An error occurred",
+              variant: "destructive",
+              duration: 3000,
+            })
+            // toast.error("An error occurred");
+          }
+        });        return (
           <div className="flex  gap-2 min-w-fit ">
             <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
               <ForcedDialogContent>

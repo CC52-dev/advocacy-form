@@ -8,15 +8,21 @@ import type { SessionValidationResult } from "../lib/session.js";
 import type { Response } from "express";
 
 export async function getUser(token: string, res: Response) {
-  const sessionValidationResult: SessionValidationResult = await validateSessionToken(token);
-  if (!sessionValidationResult.session || !sessionValidationResult.user) {
+  try {
+    const sessionValidationResult: SessionValidationResult = await validateSessionToken(token);
+    if (!sessionValidationResult.session || !sessionValidationResult.user) {
+      res.status(200).json({
+        message: "Token is Invalid Or Expired",
+      });
+      return;
+    }
+    
     res.status(200).json({
-      message: "Token is Invalid Or Expired",
+      message: sessionValidationResult.user,
     });
-    return;
+  } catch (error) {
+    res.status(400).json({
+      message: "An error occurred",
+    });
   }
-  
-  res.status(200).json({
-    message: sessionValidationResult.user,
-  });
 }
