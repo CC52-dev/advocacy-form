@@ -164,14 +164,14 @@ export function DataTableApplicants() {
 
   return (
     <div className="w-full">
-      <div className="flex md:items-center items-start py-4 flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row md:items-center items-start py-4 space-y-4 md:space-y-0 md:space-x-4">
         <Input
           placeholder="Filter emails..."
           value={table.getColumn("email")?.getFilterValue() ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="w-full md:max-w-sm"
         />
         {interestColumn && (
           <Popover>
@@ -179,7 +179,7 @@ export function DataTableApplicants() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-10 border-dashed ml-2"
+                className="w-full md:w-auto h-10 border-dashed"
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Interest
@@ -295,7 +295,7 @@ export function DataTableApplicants() {
           }}
           defaultValue="oldest"
         >
-          <SelectTrigger className="w-[140px] mr-auto ml-2 border-dashed">
+          <SelectTrigger className="w-full md:w-[140px] border-dashed">
             <SelectValue placeholder="Sort Date" />
           </SelectTrigger>
           <SelectContent>
@@ -306,12 +306,12 @@ export function DataTableApplicants() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="w-full md:w-auto">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
           <Button
-            className="border-dashed ml-2"
+            className="w-full md:w-auto border-dashed"
             size="sm"
             onClick={() => {
               table.getColumn("location")?.toggleVisibility();
@@ -394,12 +394,12 @@ export function DataTableApplicants() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between py-4">
+      <div className="flex flex-col md:flex-row items-center justify-between py-4 space-y-4 md:space-y-0">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="flex items-center space-x-6 lg:space-x-8">
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select

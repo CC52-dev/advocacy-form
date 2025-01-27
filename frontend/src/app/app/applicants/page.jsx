@@ -41,7 +41,7 @@ export default function Page() {
                     <DataTableApplicants  />
 
           <Button
-            className="mt-4"
+            className="mt-4 mx-auto md:mx-0"
             onClick={() => {
               queryClient.invalidateQueries({
                 queryKey: ["applicants"],
