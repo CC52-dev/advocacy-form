@@ -154,7 +154,7 @@ export function DataTableApplicants() {
     option.toLowerCase().includes(filterValue.toLowerCase())
   );
   if (error) {
-    router.refresh();
+    window.location.reload();
     return <div>Error: {error.message}</div>;
   }
 

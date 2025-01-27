@@ -490,7 +490,7 @@ export const columns = [
               variant: "destructive",
               duration: 3000,
             })
-            router.refresh();
+            window.location.reload();
             // toast.error("An error occurred");
           }
         });
@@ -519,7 +519,7 @@ export const columns = [
               variant: "destructive",
               duration: 3000,
             })
-            router.refresh();
+            window.location.reload();
             // toast.error("An error occurred");
           }
         });        return (
