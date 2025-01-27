@@ -101,6 +101,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 export const columns = [
     {
       id: "select",
@@ -455,6 +456,7 @@ export const columns = [
       id: "approve/deny",
       cell: ({ row }) => {
         const {toast} = useToast();
+        const router = useRouter();
         const [intrest, setIntrest] = React.useState(row.original.interest);
         const queryClient = useQueryClient();
         const [isOpenDialog, setIsOpenDialog] = React.useState(false);
@@ -488,6 +490,7 @@ export const columns = [
               variant: "destructive",
               duration: 3000,
             })
+            router.refresh();
             // toast.error("An error occurred");
           }
         });
@@ -516,6 +519,7 @@ export const columns = [
               variant: "destructive",
               duration: 3000,
             })
+            router.refresh();
             // toast.error("An error occurred");
           }
         });        return (
