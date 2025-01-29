@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import ReactQueryProvider from "@/lib/ReactQueryProvider";
 import { ViewTransitions } from "next-view-transitions";
-
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,12 +49,14 @@ export default function RootLayout({ children }) {
                 <button type="submit">Clear</button>
               
               </form>           */}
+        {/* <ThemeProvider attribute="class" defaultTheme="light"> */}
         <ReactQueryProvider>
-          {" "}
-          <ViewTransitions>{children}</ViewTransitions>
-        </ReactQueryProvider>
+            {" "}
+            <ViewTransitions>{children}</ViewTransitions>
+          </ReactQueryProvider>
 
-        <Toaster />
+          <Toaster />
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );
