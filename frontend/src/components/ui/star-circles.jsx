@@ -1,67 +1,42 @@
+"use client"
 import { cn } from "@/lib/utils";
 import React from "react";
 
-export function StarCircles({
-  className,
-  reverse,
-  duration = 20,
-  radius = 160,
-  path = true,
-  color = "currentColor",
-  speed = 1,
-  ...props
+function StarCircles ({
+  className = "",
+  color = "black",
+  speed = "6s",
+  children,
+  ...rest
 }) {
-  const calculatedDuration = duration / speed;
   return (
-    <>
-      {path && (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          version="1.1"
-          className="pointer-events-none absolute inset-0 size-full"
-          role="presentation"
-          aria-hidden="true"
-        >
-          <circle
-            className="stroke-black/20 dark:stroke-white/10 stroke-1"
-            cx="50%"
-            cy="50%"
-            r={radius}
-            fill="none"
-          />
-        </svg>
-      )}
+    <div className={`relative inline-block py-[1px] overflow-hidden rounded-[20px] ${className}`} {...rest}>
       <div
+        className="absolute w-[300%] h-[50%] opacity-70 bottom-[-11px] right-[-250%] rounded-full animate-star-movement-bottom z-0"
         style={{
-          "--duration": calculatedDuration,
-          "--radius": radius,
-          "--angle": 0,
+          background: `radial-gradient(circle, ${color}, transparent 10%)`,
+          animationDuration: speed,
         }}
-        className={cn(
-          "absolute flex transform-gpu animate-orbit items-center justify-center rounded-full",
-          { "[animation-direction:reverse]": reverse },
-          className
-        )}
-        {...props}
-      >
-        <div className={`star-border-container ${className}`} {...props}>
-          <div
-            className="border-gradient-bottom animate-spin"
-            style={{
-              background: "radial-gradient(circle, rgba(0, 0, 0, 0.3) 0%, transparent 10%)",
-              animationDuration: `${calculatedDuration}s`,
-            }}
-          />
-          <div
-            className="border-gradient-top animate-spin"
-            style={{
-              background: "radial-gradient(circle, rgba(0, 0, 0, 0.3) 0%, transparent 10%)",
-              animationDuration: `${calculatedDuration}s`,
-            }}
-          />
-          <div className="inner-content" />
-        </div>
+      />
+      <div
+        className="absolute w-[300%] h-[50%] opacity-70 top-[-10px] left-[-250%] rounded-full animate-star-movement-top z-0"
+        style={{
+          background: `radial-gradient(circle, ${color}, transparent 10%)`,
+          animationDuration: speed,
+        }}
+      />
+      <div className="relative z-1 bg-gradient-to-b from-black to-gray-900 border border-gray-800 text-white text-center text-[16px] py-[16px] px-[26px] rounded-[20px]">
+        {children}
       </div>
-    </>
+      <div
+        className="absolute inset-0 rounded-[20px] animate-border-beam"
+        style={{
+          background: `conic-gradient(from 0deg at 50% 50%, transparent 0deg, ${color} 60deg, transparent 120deg)`,
+          animationDuration: speed,
+        }}
+      />
+    </div>
   );
-}
+};
+
+export default StarCircles;

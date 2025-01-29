@@ -17,11 +17,11 @@ export default function Nav({ activeItem = "home" }) {
   return (
     <nav className="fixed top-0 left-0 right-0 p-4 z-20 select-none">
       <div className="container mx-auto flex justify-center items-center flex-row">
-        <div className={cn("rounded-full px-6 py-2 space-x-8 backdrop-blur-3xl bg-gray-100/0 filter lg border flex items-center w-full md:w-auto justify-between md:justify-normal")}>
+        <div className={cn("rounded-full px-6 py-2 space-x-8 backdrop-blur-3xl bg-gray-100/0 dark:bg-gray-900/0 filter lg border dark:border-gray-700 flex items-center w-full md:w-auto justify-between md:justify-normal")}>
           <Link
             href="/"
             className={cn(
-              "text-black hover:text-black/70 bg-none font-bold md:pb-1"
+              "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 bg-none font-bold md:pb-1"
             )}
           >
             Advocacy
@@ -29,7 +29,7 @@ export default function Nav({ activeItem = "home" }) {
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <button className="text-black hover:text-black/70" type="button">
+                <button className="text-black dark:text-white hover:text-black/70 dark:hover:text-white/70" type="button">
                   <Menu />
                 </button>
               </SheetTrigger>
@@ -41,8 +41,8 @@ export default function Nav({ activeItem = "home" }) {
                   <Link
                     href="/"
                     className={cn(
-                      "text-black hover:text-black/70 pb-1 bg-none",
-                      activeItem === "home" && "border-b-2 border-black"
+                      "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 pb-1 bg-none",
+                      activeItem === "home" && "border-b-2 border-black dark:border-white"
                     )}
                   >
                     Home
@@ -50,8 +50,8 @@ export default function Nav({ activeItem = "home" }) {
                   <Link
                     href="/signup"
                     className={cn(
-                      "text-black hover:text-black/70 pb-1 bg-none",
-                      activeItem === "signup" && "border-b-2 border-black"
+                      "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 pb-1 bg-none",
+                      activeItem === "signup" && "border-b-2 border-black dark:border-white"
                     )}
                   >
                     Signup
@@ -59,8 +59,8 @@ export default function Nav({ activeItem = "home" }) {
                   <Link
                     href="/login"
                     className={cn(
-                      "text-black hover:text-black/70 pb-1 bg-none",
-                      activeItem === "login" && "border-b-2 border-black"
+                      "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 pb-1 bg-none",
+                      activeItem === "login" && "border-b-2 border-black dark:border-white"
                     )}
                   >
                     Log In
@@ -68,7 +68,7 @@ export default function Nav({ activeItem = "home" }) {
                   <Link
                     href="https://satsankalpa.org"
                     className={cn(
-                      "text-black hover:text-black/70 p-2 bg-none",
+                      "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 p-2 bg-none",
                     )}
                   >
                     Satsankalpa.org ↗
@@ -81,8 +81,8 @@ export default function Nav({ activeItem = "home" }) {
             <Link
               href="/"
               className={cn(
-                "text-black hover:text-black/70 pb-1 bg-none",
-                activeItem === "home" && "border-b-2 border-black"
+                "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 pb-1 bg-none",
+                activeItem === "home" && "border-b-2 border-black dark:border-white"
               )}
             >
               Home
@@ -90,8 +90,8 @@ export default function Nav({ activeItem = "home" }) {
             <Link
               href="/signup"
               className={cn(
-                "text-black hover:text-black/70 pb-1 bg-none",
-                activeItem === "signup" && "border-b-2 border-black"
+                "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 pb-1 bg-none",
+                activeItem === "signup" && "border-b-2 border-black dark:border-white"
               )}
             >
               Signup
@@ -99,8 +99,8 @@ export default function Nav({ activeItem = "home" }) {
             <Link
               href="/login"
               className={cn(
-                "text-black hover:text-black/70 pb-1 bg-none",
-                activeItem === "login" && "border-b-2 border-black"
+                "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 pb-1 bg-none",
+                activeItem === "login" && "border-b-2 border-black dark:border-white"
               )}
             >
               Log In
@@ -108,7 +108,7 @@ export default function Nav({ activeItem = "home" }) {
             <Link
               href="https://satsankalpa.org"
               className={cn(
-                "text-black hover:text-black/70 p-2 bg-none hidden",
+                "text-black dark:text-white hover:text-black/70 dark:hover:text-white/70 p-2 bg-none hidden",
               )}
             >
               Satsankalpa.org ↗
