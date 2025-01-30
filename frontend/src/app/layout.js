@@ -49,14 +49,14 @@ export default function RootLayout({ children }) {
                 <button type="submit">Clear</button>
               
               </form>           */}
-        <ThemeProvider attribute="class" defaultTheme="light">
+        {/* <ThemeProvider attribute="class" defaultTheme="dark"> */}
         <ReactQueryProvider>
             {" "}
             <ViewTransitions>{children}</ViewTransitions>
           </ReactQueryProvider>
 
           <Toaster />
-        </ThemeProvider>
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );
