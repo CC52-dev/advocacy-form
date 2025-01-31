@@ -17,8 +17,12 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import StarCircles from "@/components/ui/star-circles";
+import reviews from "@/data/reviews";
+import { ReviewCard } from "@/components/reviewCard";
+import { Marquee } from "@/components/ui/marquee";
 
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 const Svg1 = () => (
   <svg
     width="1382"
@@ -32,26 +36,26 @@ const Svg1 = () => (
     <path
       d="M268 115L181.106 6.97176C178.069 3.19599 173.485 1 168.639 1H0"
       stroke="url(#paint0_linear_337_46)"
-      strokeOpacity="0.3"
-      strokeWidth="1.5"
+      strokeOpacity="0.6"
+      strokeWidth="2"
     />
     <path
       d="M1114 115L1200.89 6.97176C1203.93 3.19599 1208.52 1 1213.36 1H1382"
       stroke="url(#paint1_linear_337_46)"
-      strokeOpacity="0.3"
-      strokeWidth="1.5"
+      strokeOpacity="0.6"
+      strokeWidth="2"
     />
     <path
       d="M268 255L181.106 363.028C178.069 366.804 173.485 369 168.639 369H0"
       stroke="url(#paint2_linear_337_46)"
-      strokeOpacity="0.3"
-      strokeWidth="1.5"
+      strokeOpacity="0.6"
+      strokeWidth="2"
     />
     <path
       d="M1114 255L1200.89 363.028C1203.93 366.804 1208.52 369 1213.36 369H1382"
       stroke="url(#paint3_linear_337_46)"
-      strokeOpacity="0.3"
-      strokeWidth="1.5"
+      strokeOpacity="0.6"
+      strokeWidth="2"
     />
     <defs>
       <linearGradient
@@ -62,9 +66,9 @@ const Svg1 = () => (
         y2="175.17"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint1_linear_337_46"
@@ -74,9 +78,9 @@ const Svg1 = () => (
         y2="175.17"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint2_linear_337_46"
@@ -86,9 +90,9 @@ const Svg1 = () => (
         y2="194.83"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint3_linear_337_46"
@@ -98,14 +102,13 @@ const Svg1 = () => (
         y2="194.83"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
     </defs>
   </svg>
 );
-
 const Svg2 = () => (
   <svg
     width="445"
@@ -179,9 +182,9 @@ const Svg2 = () => (
         y2="13"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint1_linear_0_1"
@@ -191,9 +194,9 @@ const Svg2 = () => (
         y2="13"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint2_linear_0_1"
@@ -203,9 +206,9 @@ const Svg2 = () => (
         y2="13"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint3_linear_0_1"
@@ -215,9 +218,9 @@ const Svg2 = () => (
         y2="13"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint4_linear_0_1"
@@ -227,9 +230,9 @@ const Svg2 = () => (
         y2="13"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint5_linear_0_1"
@@ -239,9 +242,9 @@ const Svg2 = () => (
         y2="13"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint6_linear_0_1"
@@ -251,8 +254,9 @@ const Svg2 = () => (
         y2="205.673"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="1" stopColor="#9c40ff" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.6" stopColor="#9c40ff" />
+        <stop offset="1" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint7_linear_0_1"
@@ -262,13 +266,13 @@ const Svg2 = () => (
         y2="205.673"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="1" stopColor="#9c40ff" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.6" stopColor="#9c40ff" />
+        <stop offset="1" stopColor="#ffaa40" />
       </linearGradient>
     </defs>
   </svg>
 );
-
 const Svg3 = () => (
   <svg
     width="166"
@@ -330,9 +334,9 @@ const Svg3 = () => (
         y2="0.500009"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint1_linear_254_143"
@@ -342,9 +346,9 @@ const Svg3 = () => (
         y2="0.500009"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint2_linear_254_143"
@@ -354,9 +358,9 @@ const Svg3 = () => (
         y2="0.500009"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint3_linear_254_143"
@@ -366,9 +370,9 @@ const Svg3 = () => (
         y2="0.500009"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint4_linear_254_143"
@@ -378,9 +382,9 @@ const Svg3 = () => (
         y2="0.500009"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
       <linearGradient
         id="paint5_linear_254_143"
@@ -390,26 +394,24 @@ const Svg3 = () => (
         y2="0.500009"
         gradientUnits="userSpaceOnUse"
       >
-        <stop offset="0.481613" stopColor="#ffaa40" />
-        <stop offset="0.7" stopColor="#9c40ff" />
-        <stop offset="1" stopColor="#ffaa40" />
+        <stop offset="0.2" stopColor="#ffaa40" />
+        <stop offset="0.5" stopColor="#9c40ff" />
+        <stop offset="0.8" stopColor="#ffaa40" />
       </linearGradient>
     </defs>
   </svg>
 );
-
+const firstRow = reviews.slice(0, reviews.length / 2);
+const secondRow = reviews.slice(reviews.length / 2);
 export default function Home() {
   return (
     <>
       <Nav />
 
-
-      <section className="relative flex min-h-screen min-w-screen items-center justify-center space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32  overflow-hidden">
+      <section className="relative flex min-h-screen min-w-screen items-center justify-center  pb-8 pt-6 md:pb-12 md:pt-10 lg:pb-32  overflow-hidden">
         <Svg1 />
-      <Svg2 />
-      <Svg3 />
-
-
+        <Svg2 />
+        <Svg3 />
 
         <div className="container relative z-10 flex max-w-7xl flex-col items-center gap-4 text-center px-5 ">
           {" "}
@@ -421,18 +423,26 @@ export default function Home() {
               ease: [0, 0.71, 0.2, 1.01],
             }}
           >
-          <Link
-            href="https://www.facebook.com/satsankalpafoundation/"
-            className="rounded-2xl px-4 py-1.5 text-sm font-medium border-border text-white bg-primary hover:bg-primary/90"
-            target="_blank"
-          >
-            Follow along on Facebook
-          </Link>
+            <Link
+              href="https://www.facebook.com/satsankalpafoundation/"
+              className="rounded-2xl px-4 py-1.5 text-sm font-medium border-border text-white bg-primary hover:bg-primary/90"
+              target="_blank"
+            >
+              Follow along on Facebook
+            </Link>
           </motion.div>
-          <TextAnimate animation="blurInUp" by="character" className="font-bold text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight tracking-tight text-gray-900 dark:text-gray-50">
+          <TextAnimate
+            animation="blurInUp"
+            by="character"
+            className="font-bold text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-tight tracking-tight text-gray-900 dark:text-gray-50"
+          >
             Satsankalpa Advocacy
           </TextAnimate>
-          <TextAnimate animation="blurIn" by="character" duration={0.1} className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+          <TextAnimate
+            animation="blurIn"
+            by="character"
+            className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8"
+          >
             Join our global network of supporters and make a lasting impact.
             Together, we can further our vision, mission, and activities for a
             better world.
@@ -449,6 +459,137 @@ export default function Home() {
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className="py-20 bg-white dark:bg-gray-900 overflow-hidden border-t min-h-screen">
+        <h2 className="text-center font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50">
+          Our Global Impact
+        </h2>
+
+        <div className="relative flex flex-col items-center justify-center mb-16">
+          <Marquee pauseOnHover className="[--duration:20s]">
+            {firstRow.map((review) => (
+              <ReviewCard key={review.username} {...review} />
+            ))}
+          </Marquee>
+          <Marquee reverse pauseOnHover className="[--duration:20s]">
+            {secondRow.map((review) => (
+              <ReviewCard key={review.username} {...review} />
+            ))}
+          </Marquee>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white dark:from-background" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white dark:from-background" />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="container mx-auto px-4"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={16209} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Volunteers
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={19} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Countries
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={124} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Partners
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={32} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Awards
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={2123} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Projects
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={5432} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Donors
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={87} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Events
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={456} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Communities
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={12} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Programs
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <NumberTicker value={789} />
+                </CardTitle>
+                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                  Initiatives
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>        </motion.div>
       </section>
       {/* About Section */}
       <section className="py-20 bg-white dark:bg-gray-900">
@@ -477,72 +618,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
-
-      <section className="py-20 bg-white dark:bg-gray-900">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative md:max-w-[1150px] mt-16 mx-auto px-[16px] md:px-0"
-        >
-          <h2 className="text-center font-heading text-3xl font-extrabold leading-[1.1] sm:text-xl md:text-4xl mb-4 dark:text-gray-50">
-            Over 16,000 Volunteers{" "}
-          </h2>
-          <div className="flex flex-col md:flex-row justify-center items-center flex-grow space-y-5 md:space-y-0 md:space-x-5">
-            <Card className="w-full md:flex-1">
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={16000} />
-                </CardTitle>
-                <CardDescription className="whitespace-pre-wrap font-medium tracking-tighter text-black dark:text-white">
-                  Volunteers
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="w-full md:flex-1">
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={19} />
-                </CardTitle>
-                <CardDescription className="whitespace-pre-wrap font-medium tracking-tighter text-black dark:text-white">
-                  Countries
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="w-full md:flex-1">
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={124} />
-                </CardTitle>
-                <CardDescription className="whitespace-pre-wrap font-medium tracking-tighter text-black dark:text-white">
-                  Partners
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="w-full md:flex-1">
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={32} />
-                </CardTitle>
-                <CardDescription className="whitespace-pre-wrap font-medium tracking-tighter text-black dark:text-white">
-                  Awards
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="w-full md:flex-1">
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={2123} />
-                </CardTitle>
-                <CardDescription className="whitespace-pre-wrap font-medium tracking-tighter text-black dark:text-white">
-                  Projects
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </motion.div>
       </section>
 
       <Footer />
