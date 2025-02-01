@@ -488,108 +488,129 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           className="container mx-auto px-4"
         >
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-            <Card>
+          <div className="flex flex-col-reverse md:flex-row gap-6 ">
+            <Card className="md:w-1/6">
+              {" "}
               <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={16209} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Volunteers
+                <CardTitle className="">Achievements</CardTitle>
+                <CardDescription>
+                  Members of Satsankalpa Advocacy have made a lasting global impact with numerous feats.
                 </CardDescription>
               </CardHeader>
+              <CardContent />
+              <CardFooter className="">
+                <Link
+                  href="/signup"
+                  className={cn(buttonVariants({ size: "lg" }))}
+                >
+                  Join Now
+                </Link>
+              </CardFooter>
             </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={19} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Countries
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={124} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Partners
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={32} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Awards
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={2123} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Projects
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={5432} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Donors
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={87} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Events
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={456} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Communities
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={12} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Programs
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <NumberTicker value={789} />
-                </CardTitle>
-                <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
-                  Initiatives
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>        </motion.div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 flex-1">
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={16209} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Volunteers
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={19} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Countries
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={124} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Partners
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={32} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Awards
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={2123} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Projects
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={5432} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Donors
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={87} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Events
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={456} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Communities
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={12} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Programs
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    <NumberTicker value={789} />
+                  </CardTitle>
+                  <CardDescription className="font-medium tracking-tighter text-black dark:text-white">
+                    Initiatives
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
+          </div>{" "}
+        </motion.div>
       </section>
       {/* About Section */}
       <section className="py-20 bg-white dark:bg-gray-900">
