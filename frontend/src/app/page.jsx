@@ -24,6 +24,8 @@ import { Marquee } from "@/components/ui/marquee";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import WorldMap from "@/components/ui/world-map";
+import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { Badge } from "@/components/ui/badge";
 
 const Svg1 = () => (
   <svg
@@ -496,7 +498,8 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="">Achievements</CardTitle>
                 <CardDescription>
-                  Members of Satsankalpa Advocacy have made a lasting global impact with numerous feats.
+                  Members of Satsankalpa Advocacy have made a lasting global
+                  impact with numerous feats.
                 </CardDescription>
               </CardHeader>
               <CardContent />
@@ -612,7 +615,7 @@ export default function Home() {
               </Card>
             </div>
           </div>{" "}
-          <WorldMap
+          {/* <WorldMap
         dots={[
           {
             start: {
@@ -645,7 +648,7 @@ export default function Home() {
             end: { lat: -1.2921, lng: 36.8219 }, // Nairobi
           },
         ]}
-      />
+      /> */}
         </motion.div>
       </section>
       {/* About Section */}
@@ -653,7 +656,13 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1">
-              <h2 className="text-4xl font-bold mb-6 dark:text-gray-50">
+              <div className="w-full aspect-video bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-left font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col">
+                <Badge variant="outline" className="max-w-fit text-sm">
+                  About Us
+                </Badge>
                 About We Are - You Are
               </h2>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
@@ -670,13 +679,62 @@ export default function Home() {
                 Our Story <ArrowRight className="ml-2" />
               </Link>
             </div>
-            <div className="flex-1">
-              <div className="w-full aspect-video bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
-            </div>
           </div>
         </div>
       </section>
 
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <h2 className="text-left font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col">
+            <Badge variant="outline" className="max-w-fit text-sm">
+              Our Values
+            </Badge>
+            Why Join Us
+          </h2>
+          <BentoGrid className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <BentoCard
+              key="community"
+              className="col-span-1 row-span-1"
+              Icon={Users}
+              name="Community"
+              description="Join a global network of passionate individuals."
+              cta="Learn More"
+            />
+            <BentoCard
+              key="global-impact"
+              className="col-span-1 md:col-span-2 row-span-1"
+              Icon={Globe}
+              name="Global Impact"
+              description="Make a lasting difference worldwide."
+              cta="Learn More"
+            />
+            <BentoCard
+              key="support"
+              className="col-span-1 row-span-1"
+              Icon={Heart}
+              name="Support"
+              description="Access resources and support to further our mission."
+              cta="Learn More"
+            />
+            <BentoCard
+              key="empowerment"
+              className="col-span-1 row-span-1"
+              Icon={Zap}
+              name="Empowerment"
+              description="Empower yourself and others to create change."
+              cta="Learn More"
+            />
+            <BentoCard
+              key="recognition"
+              className="col-span-1 row-span-1"
+              Icon={Award}
+              name="Recognition"
+              description="Be recognized for your contributions and achievements."
+              cta="Learn More"
+            />
+          </BentoGrid>
+        </div>
+      </section>
       <Footer />
     </>
   );
