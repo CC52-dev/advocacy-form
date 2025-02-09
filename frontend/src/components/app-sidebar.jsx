@@ -151,39 +151,142 @@ export function AppSidebar({ ...props }) {
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible> */}
-            <Link href="/app">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  tooltip="Home"
-                  isActive={pathname === "/app"}
-                >
-                  <Home />
-                  <span>Home</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </Link>
-            <Link href="/app/applicants">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  tooltip="Applicants"
-                  isActive={pathname === "/app/applicants"}
-                >
-                  <FileUser />
-                  <span>Applicants</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </Link>
-            <Link href="/app/users">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  tooltip="Users"
-                  isActive={pathname === "/app/users"}
-                >
-                  <User2 />
-                  <span>Users</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </Link>{" "}
+            {!type ||
+            type === "" ||
+            (Array.isArray(type) && type.length === 0) ||
+            type === " " ? (
+              <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                
+                {" "}
+                
+              </>
+            ) : type === "Admin" ? (
+              <>
+                <Link href="/app">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Home"
+                      isActive={pathname === "/app"}
+                    >
+                      <Home />
+                      <span>Home</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+                <Link href="/app/applicants">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Applicants"
+                      isActive={pathname === "/app/applicants"}
+                    >
+                      <FileUser />
+                      <span>Applicants</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+                <Link href="/app/users">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Users"
+                      isActive={pathname === "/app/users"}
+                    >
+                      <User2 />
+                      <span>Users</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+              </>
+            ) : (
+              <Link href="/app">
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    tooltip="Home"
+                    isActive={pathname === "/app"}
+                  >
+                    <Home />
+                    <span>Home</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </Link>
+            )}{" "}
           </SidebarMenu>{" "}
         </SidebarGroup>
       </SidebarContent>
@@ -227,22 +330,23 @@ export function AppSidebar({ ...props }) {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage
-                      src={`https://avatar.vercel.sh/${firstname?.[0]}${lastname?.[0]}`}
-                      alt="Avatar"
-                    />
-                    <AvatarFallback className="rounded-lg">
-                      {firstname?.[0] && lastname?.[0]
-                        ? `${firstname[0]}${lastname[0]}`
-                        : "EB"}
-                    </AvatarFallback>                    </Avatar>
+                      <AvatarImage
+                        src={`https://avatar.vercel.sh/${firstname?.[0]}${lastname?.[0]}`}
+                        alt="Avatar"
+                      />
+                      <AvatarFallback className="rounded-lg">
+                        {firstname?.[0] && lastname?.[0]
+                          ? `${firstname[0]}${lastname[0]}`
+                          : "EB"}
+                      </AvatarFallback>{" "}
+                    </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold h-4 w-full ">
-                      <InfoDisplay data={`${firstname} ${lastname}`} />
-                    </span>
-                    <span className="truncate text-xs h-4">
-                      <InfoDisplay data={email} className="w-1/2" />
-                    </span>
+                      <span className="truncate font-semibold h-4 w-full ">
+                        <InfoDisplay data={`${firstname} ${lastname}`} />
+                      </span>
+                      <span className="truncate text-xs h-4">
+                        <InfoDisplay data={email} className="w-1/2" />
+                      </span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
