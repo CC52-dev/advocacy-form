@@ -5,7 +5,7 @@ import { Link } from "next-view-transitions";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Footer from "@/components/footer";
-import { ArrowRight, Users, Globe, Heart, Zap, Award } from "lucide-react";
+import { ArrowRight, Users, Globe, Bolt, Zap, Award } from "lucide-react";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { motion } from "framer-motion";
@@ -699,6 +699,10 @@ export default function Home() {
               name="Community"
               description="Join a global network of passionate individuals."
               cta="Learn More"
+              background={
+              <div className="absolute inset-0 flex justify-center">
+              <Image src={"/assets/community.svg"} layout="" className=" scale-150" objectFit="cover" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
+            </div>}
             />
             <BentoCard
               key="global-impact"
@@ -707,14 +711,25 @@ export default function Home() {
               name="Global Impact"
               description="Make a lasting difference worldwide."
               cta="Learn More"
+              background={
+                <div className="absolute inset-0">
+                  <WorldMap />
+                </div>
+              }
             />
             <BentoCard
-              key="support"
+              key="resources"
               className="col-span-1 row-span-1"
-              Icon={Heart}
-              name="Support"
+              Icon={Bolt}
+              name="Resources"
               description="Access resources and support to further our mission."
               cta="Learn More"
+              background={
+                <div className="absolute inset-0 flex justify-center">
+                  <Image src={"/assets/designer.svg"} layout="" objectFit="cover" className="scale-125" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
+                </div>
+              }
+      
             />
             <BentoCard
               key="empowerment"
@@ -723,6 +738,11 @@ export default function Home() {
               name="Empowerment"
               description="Empower yourself and others to create change."
               cta="Learn More"
+              background={
+                <div className="absolute inset-0 flex justify-center">
+                  <Image src={"/assets/pilot.png"} layout="" objectFit="cover" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
+                </div>
+              }
             />
             <BentoCard
               key="recognition"
@@ -731,6 +751,11 @@ export default function Home() {
               name="Recognition"
               description="Be recognized for your contributions and achievements."
               cta="Learn More"
+              background={
+                <div className="absolute inset-0 flex justify-center">
+                  <Image src={"/assets/recognition.svg"} layout="" objectFit="cover" className="scale-125" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
+                </div>
+              }
             />
           </BentoGrid>
         </div>
