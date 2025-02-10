@@ -67,7 +67,7 @@ export function AppSidebar({ ...props }) {
   const type =
     String(typelowercase)?.charAt(0)?.toUpperCase() +
     String(typelowercase)?.slice(1);
-  const { isMobile } = useSidebar();
+  const { isMobile, open } = useSidebar();
 
   const InfoDisplay = ({ data, className }) => {
     if (
@@ -159,82 +159,81 @@ export function AppSidebar({ ...props }) {
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
                   </SidebarMenuButton>
-                </SidebarMenuItem>
-                
+                </SidebarMenuItem>                
                 {" "}
                 
               </>
