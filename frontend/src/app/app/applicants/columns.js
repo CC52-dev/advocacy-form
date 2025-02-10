@@ -521,7 +521,7 @@ export const columns = [
             })
             queryClient.invalidateQueries({ queryKey: ["applicants"] });
             queryClient.invalidateQueries({ queryKey: ["allUsers"] });
-            // window.location.reload();
+            window.location.reload();
             // toast.error("An error occurred");
           }
         });        return (

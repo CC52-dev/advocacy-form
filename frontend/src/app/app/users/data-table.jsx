@@ -288,9 +288,9 @@ export function DataTableUsers() {
         <Select
           onValueChange={(value) => {
             if (value === "oldest") {
-              table.getColumn("appliedAt").toggleSorting(true);
+              table.getColumn("acceptedAt").toggleSorting(true);
             } else if (value === "newest") {
-              table.getColumn("appliedAt").toggleSorting(false);
+              table.getColumn("acceptedAt").toggleSorting(false);
             }
           }}
           defaultValue="oldest"

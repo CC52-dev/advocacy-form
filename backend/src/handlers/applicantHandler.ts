@@ -61,7 +61,7 @@ export async function approveApplicant(
     console.log({ message: sessionValidationResult.user });
     await db
       .update(usersTable)
-      .set({ type: "user", interest: interests })
+      .set({ type: "user", interest: interests, acceptedAt: new Date() })
       .where(and(eq(usersTable.id, id), eq(usersTable.type, "applicant")));
 
     res.status(200).json({
