@@ -428,34 +428,11 @@ export default function Home() {
       <Nav />
 
       <section className="relative flex min-h-screen min-w-screen items-center justify-center  pb-8 pt-6 md:pb-12 md:pt-10 lg:pb-32  overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          <Svg1 />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.2 }}
-        >
-          <Svg2 />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.4 }}
-        >
-          <Svg3 />
-        </motion.div>
+        <Svg1 />
+        <Svg2 />
+        <Svg3 />
 
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="container relative z-10 flex max-w-7xl flex-col items-center gap-4 text-center px-5"
-        >
+        <div className="container relative z-10 flex max-w-7xl flex-col items-center gap-4 text-center px-5 ">
           {" "}
           <motion.div
             initial={{ scale: 0 }}
@@ -489,12 +466,7 @@ export default function Home() {
             Together, we can further our vision, mission, and activities for a
             better world.
           </TextAnimate>
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="space-x-4"
-          >
+          <div className="space-x-4">
             <Link href="/signup" className={cn(buttonVariants({ size: "lg" }))}>
               Join Now
             </Link>
@@ -504,8 +476,8 @@ export default function Home() {
             >
               Learn More
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       <section className="py-20 bg-white dark:bg-gray-900 overflow-hidden border-t min-h-screen">
@@ -530,8 +502,9 @@ export default function Home() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0}}
-          transition={{ duration: 2 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="container mx-auto px-4"
         >
           <div className="flex flex-col-reverse md:flex-row gap-6 ">
@@ -697,56 +670,31 @@ export default function Home() {
       <section className="py-20 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-12">
-            <motion.div 
-              className="flex-1"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="w-full aspect-video bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
-            </motion.div>
-            <motion.div 
-              className="flex-1"
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <motion.h2 
-                className="text-left font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
+            <div className="flex-1 w-full h-full">
+              <div className="w-full h-full aspect-video bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
+              
+            </div>
+            <div className="md:flex-1">
+              <h2 className="text-left font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col">
                 <Badge variant="outline" className="max-w-fit text-sm">
                   About Us
                 </Badge>
                 About We Are - You Are
-              </motion.h2>
-              <motion.p 
-                className="text-lg text-gray-700 dark:text-gray-300 mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-              >
+              </h2>
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
                 Satsankalpa Advocacy is more than just a membership program.
                 It's a global movement of passionate individuals committed to
                 making a real difference in the world. Our diverse network of
                 supporters brings unique skills, perspectives, and resources to
                 further our mission.
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
+              </p>
+              <Link
+                href="/signup"
+                className={cn(buttonVariants({ size: "lg" }))}
               >
-                <Link
-                  href="/signup"
-                  className={cn(buttonVariants({ size: "lg" }))}
-                >
-                  Our Story <ArrowRight className="ml-2" />
-                </Link>
-              </motion.div>
-            </motion.div>
+                Our Story <ArrowRight className="ml-2" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
