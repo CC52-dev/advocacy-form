@@ -530,9 +530,8 @@ export default function Home() {
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          whileInView={{ opacity: 1, y: 0}}
+          transition={{ duration: 2 }}
           className="container mx-auto px-4"
         >
           <div className="flex flex-col-reverse md:flex-row gap-6 ">
@@ -698,30 +697,56 @@ export default function Home() {
       <section className="py-20 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1">
+            <motion.div 
+              className="flex-1"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <div className="w-full aspect-video bg-gray-200 dark:bg-gray-800 rounded-lg animate-pulse" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-left font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col">
+            </motion.div>
+            <motion.div 
+              className="flex-1"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <motion.h2 
+                className="text-left font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
                 <Badge variant="outline" className="max-w-fit text-sm">
                   About Us
                 </Badge>
                 About We Are - You Are
-              </h2>
-              <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
+              </motion.h2>
+              <motion.p 
+                className="text-lg text-gray-700 dark:text-gray-300 mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
                 Satsankalpa Advocacy is more than just a membership program.
                 It's a global movement of passionate individuals committed to
                 making a real difference in the world. Our diverse network of
                 supporters brings unique skills, perspectives, and resources to
                 further our mission.
-              </p>
-              <Link
-                href="/signup"
-                className={cn(buttonVariants({ size: "lg" }))}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
               >
-                Our Story <ArrowRight className="ml-2" />
-              </Link>
-            </div>
+                <Link
+                  href="/signup"
+                  className={cn(buttonVariants({ size: "lg" }))}
+                >
+                  Our Story <ArrowRight className="ml-2" />
+                </Link>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
