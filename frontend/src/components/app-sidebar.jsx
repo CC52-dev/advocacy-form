@@ -18,6 +18,7 @@ import {
   SquareTerminal,
   ChevronRight,
   Home,
+  CircleHelp,
   FileUser,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -159,83 +160,107 @@ export function AppSidebar({ ...props }) {
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
                     <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && <Skeleton className="h-full w-full rounded-md bg-gray-300" />}
+                    {open && (
+                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    )}
                   </SidebarMenuButton>
-                </SidebarMenuItem>                
-                {" "}
-                
+                </SidebarMenuItem>{" "}
               </>
             ) : type === "Admin" ? (
               <>
@@ -272,19 +297,43 @@ export function AppSidebar({ ...props }) {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
+                <Link href="/app/help">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Help"
+                      isActive={pathname === "/app/help"}
+                    >
+                      <CircleHelp />
+                      <span>Help</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
               </>
             ) : (
-              <Link href="/app">
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    tooltip="Home"
-                    isActive={pathname === "/app"}
-                  >
-                    <Home />
-                    <span>Home</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </Link>
+              <>
+                <Link href="/app">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Home"
+                      isActive={pathname === "/app"}
+                    >
+                      <Home />
+                      <span>Home</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+                <Link href="/app/help">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Help"
+                      isActive={pathname === "/app/help"}
+                    >
+                      <CircleHelp />
+                      <span>Help</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+              </>
             )}{" "}
           </SidebarMenu>{" "}
         </SidebarGroup>
