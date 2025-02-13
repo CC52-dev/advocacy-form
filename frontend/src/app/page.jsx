@@ -823,19 +823,19 @@ export default function Home() {
 
         <div className="relative flex h-[80vh] w-full flex-row items-center justify-center overflow-hidden">
           <div className="hidden md:block">
-            <Marquee reverse pauseOnHover vertical className="[--duration:2s]">
+            <Marquee reverse pauseOnHover vertical className="[--duration:8s]">
               {secondRow.map((review) => (
                 <ReviewCard key={review.username} {...review} />
               ))}
             </Marquee>
           </div>
-          <Marquee pauseOnHover vertical className="[--duration:5s]">
+          <Marquee pauseOnHover vertical className="[--duration:11s]">
             {[...firstRow, ...secondRow].map((review) => (
               <ReviewCard key={review.username} {...review} />
             ))}
           </Marquee>
           <div className="hidden md:block">
-            <Marquee reverse pauseOnHover vertical className="[--duration:3s]">
+            <Marquee reverse pauseOnHover vertical className="[--duration:6s]">
               {secondRow.map((review) => (
                 <ReviewCard key={review.username} {...review} />
               ))}
