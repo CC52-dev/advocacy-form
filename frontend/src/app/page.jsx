@@ -5,9 +5,23 @@ import { Link } from "next-view-transitions";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Footer from "@/components/footer";
-import { ArrowRight, Users, Globe, Bolt, Zap, Award } from "lucide-react";
+import {
+  ArrowRight,
+  Users,
+  Globe,
+  Bolt,
+  Zap,
+  Award,
+  Heart,
+} from "lucide-react";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { TextAnimate } from "@/components/ui/text-animate";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import {
   Card,
@@ -26,6 +40,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import WorldMap from "@/components/ui/world-map";
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import { Badge } from "@/components/ui/badge";
+import GridLayout from "@/components/ui/grid-layout";
 
 const Svg1 = () => (
   <svg
@@ -673,7 +688,7 @@ export default function Home() {
                 further our mission.
               </p>
               <Link
-                href="/about"
+                href="/signup"
                 className={cn(buttonVariants({ size: "lg" }))}
               >
                 Our Story <ArrowRight className="ml-2" />
@@ -683,7 +698,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 bg-white dark:bg-gray-900">
+      <section className="py-20 bg-white dark:bg-gray-900 mb-16">
         <div className="container mx-auto px-4">
           <h2 className="text-left font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col">
             <Badge variant="outline" className="max-w-fit text-sm">
@@ -698,11 +713,22 @@ export default function Home() {
               Icon={Users}
               name="Community"
               description="Join a global network of passionate individuals."
-              cta="Learn More"
+              cta="Get Started"
+              href="/signup"
               background={
-              <div className="absolute inset-0 flex justify-center">
-              <Image src={"/assets/community.svg"} layout="" className=" scale-150" objectFit="cover" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
-            </div>}
+                <div className="absolute inset-0 flex justify-center">
+                  <Image
+                    src={"/assets/community.svg"}
+                    layout=""
+                    className=" scale-150"
+                    objectFit="cover"
+                    width={800}
+                    height={600}
+                    style={{ width: "auto", height: "76%" }}
+                    alt="UserFriendlyImg"
+                  />
+                </div>
+              }
             />
             <BentoCard
               key="global-impact"
@@ -710,7 +736,8 @@ export default function Home() {
               Icon={Globe}
               name="Global Impact"
               description="Make a lasting difference worldwide."
-              cta="Learn More"
+              cta="Get Started"
+              href="/signup"
               background={
                 <div className="absolute inset-0">
                   <WorldMap />
@@ -723,13 +750,22 @@ export default function Home() {
               Icon={Bolt}
               name="Resources"
               description="Access resources and support to further our mission."
-              cta="Learn More"
+              cta="Get Started"
+              href="/signup"
               background={
                 <div className="absolute inset-0 flex justify-center">
-                  <Image src={"/assets/designer.svg"} layout="" objectFit="cover" className="scale-125" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
+                  <Image
+                    src={"/assets/designer.svg"}
+                    layout=""
+                    objectFit="cover"
+                    className="scale-125"
+                    width={800}
+                    height={600}
+                    style={{ width: "auto", height: "76%" }}
+                    alt="UserFriendlyImg"
+                  />
                 </div>
               }
-      
             />
             <BentoCard
               key="empowerment"
@@ -737,10 +773,19 @@ export default function Home() {
               Icon={Zap}
               name="Empowerment"
               description="Empower yourself and others to create change."
-              cta="Learn More"
+              cta="Get Started"
+              href="/signup"
               background={
                 <div className="absolute inset-0 flex justify-center">
-                  <Image src={"/assets/pilot.png"} layout="" objectFit="cover" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
+                  <Image
+                    src={"/assets/pilot.png"}
+                    layout=""
+                    objectFit="cover"
+                    width={800}
+                    height={600}
+                    style={{ width: "auto", height: "76%" }}
+                    alt="UserFriendlyImg"
+                  />
                 </div>
               }
             />
@@ -750,16 +795,193 @@ export default function Home() {
               Icon={Award}
               name="Recognition"
               description="Be recognized for your contributions and achievements."
-              cta="Learn More"
+              cta="Get Started"
+              href="/signup"
               background={
                 <div className="absolute inset-0 flex justify-center">
-                  <Image src={"/assets/recognition.svg"} layout="" objectFit="cover" className="scale-125" width={800} height={600} style={{ width: "auto", height: "76%" }} alt="UserFriendlyImg"/>
+                  <Image
+                    src={"/assets/recognition.svg"}
+                    layout=""
+                    objectFit="cover"
+                    className="scale-125"
+                    width={800}
+                    height={600}
+                    style={{ width: "auto", height: "76%" }}
+                    alt="UserFriendlyImg"
+                  />
                 </div>
               }
             />
           </BentoGrid>
         </div>
       </section>
+      <section className="h-screen bg-white dark:bg-gray-900 overflow-hidden ">
+        <h2 className="text-center font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50">
+          Wall of Love{" "}
+        </h2>
+
+        <div className="relative flex h-[80vh] w-full flex-row items-center justify-center overflow-hidden">
+          <div className="hidden md:block">
+            <Marquee reverse pauseOnHover vertical className="[--duration:2s]">
+              {secondRow.map((review) => (
+                <ReviewCard key={review.username} {...review} />
+              ))}
+            </Marquee>
+          </div>
+          <Marquee pauseOnHover vertical className="[--duration:5s]">
+            {[...firstRow, ...secondRow].map((review) => (
+              <ReviewCard key={review.username} {...review} />
+            ))}
+          </Marquee>
+          <div className="hidden md:block">
+            <Marquee reverse pauseOnHover vertical className="[--duration:3s]">
+              {secondRow.map((review) => (
+                <ReviewCard key={review.username} {...review} />
+              ))}
+            </Marquee>
+          </div>
+
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-2/4 bg-gradient-to-b from-background" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/4 bg-gradient-to-t from-background" />
+        </div>
+      </section>
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <h2 className="text-center font-heading text-4xl font-extrabold leading-[1.1] mb-12 dark:text-gray-50 flex flex-col items-center">
+            <Badge variant="outline" className="max-w-fit text-sm">
+              FAQ
+            </Badge>
+            Frequently Asked Questions
+            <p className="text-lg text-gray-700 dark:text-gray-300 font-normal">
+              Have Questions? We've Got Answers
+            </p>
+          </h2>
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full max-w-3xl mx-auto"
+          >
+            <AccordionItem value="item-1">
+              <AccordionTrigger>What is Satsankalpa Advocacy?</AccordionTrigger>
+              <AccordionContent>
+                Satsankalpa Advocacy is more than just a membership program.
+                It's a global movement of passionate individuals committed to
+                making a real difference in the world. Our diverse network of
+                supporters brings unique skills, perspectives, and resources to
+                further our mission.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>How can I get involved?</AccordionTrigger>
+              <AccordionContent>
+                You can get involved by joining our community, participating in
+                our initiatives, or supporting our cause. Visit our membership
+                page to learn more about how you can contribute.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>
+                What impact does Satsankalpa make?
+              </AccordionTrigger>
+              <AccordionContent>
+                Our organization works on various initiatives that create
+                meaningful change in communities worldwide. Through our network
+                of supporters, we implement programs that address critical
+                social and environmental challenges.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4">
+              <AccordionTrigger>How can I learn more?</AccordionTrigger>
+              <AccordionContent>
+                To learn more about our mission and impact, you can visit our
+                about page or contact us directly. We're always happy to share
+                more information about our work and how you can be part of our
+                journey.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-5">
+              <AccordionTrigger>
+                What are your main areas of focus?
+              </AccordionTrigger>
+              <AccordionContent>
+                We focus on several key areas including environmental
+                sustainability, social justice, education, and community
+                development. Our programs are designed to create lasting
+                positive change in these areas.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-6">
+              <AccordionTrigger>What resources do you offer?</AccordionTrigger>
+              <AccordionContent>
+                We provide a wide range of resources including educational
+                materials, training programs, community support networks, and
+                advocacy tools. These resources are designed to empower our
+                members and help them make a meaningful impact in their
+                communities.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-7">
+              <AccordionTrigger>How is my donation used?</AccordionTrigger>
+              <AccordionContent>
+                Your donations are carefully allocated to maximize impact. The
+                majority goes directly to our programs and initiatives, with a
+                small portion supporting administrative costs to ensure
+                efficient operations and sustainable growth.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-8">
+              <AccordionTrigger>
+                Can organizations partner with Satsankalpa?
+              </AccordionTrigger>
+              <AccordionContent>
+                Absolutely! We welcome partnerships with organizations that
+                share our values and vision. Whether through joint initiatives,
+                sponsorships, or collaborative projects, we're always open to
+                exploring meaningful partnerships.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>{" "}
+        </div>
+      </section>
+      <section className="py-20 bg-white dark:bg-gray-900 px-4 container mx-auto">
+        <GridLayout
+          crosshairs={{
+            topLeft: true,
+            bottomRight: true,
+          }}
+          lineVariant="center"
+          className="min-h-[350px] p-8"
+        >
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-4xl font-medium tracking-tight">
+                Ready to Volunteer?{" "}
+                <span className="text-muted-foreground">
+                  Start with signing up.
+                </span>
+              </h2>
+              <p className="text-muted-foreground mt-4 text-xl">
+                Signup and make a{" "}
+                <span className="text-blue-500">Global</span>{" "}
+                <span className="text-purple-500">Impact</span> today.
+              </p>
+            </div>
+            <div className="flex gap-4 absolute bottom-10 ">
+              <Link href="/signup" className="inline-block">
+                <Button variant="default" size="lg">
+                  Signup
+                </Button>
+              </Link>
+              <Link href="/signup" className="inline-block">
+                <Button variant="outline" size="lg">
+                  Contact Us
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </GridLayout>
+      </section>
+
       <Footer />
     </>
   );
