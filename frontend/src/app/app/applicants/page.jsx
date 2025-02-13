@@ -28,17 +28,15 @@ export default function Page() {
   // const [count, setCount] = useState(0);
   const queryClient = useQueryClient();
 
-
-
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0  ">
         <div className="flex items-start justify-start flex-col">
-          <h1 className="lg:text-5xl md:text-4xl sm:text-3xl text-3xl font-bold text-left py-4 md:py-6 lg:py-8">
-            <code>Applicant Management</code>
-          </h1>
+          <code className="text-2xl md:text-5xl lg:text-6xl font-bold text-left py-4 md:py-6 lg:py-8">
+            Applicant Management
+          </code>
 
-                    <DataTableApplicants  />
+          <DataTableApplicants />
 
           <Button
             className="mt-4 mx-auto md:mx-0"
