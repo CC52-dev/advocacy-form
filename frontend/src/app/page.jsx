@@ -428,11 +428,34 @@ export default function Home() {
       <Nav />
 
       <section className="relative flex min-h-screen min-w-screen items-center justify-center  pb-8 pt-6 md:pb-12 md:pt-10 lg:pb-32  overflow-hidden">
-        <Svg1 />
-        <Svg2 />
-        <Svg3 />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <Svg1 />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+        >
+          <Svg2 />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.4 }}
+        >
+          <Svg3 />
+        </motion.div>
 
-        <div className="container relative z-10 flex max-w-7xl flex-col items-center gap-4 text-center px-5 ">
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="container relative z-10 flex max-w-7xl flex-col items-center gap-4 text-center px-5"
+        >
           {" "}
           <motion.div
             initial={{ scale: 0 }}
@@ -466,7 +489,12 @@ export default function Home() {
             Together, we can further our vision, mission, and activities for a
             better world.
           </TextAnimate>
-          <div className="space-x-4">
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="space-x-4"
+          >
             <Link href="/signup" className={cn(buttonVariants({ size: "lg" }))}>
               Join Now
             </Link>
@@ -476,8 +504,8 @@ export default function Home() {
             >
               Learn More
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       <section className="py-20 bg-white dark:bg-gray-900 overflow-hidden border-t min-h-screen">
