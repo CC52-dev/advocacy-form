@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node dev.js",
+    "build": "node build.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tanstack/query-sync-storage-persister": "^5.64.2",
-    "@tanstack/react-query-persist-client": "^5.64.2",
-    "concurrency": "^0.1.4"
+    "concurrently": "^9.1.2"
   }
 }
