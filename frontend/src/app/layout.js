@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ReactQueryProvider from "@/lib/ReactQueryProvider";
 import { ViewTransitions } from "next-view-transitions";
 import { ThemeProvider } from "next-themes";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,11 +52,14 @@ export default function RootLayout({ children }) {
               </form>           */}
         {/* <ThemeProvider attribute="class" defaultTheme="dark"> */}
         <ReactQueryProvider>
+          {" "}
+          <ViewTransitions>
             {" "}
-            <ViewTransitions>{children}</ViewTransitions>
-          </ReactQueryProvider>
+            <TooltipProvider>{children} </TooltipProvider>
+          </ViewTransitions>
+        </ReactQueryProvider>
 
-          <Toaster />
+        <Toaster />
         {/* </ThemeProvider> */}
       </body>
     </html>

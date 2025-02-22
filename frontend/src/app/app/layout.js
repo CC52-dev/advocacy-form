@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
-import ReactQueryProvider from "@/lib/ReactQueryProvider";
-import { ViewTransitions } from "next-view-transitions";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import {
@@ -20,7 +18,6 @@ import {
 } from "@/components/ui/sidebar";
 import { cookies, headers } from "next/headers";
 import AppHeader from "@/components/app-header";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import AuthStoreProvider from "@/lib/authMiddleware";
 
 export default async function Layout({ children }) {
@@ -28,9 +25,6 @@ export default async function Layout({ children }) {
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
 
   return (
-    <ReactQueryProvider>
-      <ViewTransitions>
-        <TooltipProvider>
           <AuthStoreProvider>
             <SidebarProvider defaultOpen={defaultOpen}>
               <AppSidebar />
@@ -45,11 +39,6 @@ export default async function Layout({ children }) {
               </SidebarInset>
             </SidebarProvider>
           </AuthStoreProvider>
-        </TooltipProvider>
 
-        <Toaster />
-      </ViewTransitions>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </ReactQueryProvider>
   );
 }
