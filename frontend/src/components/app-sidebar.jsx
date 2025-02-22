@@ -181,133 +181,6 @@ export function AppSidebar({ ...props }) {
                     )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
-                    {open && (
-                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
-                    )}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>{" "}
-              </>
-            ) : type === "Admin" ? (
-              <>
-                <Link href="/app">
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      tooltip="Home"
-                      isActive={pathname === "/app"}
-                    >
-                      <Home />
-                      <span>Home</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </Link>
-                <Link href="/app/applicants">
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      tooltip="Applicants"
-                      isActive={pathname === "/app/applicants"}
-                    >
-                      <FileUser />
-                      <span>Applicants</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </Link>
-                <Link href="/app/users">
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      tooltip="Users"
-                      isActive={pathname === "/app/users"}
-                    >
-                      <User2 />
-                      <span>Users</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </Link>
-                <Link href="/app/help">
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      tooltip="Help"
-                      isActive={pathname === "/app/help"}
-                    >
-                      <CircleHelp />
-                      <span>Help</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </Link>
               </>
             ) : (
               <>
@@ -322,6 +195,44 @@ export function AppSidebar({ ...props }) {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
+                {type === "Admin" ? (
+                  <>
+                    <Link href="/app/applicants">
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          tooltip="Applicants"
+                          isActive={pathname === "/app/applicants"}
+                        >
+                          <FileUser />
+                          <span>Applicants</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </Link>
+                    <Link href="/app/users">
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          tooltip="Users"
+                          isActive={pathname === "/app/users"}
+                        >
+                          <User2 />
+                          <span>Users</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </Link>
+                  </>
+                ) : (
+                  <Link href="/app/chat">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Chat"
+                        isActive={pathname === "/app/chat"}
+                      >
+                        {/* <MessageSquare /> */}
+                        <span>Chat</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
                 <Link href="/app/help">
                   <SidebarMenuItem>
                     <SidebarMenuButton
@@ -334,7 +245,7 @@ export function AppSidebar({ ...props }) {
                   </SidebarMenuItem>
                 </Link>
               </>
-            )}{" "}
+            )}
           </SidebarMenu>{" "}
         </SidebarGroup>
       </SidebarContent>
