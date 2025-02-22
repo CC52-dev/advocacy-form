@@ -51,19 +51,17 @@ export function AuthStoreProvider({ children }) {
   }, [data, setUserData]);
 
   useEffect(() => {
-    if (!isLoading && isLoggedIn) {
-      console.log(router.pathname);
-      if (
-        type !== "admin" &&
-        (pathname === "/app/applicants" || pathname === "/app/users")
-      ) {
-        router.push("/app/");
+    const adminProtectedRoutes = ['/app/applicants', '/app/users'];
+    const isAppRoute = pathname.startsWith('/app');
+
+    if (!isLoading) {
+      if (!isLoggedIn && isAppRoute) {
+        router.push('/login');
+      } else if (isLoggedIn && type !== 'admin' && adminProtectedRoutes.includes(pathname)) {
+        router.push('/app/');
       }
-    } else if (!isLoading && !isLoggedIn) {
-      router.push("/login");
     }
   }, [isLoading, isLoggedIn, router, type, pathname]);
-
   if (isLoading) {
     return children; // Or return a loading spinner component
   }
