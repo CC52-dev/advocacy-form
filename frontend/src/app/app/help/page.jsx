@@ -45,6 +45,17 @@ export default function Page() {
                                                     </div>
                                                     <span className="text-sm text-muted-foreground">{article.category}</span>
                                                 </div>
+                                                {article.image && (
+                                                    <div className="mt-4">
+                                                        <Image
+                                                            src={article.image}
+                                                            alt={article.title}
+                                                            width={400}
+                                                            height={400}
+                                                            className="rounded-lg object-cover aspect-video object-scale-down"
+                                                        />
+                                                    </div>
+                                                )}
                                             </CardHeader>
                                             <CardContent>
                                                 <div className="text-sm text-muted-foreground">
