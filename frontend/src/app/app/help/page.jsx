@@ -5,41 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-
-const articles = [
-    {
-        id: 1,
-        title: "How to get started",
-        description: "Learn the basics of our platform",
-        category: "Getting Started",
-        date: "2024-01-15",
-        link: "/app/help/1"
-    },
-    {
-        id: 2,
-        title: "Account settings",
-        description: "Manage your account preferences",
-        category: "Account",
-        date: "2024-01-14",
-        link: "/app/help/2"
-    },
-    {
-        id: 3,   
-        title: "Payment methods",
-        description: "Learn about payment options",
-        category: "Billing",
-        date: "2024-01-13",
-        link: "/app/help/3"
-    },
-    {
-        id: 4,
-        title: "Security features",
-        description: "Keep your account secure",
-        category: "Security",
-        date: "2024-01-12",
-        link: "/app/help/4"
-    }
-];
+import articles from "@/data/articles.json";
 
 export default function Page() {
     const [searchTerm, setSearchTerm] = useState("");
