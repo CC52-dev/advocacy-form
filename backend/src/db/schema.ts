@@ -66,12 +66,15 @@ export const helpTable = pgTable("help", {
   title: varchar("title").notNull(),
   description: text("description").notNull(),
   category: varchar("category").notNull(),
-  date: timestamp("date").notNull(),
+  lastModified: timestamp("last_modified").notNull(),
   authorId: varchar("authorId").notNull().references(() => usersTable.id),
   image: varchar("image").notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
-});export type Otp = typeof otpTable.$inferSelect;
+});
+
+export type Help = typeof helpTable.$inferSelect;
+export type Otp = typeof otpTable.$inferSelect;
 export type User = typeof usersTable.$inferInsert;
 export type Session = typeof sessionTable.$inferInsert;
 // {

@@ -22,10 +22,12 @@ import formRouter from './routes/form.js';
 import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
 import applicantRouter from './routes/applicant.js';
+import helpRouter from './routes/help.js';
 app.use('/api/form', formRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/applicants', applicantRouter);
+app.use('/api/help', helpRouter);
 
 
 app.use(notFound);
