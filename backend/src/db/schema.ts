@@ -61,8 +61,17 @@ export const otpTable = pgTable("otp", {
   otp: varchar("otp", { length: 6 }).notNull().default(sql`floor(random() * (999999 - 100000 + 1) + 100000)::text`)
   .notNull(),
   createdAt: timestamp("created_at").defaultNow(),});
-
-export type Otp = typeof otpTable.$inferSelect;
+export const helpTable = pgTable("help", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  category: varchar("category").notNull(),
+  date: timestamp("date").notNull(),
+  authorId: varchar("authorId").notNull().references(() => usersTable.id),
+  image: varchar("image").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});export type Otp = typeof otpTable.$inferSelect;
 export type User = typeof usersTable.$inferInsert;
 export type Session = typeof sessionTable.$inferInsert;
 // {

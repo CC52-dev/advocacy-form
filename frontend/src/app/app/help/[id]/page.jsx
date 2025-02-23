@@ -43,17 +43,21 @@ export default function Page({ params }) {
         <div className="animate-pulse space-y-8">
           {/* Back button skeleton */}
           <div className="h-9 w-24 bg-gray-200 rounded" />
-          
+
           {/* Header section skeleton */}
           <div className="space-y-4">
             <div className="h-5 w-40 bg-gray-200 rounded" /> {/* Date */}
             <div className="h-12 w-3/4 bg-gray-200 rounded" /> {/* Title */}
-            <div className="h-8 w-2/3 bg-gray-200 rounded" /> {/* Description */}
+            <div className="h-8 w-2/3 bg-gray-200 rounded" />{" "}
+            {/* Description */}
             <div className="flex items-center space-x-2">
-              <div className="h-10 w-10 bg-gray-200 rounded-full" /> {/* Avatar */}
+              <div className="h-10 w-10 bg-gray-200 rounded-full" />{" "}
+              {/* Avatar */}
               <div className="space-y-2">
-                <div className="h-4 w-32 bg-gray-200 rounded" /> {/* Author name */}
-                <div className="h-4 w-40 bg-gray-200 rounded" /> {/* Author email */}
+                <div className="h-4 w-32 bg-gray-200 rounded" />{" "}
+                {/* Author name */}
+                <div className="h-4 w-40 bg-gray-200 rounded" />{" "}
+                {/* Author email */}
               </div>
             </div>
           </div>
@@ -69,16 +73,15 @@ export default function Page({ params }) {
               <div className="h-4 w-full bg-gray-200 rounded" />
               <div className="h-4 w-3/4 bg-gray-200 rounded" />
             </div>
-
             <div className="space-y-3">
-              <div className="h-6 w-1/2 bg-gray-200 rounded" /> {/* Subheading */}
+              <div className="h-6 w-1/2 bg-gray-200 rounded" />{" "}
+              {/* Subheading */}
               <div className="h-4 w-full bg-gray-200 rounded" />
               <div className="h-4 w-full bg-gray-200 rounded" />
               <div className="h-4 w-4/5 bg-gray-200 rounded" />
             </div>
-
-            <div className="h-[200px] w-full bg-gray-200 rounded-lg" /> {/* Image placeholder */}
-
+            <div className="h-[200px] w-full bg-gray-200 rounded-lg" />{" "}
+            {/* Image placeholder */}
             <div className="space-y-3">
               <div className="h-4 w-full bg-gray-200 rounded" />
               <div className="h-4 w-full bg-gray-200 rounded" />
@@ -97,6 +100,7 @@ export default function Page({ params }) {
   const date = article?.date;
   const image = article?.image;
   const author = article?.author;
+  const category = article?.category;
   return (
     <div className="container max-w-3xl px-6 py-6 lg:py-12 space-y-8">
       {/* Post Header */}
@@ -107,8 +111,10 @@ export default function Page({ params }) {
             Back
           </Link>
         </Button>
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground flex flex-col">
           Published on {format(new Date(date), "MMMM d, yyyy")}
+          {""}
+          <span> {category}</span>
         </div>
         <h1 className="text-4xl font-bold">{title}</h1>
         <p className="text-xl text-muted-foreground">{description}</p>
