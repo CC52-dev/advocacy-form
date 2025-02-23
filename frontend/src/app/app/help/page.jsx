@@ -52,7 +52,7 @@ export default function Page() {
                                                             alt={article.title}
                                                             width={400}
                                                             height={400}
-                                                            className="rounded-lg object-cover aspect-video object-scale-down"
+                                                            className="rounded-lg aspect-video object-scale-down"
                                                         />
                                                     </div>
                                                 )}
