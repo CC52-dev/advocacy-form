@@ -4,7 +4,9 @@
   "description": "",
   "scripts": {
     "dev": "node dev.js",
-    "build": "node build.js"
+    "build": "node build.js",
+    "start": "node start.js",
+    "runbuild": "node runbuild.js"
   },
   "author": "",
   "license": "ISC",
