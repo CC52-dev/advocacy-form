@@ -160,7 +160,7 @@ export async function logout(token: string, res: Response) {
       });
       return;
     }
-    await invalidateSession(token);
+    await invalidateSession(sessionValidationResult.session.id);
     res.status(200).json({
       message: "Logged out successfully",
     });
