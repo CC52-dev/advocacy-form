@@ -61,7 +61,7 @@ export async function getAllUsers(token: string, res: Response) {
 }
 
 
-async function logout (token: string, res: Response) {
+export async function logout(token: string, res: Response) {
   try {
     const sessionValidationResult: SessionValidationResult = await validateSessionToken(token);
     if (!sessionValidationResult.session || !sessionValidationResult.user) {
