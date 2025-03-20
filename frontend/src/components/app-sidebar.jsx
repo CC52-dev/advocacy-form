@@ -221,17 +221,18 @@ export function AppSidebar({ ...props }) {
                     </Link>
                   </>
                 ) : (
-                  <Link href="/app/chat">
+                  <>
+                  {/* <Link href="/app/chat">
                     <SidebarMenuItem>
                       <SidebarMenuButton
                         tooltip="Chat"
                         isActive={pathname === "/app/chat"}
                       >
-                        {/* <MessageSquare /> */}
                         <span>Chat</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  </Link>
+                  </Link> */}
+                    </>
                 )}
                 <Link href="/app/help">
                   <SidebarMenuItem>
