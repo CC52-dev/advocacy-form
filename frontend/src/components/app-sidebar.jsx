@@ -59,8 +59,6 @@ import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
-import Logout from "./logout";
-import { Button } from "./ui/button";
 export function AppSidebar({ ...props }) {
   const pathname = usePathname();
   const firstname = useAuthStore((state) => state.firstname);
@@ -222,11 +220,19 @@ export function AppSidebar({ ...props }) {
                       </SidebarMenuItem>
                     </Link>
                   </>
-                ) : type === "User" ? (
-                  <></>
-                ) : type === "Applicant" ? (
-                  <></>
-                ) : null}
+                ) : (
+                  <Link href="/app/chat">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Chat"
+                        isActive={pathname === "/app/chat"}
+                      >
+                        {/* <MessageSquare /> */}
+                        <span>Chat</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
                 <Link href="/app/help">
                   <SidebarMenuItem>
                     <SidebarMenuButton
@@ -306,7 +312,7 @@ export function AppSidebar({ ...props }) {
 
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem disabled>
+                  <DropdownMenuItem>
                     <Settings />
                     Settings
                   </DropdownMenuItem>

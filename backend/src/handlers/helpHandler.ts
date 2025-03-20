@@ -34,7 +34,6 @@ export async function getAllUsers(token: string, res: Response) {
     if (
       !sessionValidationResult.session ||
       !sessionValidationResult.user ||
-      // biome-ignore lint/complexity/useLiteralKeys: <explanation>
       sessionValidationResult.user["type"] !== "admin"
     ) {
       res.status(400).json({ message: "Token is Invalid Or Expired" });
