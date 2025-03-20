@@ -64,6 +64,7 @@ const otpSchema = z.object({
 
 export default function LoginPage() {
     const isLogggedIn = useAuthStore((state) => state.isLoggedIn);
+    const setIsLoggedIn = useAuthStore((state) => state.setUserData);
     const router = useRouter();
     useEffect(() => {
       if (isLogggedIn) {
@@ -146,6 +147,7 @@ export default function LoginPage() {
         duration: 10000,
       });
       setTimeout(() => {
+        setIsLoggedIn({isLoggedIn: true});
         router.push("/app");
       }, 1000);
     } catch (error) {
