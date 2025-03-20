@@ -2,7 +2,7 @@ import express from "express";
 import type { Response, Request, NextFunction } from "express";
 const router = express.Router();
 import "dotenv/config";
-import { getUser, getAllUsers, logout } from "../handlers/userHandler.js";
+import { getUser, getAllUsers } from "../handlers/userHandler.js";
 
 router.post("/getUser", async (req: Request, res: Response) => {
   const token = req.headers.cookie?.split('session_token=')[1]?.split(';')[0];
@@ -15,9 +15,5 @@ router.post("/getAllUsers", async (req: Request, res: Response) => {
   await getAllUsers(token, res);
 })
 
-router.post("/logout", async (req: Request, res: Response) => {
-  const token = req.headers.cookie?.split('session_token=')[1]?.split(';')[0];
-  await logout(token, res);
-})
 
 export default router;
