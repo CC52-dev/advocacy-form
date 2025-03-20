@@ -4,7 +4,7 @@ const router = express.Router();
 import { z } from "zod";
 import db from "../db/db.js";
 import { eq } from "drizzle-orm";
-import { authenticate, verifyOTP, resendOTP } from "../handlers/authHandler.js";
+import { authenticate, verifyOTP, resendOTP, logout } from "../handlers/authHandler.js";
 import "dotenv/config";
 
 
@@ -24,5 +24,11 @@ router.post("/verify/otp/resend/:email", async (req: Request, res: Response) => 
   const email: string = req.params.email;
   await resendOTP(email, res);
 });
+
+router.post("/logout", async (req: Request, res: Response) => {
+  const token = req.headers.cookie?.split('session_token=')[1]?.split(';')[0];
+  await logout(token, res);
+})
+
 
 export default router;
