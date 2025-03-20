@@ -59,3 +59,24 @@ export async function getAllUsers(token: string, res: Response) {
     console.error(error);
   }
 }
+
+
+async function logout (token: string, res: Response) {
+  try {
+    const sessionValidationResult: SessionValidationResult = await validateSessionToken(token);
+    if (!sessionValidationResult.session || !sessionValidationResult.user) {
+      res.status(200).json({
+        message: "Token is Invalid Or Expired",
+      });
+      return;
+    }
+    await invalidateSession(token);
+    res.status(200).json({
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "An error occurred",
+    });
+  }
+}
