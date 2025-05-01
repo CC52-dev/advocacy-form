@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import api from "@/lib/axios";
 import { useAuthStore } from "@/stores/authStore"; // Assuming you have an auth store
 import { usePathname } from "next/navigation";
 
@@ -14,7 +14,7 @@ export function AuthStoreProvider({ children }) {
   const { data, isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const response = await axios.post("/api/user/getuser");
+      const response = await api.post("/api/user/getuser");
       return response.data;
     },
     staleTime: 60000,
@@ -47,23 +47,33 @@ export function AuthStoreProvider({ children }) {
         },
         false
       );
+      // Clear any invalid tokens
+      localStorage.removeItem('token');
     }
   }, [data, setUserData]);
 
   useEffect(() => {
     const adminProtectedRoutes = ['/app/applicants', '/app/users'];
     const isAppRoute = pathname.startsWith('/app');
+    const isAuthRoute = pathname === '/login' || pathname === '/signup';
 
     if (!isLoading) {
       if (!isLoggedIn && isAppRoute) {
-        router.push('/login');
+        router.replace('/login');
       } else if (isLoggedIn && type !== 'admin' && adminProtectedRoutes.includes(pathname)) {
-        router.push('/app/');
+        router.replace('/app/');
+      } else if (isLoggedIn && isAuthRoute) {
+        router.replace('/app/');
       }
     }
   }, [isLoading, isLoggedIn, router, type, pathname]);
+
   if (isLoading) {
-    return children; // Or return a loading spinner component
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   return children;

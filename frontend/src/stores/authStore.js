@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import api from "@/lib/axios";
 
 // const fetchUser = () => {
 //   const { data, isLoading, isFetching } = useQuery({
@@ -52,6 +52,24 @@ export const useAuthStore = create(
           zip: userData?.message?.zip,
           applied_at: userData?.message?.applied_at,
           accepted_at: userData?.message?.accepted_at,
+        });
+      },
+      logout: () => {
+        set({
+          isLoggedIn: false,
+          firstname: "",
+          lastname: "",
+          email: "",
+          id: "",
+          type: "",
+          interest: [],
+          location: [],
+          addr: "",
+          phone: "",
+          city: "",
+          zip: "",
+          applied_at: "",
+          accepted_at: "",
         });
       },
     }),

@@ -96,7 +96,7 @@ import {
   AlertDialogTrigger,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import axios from "axios";
+import api from "@/lib/axios";
 import { useToast } from "@/hooks/use-toast";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -463,7 +463,7 @@ export const columns = [
         const [isOpenAlert, setIsOpenAlert] = React.useState(false);
         const approve = useMutation({
           mutationFn: async (applicantId) => {
-            const response = await axios.post(
+            const response = await api.post(
               `/api/applicants/approveApplicant/${applicantId}`,
               {
                 interests: intrest,
@@ -480,8 +480,6 @@ export const columns = [
               variant: "default",
               duration: 3000,
             })
-       
-            // toast.success("Applicant approved successfully");
           },
           onError: () => {
             toast({
@@ -491,12 +489,11 @@ export const columns = [
               duration: 3000,
             })
             window.location.reload();
-            // toast.error("An error occurred");
           }
         });
         const deny = useMutation({
           mutationFn: async (applicantId) => {
-            const response = await axios.post(
+            const response = await api.post(
               `/api/applicants/denyApplicant/${applicantId}`
             );
             return response.data;
@@ -510,7 +507,6 @@ export const columns = [
               variant: "default",
               duration: 3000,
             })
-            // toast.success("Applicant denied successfully");
           },
           onError: () => {
             toast({
@@ -522,7 +518,6 @@ export const columns = [
             queryClient.invalidateQueries({ queryKey: ["applicants"] });
             queryClient.invalidateQueries({ queryKey: ["allUsers"] });
             window.location.reload();
-            // toast.error("An error occurred");
           }
         });        return (
           <div className="flex  gap-2 min-w-fit ">

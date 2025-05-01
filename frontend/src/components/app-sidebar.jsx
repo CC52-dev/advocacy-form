@@ -55,12 +55,18 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { User2 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
+import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
+import api from "@/lib/axios";
+
 export function AppSidebar({ ...props }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
+  const logout = useAuthStore((state) => state.logout);
   const firstname = useAuthStore((state) => state.firstname);
   const lastname = useAuthStore((state) => state.lastname);
   const email = useAuthStore((state) => state.email);
@@ -69,6 +75,26 @@ export function AppSidebar({ ...props }) {
     String(typelowercase)?.charAt(0)?.toUpperCase() +
     String(typelowercase)?.slice(1);
   const { isMobile, open } = useSidebar();
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/api/auth/logout");
+      logout();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+        duration: 3000,
+      });
+      router.push("/login");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to logout. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
 
   const InfoDisplay = ({ data, className }) => {
     if (
@@ -268,7 +294,7 @@ export function AppSidebar({ ...props }) {
                       {firstname?.[0] && lastname?.[0]
                         ? `${firstname[0]}${lastname[0]}`
                         : "EB"}
-                    </AvatarFallback>
+                    </AvatarFallback>{" "}
                   </Avatar>{" "}
                   <div className="grid flex-1 text-left text-sm leading-tight gap-1">
                     <span className="truncate font-semibold h-4 w-full ">
@@ -319,9 +345,14 @@ export function AppSidebar({ ...props }) {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <LogOut />
-                  Log out
+                <DropdownMenuItem asChild>
+                  <button 
+                    onClick={handleLogout} 
+                    className="w-full flex items-center cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

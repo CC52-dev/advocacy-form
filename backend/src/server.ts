@@ -3,11 +3,19 @@ import { notFound } from "./middleware/not-found.js";
 import { error } from "./middleware/error.js";
 import { request } from "./middleware/request.js";
 import helmet from "helmet";
+import cors from "cors";
 
 const app = express();
 app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use(helmet());
+
+// Configure CORS
+app.use(cors({
+  origin: 'http://localhost:3000', // Frontend URL
+  credentials: true, // Allow cookies
+}));
+
 app.use(request);
 
 app.get('/', (req, res) => {

@@ -5,6 +5,7 @@ import { z } from "zod";
 import db from "../db/db.js";
 import { eq } from "drizzle-orm";
 import { authenticate, verifyOTP, resendOTP } from "../handlers/authHandler.js";
+import { validateSessionToken, invalidateSession } from "../lib/session.js";
 import "dotenv/config";
 
 
@@ -23,6 +24,21 @@ router.post("/verify/otp", async (req: Request, res: Response) => {
 router.post("/verify/otp/resend/:email", async (req: Request, res: Response) => {
   const email: string = req.params.email;
   await resendOTP(email, res);
+});
+
+router.post("/logout", async (req: Request, res: Response) => {
+  const token = req.headers.cookie?.split('session_token=')[1]?.split(';')[0];
+  if (!token) {
+    res.status(200).json({ message: "No session to logout" });
+    return;
+  }
+
+  const sessionValidationResult = await validateSessionToken(token);
+  if (sessionValidationResult.session) {
+    await invalidateSession(sessionValidationResult.session.id);
+  }
+
+  res.clearCookie("session_token").status(200).json({ message: "Logged out successfully" });
 });
 
 export default router;

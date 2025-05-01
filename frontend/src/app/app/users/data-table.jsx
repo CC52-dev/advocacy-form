@@ -76,7 +76,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-import axios from "axios";
+import api from "@/lib/axios";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -93,7 +93,7 @@ export function DataTableUsers() {
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["allUsers"],
     queryFn: async () => {
-      const response = await axios.post("/api/user/getAllUsers");
+      const response = await api.post("/api/user/getAllUsers");
       return response.data;
     },
     staleTime: 60000,

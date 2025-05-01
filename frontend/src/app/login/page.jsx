@@ -47,7 +47,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "next-view-transitions";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+import api from "@/lib/axios";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
 
@@ -96,7 +96,7 @@ export default function LoginPage() {
 
   const mutate = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post(`/api/auth/login/${data.email}`);
+      const response = await api.post(`/api/auth/login/${data.email}`);
       return response.data;
     },
   });
@@ -133,7 +133,7 @@ export default function LoginPage() {
 
   const otpMutate = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post('/api/auth/verify/otp', { email: form.getValues().email, otp: data.otp });
+      const response = await api.post('/api/auth/verify/otp', { email: form.getValues().email, otp: data.otp });
       return response.data;
     },
   });
@@ -144,26 +144,34 @@ export default function LoginPage() {
       toast({
         title: "Login successful",
         description: response.message,
-        duration: 10000,
+        duration: 3000,
       });
-      setTimeout(() => {
-        setIsLoggedIn({isLoggedIn: true});
-        router.push("/app");
-      }, 1000);
+      
+      // Set user data first
+      setIsLoggedIn({
+        isLoggedIn: true,
+        ...response.user
+      });
+      
+      // Use a small delay to ensure state is updated
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Then navigate
+      router.push("/app");
     } catch (error) {
       if (error.response?.status === 400) {
         otpForm.setError("otp", { message: error.response.data.message });
         toast({
           title: "Invalid OTP",
           description: error.response.data.message,
-          duration: 10000,
+          duration: 3000,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Error",
           description: error.message,
-          duration: 10000,
+          duration: 3000,
           variant: "destructive",
         });
       }
@@ -172,7 +180,7 @@ export default function LoginPage() {
 
   const resendOtpMutate = useMutation({
     mutationFn: async () => {
-      const response = await axios.post(`/api/auth/verify/otp/resend/${form.getValues().email}`);
+      const response = await api.post(`/api/auth/verify/otp/resend/${form.getValues().email}`);
       return response.data;
     },
   });

@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import LocationSelector from "@/components/ui/location-input";
 import { MultiSelect } from "@/components/ui/multi-select";
-import axios from "axios";
+import api from "@/lib/axios";
 import {
   Drawer,
   DrawerContent,
@@ -51,7 +51,7 @@ function MyForm() {
       .superRefine(async (val, ctx) => {
         if (val && step === 1) {
           try {
-          const response = await axios.post(
+          const response = await api.post(
             `/api/form/checkemail/${String(val)}`
           );
         
@@ -88,7 +88,7 @@ function MyForm() {
   });
   const mutate = useMutation({
     mutationFn: async (data) => {
-      const response = await axios.post("/api/form/new", data);
+      const response = await api.post("/api/form/new", data);
       return response.data;
     },
     onError: (error) => {
