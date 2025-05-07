@@ -6,7 +6,8 @@
     "dev": "node dev.js",
     "build": "node build.js",
     "start": "node start.js",
-    "runbuild": "node runbuild.js"
+    "runbuild": "node runbuild.js",
+    "db:studio": "cd backend && npx drizzle-kit studio"
   },
   "author": "",
   "license": "ISC",

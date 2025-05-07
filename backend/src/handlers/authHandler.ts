@@ -47,15 +47,21 @@ export async function authenticate(email: string, res: Response) {
         return;
       }
     }
-    const newOtp: Otp[] = await db
+    const newOtp = await db
       .insert(otpTable)
       .values({
         email: user[0].email,
         userId: user[0].id,
-      })
-      .returning();
+      });
+    
+    const insertedOtp = await db
+      .select()
+      .from(otpTable)
+      .where(eq(otpTable.email, user[0].email))
+      .limit(1);
+      
     res.status(200).json({
-      message: newOtp[0].otp,
+      message: insertedOtp[0].otp,
     });
   } catch (error) {
     res.status(400).json({
@@ -133,16 +139,21 @@ export async function resendOTP(email: string, res: Response) {
     await db.delete(otpTable).where(eq(otpTable.email, email));
 
     // Create new OTP
-    const newOtp: Otp[] = await db
+    const newOtp = await db
       .insert(otpTable)
       .values({
         email: user[0].email,
         userId: user[0].id,
-      })
-      .returning();
-
+      });
+    
+    const insertedOtp = await db
+      .select()
+      .from(otpTable)
+      .where(eq(otpTable.email, user[0].email))
+      .limit(1);
+      
     res.status(200).json({
-      message: newOtp[0].otp,
+      message: insertedOtp[0].otp,
     });
   } catch (error) {
     res.status(400).json({

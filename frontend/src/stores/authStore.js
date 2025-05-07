@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import Cookies from 'js-cookie';
 
 // const fetchUser = () => {
 //   const { data, isLoading, isFetching } = useQuery({
@@ -37,24 +38,33 @@ export const useAuthStore = create(
       applied_at: "",
       accepted_at: "",
       setUserData: (userData, isLoggedIn) => {
+        if (!userData?.message) {
+          console.error('Invalid user data structure:', userData);
+          return;
+        }
+        
+        const user = userData.message;
         set({
           isLoggedIn: isLoggedIn,
-          firstname: userData?.message?.firstname,
-          lastname: userData?.message?.lastname,
-          email: userData?.message?.email,
-          id: userData?.message?.id,
-          type: userData?.message?.type,
-          interest: userData?.message?.interest,
-          location: userData?.message?.location,
-          addr: userData?.message?.addr,
-          phone: userData?.message?.phone,
-          city: userData?.message?.city,
-          zip: userData?.message?.zip,
-          applied_at: userData?.message?.applied_at,
-          accepted_at: userData?.message?.accepted_at,
+          firstname: user.firstname || "",
+          lastname: user.lastname || "",
+          email: user.email || "",
+          id: user.id || "",
+          type: user.type || "",
+          interest: user.interest || [],
+          location: user.location || [],
+          addr: user.addr || "",
+          phone: user.phone || "",
+          city: user.city || "",
+          zip: user.zip || "",
+          applied_at: user.applied_at || "",
+          accepted_at: user.accepted_at || "",
         });
       },
-      logout: () => {
+      logout: async() => {
+        // Remove cookie using js-cookie
+        Cookies.remove('session_token');
+        
         set({
           isLoggedIn: false,
           firstname: "",
@@ -75,6 +85,23 @@ export const useAuthStore = create(
     }),
     {
       name: "auth-storage",
+      // Only persist these fields
+      partialize: (state) => ({
+          isLoggedIn: state.isLoggedIn,
+          firstname: state.firstname,
+          lastname: state.lastname,
+          email: state.email,
+          id: state.id,
+          type: state.type,
+          interest: state.interest,
+          location: state.location,
+          addr: state.addr,
+          phone: state.phone,
+          city: state.city,
+          zip: state.zip,
+          applied_at: state.applied_at,
+          accepted_at: state.accepted_at,
+      }),
     }
   )
 );

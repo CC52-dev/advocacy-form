@@ -21,7 +21,7 @@ import React, { useState } from "react"
 
 const MultiSelect = ({
   options,
-  selected,
+  selected = [],
   onChange,
   placeholder = "Select items...",
   className,
@@ -29,15 +29,17 @@ const MultiSelect = ({
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
+  const selectedArray = Array.isArray(selected) ? selected : []
+
   const filteredOptions = options.filter(option =>
     option.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleSelect = (option) => {
-    if (selected.includes(option)) {
-      onChange(selected.filter(item => item !== option))
+    if (selectedArray.includes(option)) {
+      onChange(selectedArray.filter(item => item !== option))
     } else {
-      onChange([...selected, option])
+      onChange([...selectedArray, option])
     }
   }
 
@@ -57,8 +59,8 @@ const MultiSelect = ({
           className={cn("w-full justify-between", className)}
         >
           <div className="flex gap-1 flex-wrap">
-            {selected.length === 0 && <span className="text-muted-foreground">{placeholder}</span>}
-            {selected.slice(0, maxVisibleBadges).map((item) => (
+            {selectedArray.length === 0 && <span className="text-muted-foreground">{placeholder}</span>}
+            {selectedArray.slice(0, maxVisibleBadges).map((item) => (
               <Badge
                 variant="secondary"
                 key={item}
@@ -72,9 +74,9 @@ const MultiSelect = ({
                 <X className="ml-1 h-3 w-3 hover:text-destructive" />
               </Badge>
             ))}
-            {selected.length > maxVisibleBadges && (
+            {selectedArray.length > maxVisibleBadges && (
               <Badge variant="secondary" className="mr-1 mb-1">
-                +{selected.length - maxVisibleBadges} more
+                +{selectedArray.length - maxVisibleBadges} more
               </Badge>
             )}
           </div>
@@ -97,13 +99,10 @@ const MultiSelect = ({
                 className="flex items-center gap-2 m-2"
               >
                 <Checkbox
-                  checked={selected.includes(option)}
+                  checked={selectedArray.includes(option)}
                   onCheckedChange={() => handleSelect(option)}
                 />
                 {option}
-                {/* {selected.includes(option) && (
-                  <Check className="ml-auto h-4 w-4" />
-                )} */}
               </CommandItem>
             ))}
           </CommandList>

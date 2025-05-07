@@ -1,5 +1,5 @@
 "use client";
-import { Lock } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,7 +16,7 @@ import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import Nav from "@/components/nav";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -63,6 +63,7 @@ const otpSchema = z.object({
 });
 
 export default function LoginPage() {
+    const queryClient = useQueryClient();
     const isLogggedIn = useAuthStore((state) => state.isLoggedIn);
     const setIsLoggedIn = useAuthStore((state) => state.setUserData);
     const router = useRouter();
@@ -147,16 +148,20 @@ export default function LoginPage() {
         duration: 3000,
       });
       
-      // Set user data first
-      setIsLoggedIn({
-        isLoggedIn: true,
-        ...response.user
-      });
+
       
-      // Use a small delay to ensure state is updated
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Fetch user details after successful login
+      const userResponse = await api.post("/api/user/getuser");
+      console.log("Login Page Activating");
+      console.log(userResponse.data.message);
       
-      // Then navigate
+      // Set user data in the store with the correct structure
+      setIsLoggedIn(userResponse.data, true);
+      
+      // Force a small delay to ensure store is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Navigate to app
       router.push("/app");
     } catch (error) {
       if (error.response?.status === 400) {
@@ -259,7 +264,14 @@ export default function LoginPage() {
                       className="w-full"
                       disabled={mutate.isLoading}
                     >
-                      {mutate.isLoading ? "Loading..." : "Login"}
+                      {mutate.isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        "Login"
+                      )}
                     </Button>
                     <div className="text-center text-sm">
                       Don't have an account?{" "}
@@ -319,8 +331,19 @@ export default function LoginPage() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      Submit
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={otpMutate.isLoading}
+                    >
+                      {otpMutate.isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        "Submit"
+                      )}
                     </Button>
                   </form>
                 </Form>

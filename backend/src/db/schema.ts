@@ -1,76 +1,64 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
-  pgTable,
+  mysqlTable,
   varchar,
-  uuid,
+  char,
   timestamp,
   text,
-  PgArray,
-  pgEnum
-} from "drizzle-orm/pg-core";
+  mysqlEnum,
+  json
+} from "drizzle-orm/mysql-core";
 
-export const userEnum = pgEnum("type", ["admin", "user", "applicant", "disabled"]);
+export const userEnum = mysqlEnum("type", ["admin", "user", "applicant", "disabled"]);
 
-export const usersTable = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  firstname: varchar("firstname"),
-  lastname: varchar("lastname"),
-  phone: varchar("phone"),
-  email: varchar("email"),
-  location: text("location")
-    .array()
-    .notNull()
-    .default(sql`ARRAY[]::text[]`),
-  addr: varchar("addr"),
-  city: varchar("city"),
-  zip: varchar("zip"),
-  interest: text("interest")
-    .array()
-    .notNull()
-    .default(sql`ARRAY[]::text[]`),
-  over16: boolean("over16")
-    .notNull()
-    .default(false),
-  appliedAt: timestamp("applied_at").defaultNow(),
-  acceptedAt: timestamp("accepted_at")
-  .default(sql`NULL`),
-  type: userEnum().default("applicant"),
+export const usersTable = mysqlTable("users", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  firstname: varchar("firstname", { length: 255 }),
+  lastname: varchar("lastname", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 255 }),
+  location: json("location").notNull().default(sql`JSON_ARRAY()`),
+  addr: varchar("addr", { length: 255 }),
+  city: varchar("city", { length: 255 }),
+  zip: varchar("zip", { length: 10 }),
+  interest: json("interest").notNull().default(sql`JSON_ARRAY()`),
+  over16: boolean("over16").notNull().default(false),
+  appliedAt: timestamp("applied_at").default(sql`CURRENT_TIMESTAMP`),
+  acceptedAt: timestamp("accepted_at").default(sql`NULL`),
+  type: userEnum.default("applicant"),
 });
-export const sessionTable = pgTable("session", {
-  id: text("id").primaryKey(),
-  userId: uuid("user_id")
+
+export const sessionTable = mysqlTable("session", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: char("user_id", { length: 36 })
     .notNull()
     .references(() => usersTable.id),
-  expiresAt: timestamp("expires_at", {
-    withTimezone: true,
-    mode: "date",
-  }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
 });
 
+export const otpTable = mysqlTable("otp", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  email: varchar("email", { length: 255 })
+    .notNull()
+    .references(() => usersTable.email),
+  userId: char("user_id", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id),
+  otp: varchar("otp", { length: 6 }).notNull().default(sql`FLOOR(RAND() * (999999 - 100000 + 1) + 100000)`),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
 
-
-export const otpTable = pgTable("otp", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  email: varchar("email")
-  .notNull()
-  .references(() => usersTable.email),
-  userId: uuid("user_id")
-  .notNull()
-  .references(() => usersTable.id),
-  otp: varchar("otp", { length: 6 }).notNull().default(sql`floor(random() * (999999 - 100000 + 1) + 100000)::text`)
-  .notNull(),
-  createdAt: timestamp("created_at").defaultNow(),});
-export const helpTable = pgTable("help", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  title: varchar("title").notNull(),
+export const helpTable = mysqlTable("help", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  title: varchar("title", { length: 255 }).notNull(),
   description: text("description").notNull(),
-  category: varchar("category").notNull(),
+  category: varchar("category", { length: 255 }).notNull(),
   lastModified: timestamp("last_modified").notNull(),
-  authorId: varchar("authorId").notNull().references(() => usersTable.id),
-  image: varchar("image").notNull(),
+  authorId: varchar("authorId", { length: 36 }).notNull().references(() => usersTable.id),
+  image: varchar("image", { length: 255 }).notNull(),
   content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 export type Help = typeof helpTable.$inferSelect;

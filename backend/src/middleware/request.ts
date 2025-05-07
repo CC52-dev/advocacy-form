@@ -12,6 +12,6 @@ export function request(req: Request, res: Response, next: NextFunction) {
         body: req.body as unknown,
         response: {
           status: res.statusCode,
-        }
+        } 
       });
     next();}

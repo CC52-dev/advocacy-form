@@ -345,13 +345,13 @@ export function AppSidebar({ ...props }) {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
+                <DropdownMenuItem>
                   <button 
                     onClick={handleLogout} 
                     className="w-full flex items-center cursor-pointer"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    Log out
                   </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>

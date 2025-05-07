@@ -265,10 +265,21 @@ export const columns = [
     accessorKey: "location",
     header: "Location",
     cell: ({ row }) => {
-      const isTruncated = row.original.location.join(", ").length > 20;
+      let location;
+      try {
+        location = typeof row.original.location === 'string' 
+          ? JSON.parse(row.original.location) 
+          : row.original.location;
+      } catch (e) {
+        location = [row.original.location || ''];
+      }
+      location = Array.isArray(location) ? location : [location || ''];
+      
+      const locationString = location.join(", ");
+      const isTruncated = locationString.length > 20;
       const content = isTruncated
-        ? `${row.original.location.join(", ").substring(0, 20)}...`
-        : row.original.location.join(", ");
+        ? `${locationString.substring(0, 20)}...`
+        : locationString;
       return isTruncated ? (
         <>
           <div className="hidden md:block">
@@ -276,7 +287,7 @@ export const columns = [
               <TooltipTrigger>{content}</TooltipTrigger>
               <TooltipContent>
                 <div className="whitespace-pre-line">
-                  {row.original.location.join("\n")}
+                  {location.join("\n")}
                 </div>
               </TooltipContent>
             </Tooltip>
@@ -286,7 +297,7 @@ export const columns = [
               <DropdownMenuTrigger>{content}</DropdownMenuTrigger>
               <DropdownMenuContent>
                 <div className="whitespace-pre-line">
-                  {row.original.location.join("\n")}
+                  {location.join("\n")}
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -398,18 +409,21 @@ export const columns = [
     header: "Interests",
     filterFn: "interestFilter",
     cell: ({ row }) => {
+      const interest = Array.isArray(row.original.interest) ? row.original.interest : JSON.parse(row.original.interest || '[]');
       return (
         <div className="flex whitespace-nowrap">
           <div className="hidden md:block">
             <Tooltip>
               <TooltipTrigger>
                 <Badge variant="primary">
-                  {row.original.interest.length} Interests
+                  {interest.length} Interests
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="whitespace-pre-line">
-                  {row.original.interest.join("\n")}
+                  {interest.map((item, i) => (
+                    <div key={i}>{item}</div>
+                  ))}
                 </div>
               </TooltipContent>
             </Tooltip>
@@ -418,12 +432,14 @@ export const columns = [
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Badge variant="primary">
-                  {row.original.interest.length} Interests
+                  {interest.length} Interests
                 </Badge>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <div className="whitespace-pre-line">
-                  {row.original.interest.join("\n")}
+                  {interest.map((item, i) => (
+                    <div key={i}>{item}</div>
+                  ))}
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>

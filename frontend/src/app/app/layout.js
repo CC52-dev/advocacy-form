@@ -25,8 +25,8 @@ export default async function Layout({ children }) {
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
 
   return (
+    <SidebarProvider defaultOpen={defaultOpen}>
     <AuthStoreProvider>
-      <SidebarProvider defaultOpen={defaultOpen}>
         <div className="flex h-screen overflow-hidden">
           <AppSidebar />
           <SidebarInset>
@@ -38,7 +38,8 @@ export default async function Layout({ children }) {
             </div>
           </SidebarInset>
         </div>
-      </SidebarProvider>
     </AuthStoreProvider>
+    </SidebarProvider>
+
   );
 }

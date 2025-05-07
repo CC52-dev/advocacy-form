@@ -102,8 +102,10 @@ export function DataTableApplicants() {
     refetchOnMount: true,
   });
 
+  const tableData = data?.message || [];
+
   const table = useReactTable({
-    data: data?.message,
+    data: tableData,
     columns,
     defaultColumn: {
       minSize: 60,
@@ -139,7 +141,7 @@ export function DataTableApplicants() {
   const options = [
     "Thapo Kshetra revival (Bharat)",
     "Vedic Worship (USA)",
-    "Virtual Knowledge Sessions",
+    "Virtual Knowledge Sessions", 
     "Research (USA)",
     "Print and Publications (USA)",
     "Bharatheeyatha Annual Event (USA)",
@@ -153,14 +155,44 @@ export function DataTableApplicants() {
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(filterValue.toLowerCase())
   );
-  if (error) {
-    window.location.reload();
-    return <div>Error: {error.message}</div>;
+
+  if (isLoading || isFetching) {
+    return (
+      <div className="w-full">
+        <div className="flex flex-col md:flex-row md:items-center items-start py-4 space-y-4 md:space-y-0 md:space-x-4">
+          <Skeleton className="h-10 w-full md:max-w-sm" />
+          <Skeleton className="h-10 w-[140px]" />
+          <Skeleton className="h-10 w-[140px]" />
+        </div>
+        <div className="rounded-md border">
+          <div className="p-4">
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, rowIndex) => (
+                <div key={`skeleton-row-${rowIndex}`} className="flex space-x-4">
+                  {columns.map((column, colIndex) => (
+                    <Skeleton 
+                      key={`skeleton-col-${rowIndex}-${colIndex}`} 
+                      className="h-6 w-[100px]" 
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  if (isLoading && isFetching) {
-    return <Skeleton className="h-[70vh] w-full bg-gray-300" />;
+  if (error) {
+    return (
+      <div className="w-full p-4 text-center text-destructive">
+        Error loading data. Please try refreshing the page.
+      </div>
+    );
   }
+
+
 
   return (
     <div className="w-full">
@@ -258,28 +290,13 @@ export function DataTableApplicants() {
                                 : "opacity-50 [&_svg]:invisible"
                             )}
                           >
-                            <Check className="h-4 w-4" />
+                            <Check className={cn("h-4 w-4")} />
                           </div>
-                          <span>{option}</span>
+                          {option}
                         </CommandItem>
                       );
                     })}
                   </CommandGroup>
-                  {selectedValues.size > 0 && (
-                    <>
-                      <CommandSeparator />
-                      <CommandGroup>
-                        <CommandItem
-                          onSelect={() =>
-                            interestColumn?.setFilterValue(undefined)
-                          }
-                          className="justify-center text-center"
-                        >
-                          Clear filters
-                        </CommandItem>
-                      </CommandGroup>
-                    </>
-                  )}
                 </CommandList>
               </Command>
             </PopoverContent>
@@ -346,21 +363,36 @@ export function DataTableApplicants() {
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader className="">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead 
+                    key={header.id}
+                    className={cn(
+                      "whitespace-nowrap",
+                      header.id === "select" && "w-[50px]",
+                      header.id === "firstname" && "w-[150px]",
+                      header.id === "lastname" && "w-[150px]",
+                      header.id === "email" && "w-[250px]",
+                      header.id === "phone" && "w-[150px]",
+                      header.id === "location" && "w-[200px]",
+                      header.id === "addr" && "w-[200px]",
+                      header.id === "city" && "w-[150px]",
+                      header.id === "zip" && "w-[100px]",
+                      header.id === "interest" && "w-[200px]",
+                      header.id === "appliedAt" && "w-[180px]",
+                      header.id === "approve/deny" && "w-[150px]"
+                    )}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -373,10 +405,7 @@ export function DataTableApplicants() {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>

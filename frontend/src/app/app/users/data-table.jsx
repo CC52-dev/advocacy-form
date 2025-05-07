@@ -123,7 +123,6 @@ export function DataTableUsers() {
       columnVisibility,
       rowSelection,
     },
-
     filterFns: {
       interestFilter: (row, columnId, filterValues) => {
         if (!filterValues?.length) return true;
@@ -140,7 +139,7 @@ export function DataTableUsers() {
     "Thapo Kshetra revival (Bharat)",
     "Vedic Worship (USA)",
     "Virtual Knowledge Sessions",
-    "Research (USA)",
+    "Research (USA)", 
     "Print and Publications (USA)",
     "Bharatheeyatha Annual Event (USA)",
     "Content Management (Global Shared Services)",
@@ -153,13 +152,36 @@ export function DataTableUsers() {
   const filteredOptions = options.filter((option) =>
     option.toLowerCase().includes(filterValue.toLowerCase())
   );
+
   if (error) {
     window.location.reload();
     return <div>Error: {error.message}</div>;
   }
 
   if (isLoading && isFetching) {
-    return <Skeleton className="h-[70vh] w-full bg-gray-300" />;
+    return (<div className="w-full">
+    <div className="flex flex-col md:flex-row md:items-center items-start py-4 space-y-4 md:space-y-0 md:space-x-4">
+      <Skeleton className="h-10 w-full md:max-w-sm" />
+      <Skeleton className="h-10 w-[140px]" />
+      <Skeleton className="h-10 w-[140px]" />
+    </div>
+    <div className="rounded-md border">
+      <div className="p-4">
+        <div className="space-y-4">
+          {Array.from({ length: 5 }).map((_, rowIndex) => (
+            <div key={`skeleton-row-${rowIndex}`} className="flex space-x-4">
+              {columns.map((column, colIndex) => (
+                <Skeleton 
+                  key={`skeleton-col-${rowIndex}-${colIndex}`} 
+                  className="h-6 w-[100px]" 
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>);
   }
 
   return (
@@ -346,12 +368,12 @@ export function DataTableUsers() {
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader className="">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="">
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="">
+                    <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -373,10 +395,7 @@ export function DataTableUsers() {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
