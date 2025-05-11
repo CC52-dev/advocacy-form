@@ -43,7 +43,6 @@
     "dotted-map": "^2.2.3",
     "framer-motion": "^11.15.0",
     "input-otp": "^1.4.2",
-    "js-cookie": "^3.0.5",
     "lucide-react": "^0.469.0",
     "motion": "^12.0.6",
     "next": "^15.1.5",
