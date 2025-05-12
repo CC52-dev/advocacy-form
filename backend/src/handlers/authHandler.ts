@@ -103,10 +103,14 @@ export async function verifyOTP(
       res
         .cookie("session_token", token, {
           expires: expiresAt,
+          secure: true,
+          sameSite: 'none',
+          httpOnly: true
         })
         .status(200)
         .json({
           message: "OTP verified",
+          token: token,
         });
       console.log({ message: token });
       return;
