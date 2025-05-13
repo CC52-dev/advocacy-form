@@ -22,14 +22,14 @@ export default function Nav({ activeItem = "home" }) {
           <Image
             src="https://satsankalpa.org/wp-content/uploads/2025/01/cropped-SatSankalpa_Logo_retina_0523.png"
             alt="Satsankalpa Logo"
-            width={40}
-            height={40}
-            className="rounded-full"
+            width={80}
+            height={80}
+            className="rounded-full md:w-20 md:h-20 w-10 h-10"
           />
         </div>
 
         <div className="flex-1 text-center">
-          <span className="font-bold text-lg">Satsankalpa Foundation Inc</span>
+          <span className="font-bold text-lg md:text-4xl">Satsankalpa Foundation Inc</span>
         </div>
 
         <div className="hidden md:flex items-center gap-8">
