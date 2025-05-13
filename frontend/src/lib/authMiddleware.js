@@ -52,7 +52,7 @@ export function AuthStoreProvider({ children }) {
           false
         );
         if (pathname.startsWith('/app')) {
-          return null;
+          router.replace('/login');
         }
       }
     }
@@ -66,7 +66,7 @@ export function AuthStoreProvider({ children }) {
       const isAuthRoute = pathname === '/login' || pathname === '/signup';
 
       if (!isLoggedIn && isAppRoute) {
-        return null;
+        router.replace('/login');
       } else if (isLoggedIn && type !== 'admin' && adminProtectedRoutes.includes(pathname)) {
         router.replace('/app/');
       } else if (isLoggedIn && isAuthRoute) {
@@ -85,6 +85,7 @@ export function AuthStoreProvider({ children }) {
   }
 
   if (!isLoggedIn && pathname.startsWith('/app')) {
+    router.replace('/login');
     return null;
   }
 

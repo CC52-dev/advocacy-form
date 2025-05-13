@@ -61,6 +61,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
+import Image from "next/image";
 
 export function AppSidebar({ ...props }) {
   const pathname = usePathname();
@@ -119,9 +120,14 @@ export function AppSidebar({ ...props }) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <GalleryVerticalEnd className="size-4" />
-              </div>
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-secondary text-sidebar-primary-foreground">
+              <Image
+            src="https://satsankalpa.org/wp-content/uploads/2025/01/cropped-SatSankalpa_Logo_retina_0523.png"
+            alt="Satsankalpa Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />              </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
                   Satsankalpa Advocacy
