@@ -527,7 +527,6 @@ export default function Signup() {
   }, [isLogggedIn, router]);
   return (
     <>
-      <Nav activeItem="signup" />
       <div className="min-h-[100vh] flex flex-col md:flex-row flex-1 w-full mx-auto">
         <Card className="md:w-1/2 bg-gray-100 p-4 sm:p-6 md:p-8 m-3 md:mx-8 lg:mx-20 md:my-20 mb-0 mt-20 flex flex-col items-center justify-center">
           <h2 className="text-2xl font-bold mb-4">
@@ -583,7 +582,6 @@ export default function Signup() {
           <MyForm />
         </div>
       </div>
-      <Footer />
     </>
   );
 }
