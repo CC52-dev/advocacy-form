@@ -580,26 +580,7 @@ export default function Signup() {
           </div>
         </Card>
         <div className="md:w-1/2 p-4 sm:p-6 md:p-8 my-auto md:h-auto">
-          <>
-            <div className="hidden md:block">
-              <MyForm />
-            </div>
-            <div className="md:hidden">
-              <Drawer>
-                <DrawerTrigger asChild>
-                  <Button className="w-full bg-primary text-white">
-                    Open Registration Form
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent>
-                  <DrawerTitle />
-                  <div className="p-4 max-h-[90vh] overflow-y-auto">
-                    <MyForm />
-                  </div>
-                </DrawerContent>
-              </Drawer>
-            </div>
-          </>
+          <MyForm />
         </div>
       </div>
       <Footer />
