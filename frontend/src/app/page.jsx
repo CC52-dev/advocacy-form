@@ -526,62 +526,10 @@ export default function Signup() {
     }
   }, [isLogggedIn, router]);
   return (
-    <>
-      <div className="min-h-[100vh] flex flex-col md:flex-row flex-1 w-full mx-auto">
-        <Card className="md:w-1/2 bg-gray-100 p-4 sm:p-6 md:p-8 m-3 md:mx-8 lg:mx-20 md:my-20 mb-0 mt-20 flex flex-col items-center justify-center md:block hidden">
-          <h2 className="text-2xl font-bold mb-4">
-            Satsankalpa Advocacy Membership
-          </h2>
-          <div className="text-gray-600 space-y-4">
-            <p>Satsankalpa Foundation is based in USA and Bharat.</p>
-            <p>
-              'Satsankalpa Foundation Inc' is a 501(C)(3) non-profit
-              organization in USA with a primary mission to positively impact
-              peace and progress in humanity by reviving ancient Sanathana
-              culture.
-            </p>
-            <p>
-              'Sri Sivananda Satsankalpa Foundation' is a 80G non-profit
-              organization in Bharat focused on revival of Thapo Kshetras and
-              other activities
-            </p>
-            <p>
-              Advocacy membership program's objective is to build a strong
-              network of global supporters to further both the Foundations'
-              vision, mission and activities.
-            </p>
-            <p>
-              If you would like to become a member, please provide your details
-              in the form below by indicating your areas of interest. Membership
-              is free but one should be 16 years of age and above. Your personal
-              details will be kept confidential.
-            </p>
-            <p>If you are already a member, you don't need to apply again.</p>
-            <p>For any questions please email: engage@satsankalpa.org</p>
-            <p>
-              USA:{" "}
-              <a
-                href="https://satsankalpa.org/"
-                className="text-blue-600 hover:underline"
-              >
-                https://satsankalpa.org/
-              </a>
-            </p>
-            <p>
-              India:{" "}
-              <a
-                href="https://satsankalpa.in"
-                className="text-blue-600 hover:underline"
-              >
-                https://satsankalpa.in
-              </a>
-            </p>
-          </div>
-        </Card>
-        <div className="md:w-1/2 p-4 sm:p-6 md:p-8 my-auto md:h-auto">
-          <MyForm />
-        </div>
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="w-full max-w-2xl px-4">
+        <MyForm />
       </div>
-    </>
+    </div>
   );
 }
