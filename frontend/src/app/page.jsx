@@ -186,7 +186,7 @@ function MyForm() {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="space-y-8 py-10 text-left">
+        <form onSubmit={handleSubmit} className="space-y-8 text-left">
           {step === 1 && (
             <>
               <FormField
