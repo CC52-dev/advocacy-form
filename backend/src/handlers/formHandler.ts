@@ -24,7 +24,7 @@ const formSchema = z.object({
   location: z.array(z.string()).min(2, "Both country and state are required"),
   addr: z.string().min(1, "Street address is required"),
   city: z.string().min(1, "City is required"),
-  zip: z.string().regex(/^\d{5}$/, "ZIP code must be 5 digits"),
+  zip: z.string().min(1, "ZIP code is required").max(10, "ZIP code must be 10 characters or less"),
   interest: z.array(z.string()).min(1, "Please select at least one interest"),
   over16: z.boolean().refine((val) => val === true, {
     message: "You must be over 16 years old",
