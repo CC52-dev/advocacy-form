@@ -6,6 +6,7 @@ import type { User } from "../db/schema.js";
 import { validateSessionToken, invalidateSession } from "../lib/session.js";
 import type { SessionValidationResult } from "../lib/session.js";
 import type { Response } from "express";
+import { emailService } from "../lib/emailService.js";
 
 export async function getAllApplicants(token: string, res: Response) {
   try {
@@ -59,10 +60,29 @@ export async function approveApplicant(
       return;
     }
     console.log({ message: sessionValidationResult.user });
+
+    // Get applicant details before updating
+    const applicant = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, id))
+      .limit(1);
+
+    if (!applicant[0]) {
+      res.status(400).json({ message: "Applicant not found" });
+      return;
+    }
+
     await db
       .update(usersTable)
       .set({ type: "user", interest: interests, acceptedAt: new Date() })
       .where(and(eq(usersTable.id, id), eq(usersTable.type, "applicant")));
+
+    // Send approval email
+    await emailService.sendApprovalEmail(
+      applicant[0].email,
+      `${applicant[0].firstname} ${applicant[0].lastname}`
+    );
 
     res.status(200).json({
       message: "success",
@@ -87,10 +107,29 @@ export async function denyApplicant(token: string, id: string, res: Response) {
       return;
     }
     console.log({ message: sessionValidationResult.user });
+
+    // Get applicant details before updating
+    const applicant = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, id))
+      .limit(1);
+
+    if (!applicant[0]) {
+      res.status(400).json({ message: "Applicant not found" });
+      return;
+    }
+
     await db
       .update(usersTable)
       .set({ type: "disabled" })
       .where(and(eq(usersTable.id, id), eq(usersTable.type, "applicant")));
+
+    // Send rejection email
+    await emailService.sendRejectionEmail(
+      applicant[0].email,
+      `${applicant[0].firstname} ${applicant[0].lastname}`
+    );
 
     res.status(200).json({
       message: "success",

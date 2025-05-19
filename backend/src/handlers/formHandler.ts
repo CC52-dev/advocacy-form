@@ -2,6 +2,7 @@ import { z } from "zod";
 import db from "../db/db.js";
 import { usersTable } from "../db/schema.js";
 import { checkEmail } from "../lib/checkEmail.js";
+import { emailService } from "../lib/emailService.js";
 
 const formSchema = z.object({
   firstname: z.string().min(1, "First name is required"),
@@ -37,8 +38,19 @@ export async function handleNewForm(formdata: object) {
     return { result: parseResult.error.issues };
   }
 
-  await db.insert(usersTable).values(formdata);
-  return { result: true };
+  try {
+    // Insert the form data
+    await db.insert(usersTable).values(formdata);
+
+    // Send welcome email
+    const { email, firstname, lastname } = formdata as { email: string; firstname: string; lastname: string };
+    await emailService.sendSignupEmail(email, `${firstname} ${lastname}`);
+
+    return { result: true };
+  } catch (error) {
+    console.error('Error handling form submission:', error);
+    return { result: false, error: 'Failed to process form submission' };
+  }
 }
 // const router = express.Router();
 

@@ -15,6 +15,7 @@ import {
 } from "../lib/session.js";
 import type { SessionValidationResult } from "../lib/session.js";
 import type { Response } from "express";
+import { emailService } from "../lib/emailService.js";
 
 export async function authenticate(email: string, res: Response) {
   try {
@@ -41,8 +42,9 @@ export async function authenticate(email: string, res: Response) {
       if (minutesDifference > 30) {
         await db.delete(otpTable).where(eq(otpTable.id, otp[0].id));
       } else {
+        await emailService.sendOTPEmail(email, otp[0].otp);
         res.status(200).json({
-          message: otp[0].otp,
+          message: "OTP sent to email",
         });
         return;
       }
@@ -59,9 +61,10 @@ export async function authenticate(email: string, res: Response) {
       .from(otpTable)
       .where(eq(otpTable.email, user[0].email))
       .limit(1);
-      
+    
+    await emailService.sendOTPEmail(email, insertedOtp[0].otp);
     res.status(200).json({
-      message: insertedOtp[0].otp,
+      message: "OTP sent to email",
     });
   } catch (error) {
     res.status(400).json({
@@ -155,9 +158,10 @@ export async function resendOTP(email: string, res: Response) {
       .from(otpTable)
       .where(eq(otpTable.email, user[0].email))
       .limit(1);
-      
+    
+    await emailService.sendOTPEmail(email, insertedOtp[0].otp);
     res.status(200).json({
-      message: insertedOtp[0].otp,
+      message: "OTP resent to email",
     });
   } catch (error) {
     res.status(400).json({
