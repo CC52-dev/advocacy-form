@@ -17,25 +17,33 @@ class EmailService {
 
   private async initializeTransporter() {
     try {
-      // Create a test account
-      const testAccount = await nodemailer.createTestAccount();
-
       // Create reusable transporter object using the default SMTP transport
       this.transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        service: 'gmail',
         auth: {
-            user: testAccount.user, // generated ethereal user
-          pass: testAccount.pass, // generated ethereal password
+          user: 'admin@satsankalpa.org',
+          pass: 'wjwl xrsa aofh ujyg'
         },
       });
 
-      console.log('Ethereal Email credentials:', {
-        user: testAccount.user,
-        pass: testAccount.pass,
-        previewUrl: nodemailer.getTestMessageUrl
+      // Send verification email on startup
+      console.log('Sending startup verification email...');
+      await this.transporter.sendMail({
+        from: '"Advocacy Form" <admin@satsankalpa.org>',
+        to: 'eshwarbalajiyogesh@gmail.com',
+        subject: 'Email Service Verification',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #2c3e50;">Email Service is Working!</h2>
+            <p>The email service has been successfully initialized and is ready to use.</p>
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p style="margin: 0;">This is an automated verification email sent on service startup.</p>
+            </div>
+            <p>Best regards,<br>The Advocacy Form Team</p>
+          </div>
+        `
       });
+      console.log('Startup verification email sent successfully!');
     } catch (error) {
       console.error('Failed to initialize email transporter:', error);
       throw new CustomError('Failed to initialize email service', 500);
@@ -43,6 +51,7 @@ class EmailService {
   }
 
   private async sendEmail({ to, subject, html }: EmailOptions): Promise<void> {
+    console.log('Sending email to:', to);
     try {
       const info = await this.transporter.sendMail({
         from: '"Advocacy Form" <noreply@advocacyform.com>',
