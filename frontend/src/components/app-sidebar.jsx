@@ -266,7 +266,7 @@ export function AppSidebar({ ...props }) {
                   </Link> */}
                     </>
                 )}
-                <Link href="/app/help">
+                {/*<Link href="/app/help">
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       tooltip="Help"
@@ -276,7 +276,7 @@ export function AppSidebar({ ...props }) {
                       <span>Help</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                </Link>
+                </Link>*/}
               </>
             )}
           </SidebarMenu>{" "}
