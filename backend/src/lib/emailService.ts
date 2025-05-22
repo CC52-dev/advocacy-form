@@ -1,5 +1,8 @@
 import nodemailer from 'nodemailer';
 import { CustomError } from './custom-error.js';
+import db from '../db/db.js';
+import { usersTable } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
 
 interface EmailOptions {
   to: string;
@@ -84,6 +87,19 @@ class EmailService {
     `;
   }
 
+  private getNewUserNotificationTemplate(newUserName: string): string {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2c3e50;">New User Signup Notification</h2>
+        <p>A new user has signed up for the Advocacy Form platform.</p>
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 0;"><strong>New User:</strong> ${newUserName}</p>
+        </div>
+        <p>Best regards,<br>The Advocacy Form Team</p>
+      </div>
+    `;
+  }
+
   private getOTPTemplate(otp: string): string {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -132,11 +148,39 @@ class EmailService {
 
   // Public methods to send different types of emails
   async sendSignupEmail(to: string, name: string): Promise<void> {
+    // Send welcome email to the new user
     await this.sendEmail({
       to,
       subject: 'Welcome to Advocacy Form!',
       html: this.getSignupTemplate(name),
     });
+
+    // Notify all admins about the new signup
+    await this.notifyUsersOfType('admin', name);
+  }
+
+  async notifyUsersOfType(userType: 'admin' | 'user' | 'applicant' | 'disabled', newUserName: string): Promise<void> {
+    try {
+      // Get all users of the specified type from the database
+      const users = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.type, userType));
+
+      // Send notification email to each user
+      for (const user of users) {
+        if (user.email) {
+          await this.sendEmail({
+            to: user.email,
+            subject: 'New User Signup Notification',
+            html: this.getNewUserNotificationTemplate(newUserName),
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to send notifications:', error);
+      throw new CustomError('Failed to send notifications', 500);
+    }
   }
 
   async sendOTPEmail(to: string, otp: string): Promise<void> {
