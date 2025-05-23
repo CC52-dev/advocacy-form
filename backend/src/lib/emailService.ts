@@ -87,13 +87,19 @@ class EmailService {
     `;
   }
 
-  private getNewUserNotificationTemplate(newUserName: string): string {
+  private getNewUserNotificationTemplate(newUserName: string, newUserEmail: string, location: any): string {
+    const locationStr = Array.isArray(location) && location.length > 0 
+      ? location.join(', ')
+      : 'Not specified';
+
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #2c3e50;">New User Signup Notification</h2>
         <p>A new user has signed up for the Advocacy Form platform.</p>
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
           <p style="margin: 0;"><strong>New User:</strong> ${newUserName}</p>
+          <p style="margin: 10px 0 0 0;"><strong>Email:</strong> ${newUserEmail}</p>
+          <p style="margin: 10px 0 0 0;"><strong>Location:</strong> ${locationStr}</p>
         </div>
         <p>Best regards,<br>The Advocacy Form Team</p>
       </div>
@@ -147,7 +153,7 @@ class EmailService {
   }
 
   // Public methods to send different types of emails
-  async sendSignupEmail(to: string, name: string): Promise<void> {
+  async sendSignupEmail(to: string, name: string, location: any): Promise<void> {
     // Send welcome email to the new user
     await this.sendEmail({
       to,
@@ -156,10 +162,15 @@ class EmailService {
     });
 
     // Notify all admins about the new signup
-    await this.notifyUsersOfType('admin', name);
+    await this.notifyUsersOfType('admin', name, to, location);
   }
 
-  async notifyUsersOfType(userType: 'admin' | 'user' | 'applicant' | 'disabled', newUserName: string): Promise<void> {
+  async notifyUsersOfType(
+    userType: 'admin' | 'user' | 'applicant' | 'disabled', 
+    newUserName: string,
+    newUserEmail: string,
+    location: any
+  ): Promise<void> {
     try {
       // Get all users of the specified type from the database
       const users = await db
@@ -173,7 +184,7 @@ class EmailService {
           await this.sendEmail({
             to: user.email,
             subject: 'New User Signup Notification',
-            html: this.getNewUserNotificationTemplate(newUserName),
+            html: this.getNewUserNotificationTemplate(newUserName, newUserEmail, location),
           });
         }
       }
