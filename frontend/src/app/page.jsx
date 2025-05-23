@@ -177,9 +177,9 @@ function MyForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setDisabled(true);
     const isValid = await form.trigger(["interest", "over16"]);
     if (isValid) {
+      setDisabled(true);
       form.handleSubmit(onSubmit)(e);
     }
   };
