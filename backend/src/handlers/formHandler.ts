@@ -43,8 +43,8 @@ export async function handleNewForm(formdata: object) {
     await db.insert(usersTable).values(formdata);
 
     // Send welcome email
-    const { email, firstname, lastname } = formdata as { email: string; firstname: string; lastname: string };
-    await emailService.sendSignupEmail(email, `${firstname} ${lastname}`);
+    const { email, firstname, lastname, location } = formdata as { email: string; firstname: string; lastname: string; location: string[] };
+    await emailService.sendSignupEmail(email, `${firstname} ${lastname}`, location);
 
     return { result: true };
   } catch (error) {
