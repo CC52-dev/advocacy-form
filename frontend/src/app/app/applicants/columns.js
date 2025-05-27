@@ -556,6 +556,9 @@ export const columns = [
                     "Print and Publications (USA)",
                     "Bharatheeyatha Annual Event (USA)",
                     "Content Management (Global Shared Services)",
+                    "Marketing (Global Shared Services)",
+                    "Technology (Global Shared Services)",
+                    "Charity (USA and Bharat)",
                   ]}
                   selected={intrest}
                   onChange={setIntrest}

@@ -412,7 +412,6 @@ function MyForm() {
                           "Marketing (Global Shared Services)",
                           "Technology (Global Shared Services)",
                           "Charity (USA and Bharat)",
-                          "Will participate in the near future",
                         ]}
                         selected={field.value}
                         onChange={field.onChange}
