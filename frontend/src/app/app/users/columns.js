@@ -595,7 +595,7 @@ export const columns = [
   //               options={[
   //                 "Thapo Kshetra revival (Bharat)",
   //                 "Vedic Worship (USA)",
-  //                 "Virtual Knowledge Sessions",
+  //                 "Virtual Knowledge Sessions (USA)",
   //                 "Research (USA)",
   //                 "Print and Publications (USA)",
   //                 "Bharatheeyatha Annual Event (USA)",
@@ -603,7 +603,7 @@ export const columns = [
   //                 "Marketing (Global Shared Services)",
   //                 "Technology (Global Shared Services)",
   //                 "Charity (USA and Bharat)",
-  //                 "Will participate in the near future",
+  //                 "Help me decide",
   //               ]}
   //               selected={intrest}
   //               onChange={setIntrest}

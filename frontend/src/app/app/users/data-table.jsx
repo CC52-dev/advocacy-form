@@ -138,15 +138,15 @@ export function DataTableUsers() {
   const options = [
     "Thapo Kshetra revival (Bharat)",
     "Vedic Worship (USA)",
-    "Virtual Knowledge Sessions",
-    "Research (USA)", 
+    "Virtual Knowledge Sessions (USA)",
+    "Research (USA)",
     "Print and Publications (USA)",
     "Bharatheeyatha Annual Event (USA)",
     "Content Management (Global Shared Services)",
     "Marketing (Global Shared Services)",
     "Technology (Global Shared Services)",
     "Charity (USA and Bharat)",
-    "Will participate in the near future",
+    "Help me decide",
   ];
 
   const filteredOptions = options.filter((option) =>
@@ -159,21 +159,21 @@ export function DataTableUsers() {
   }
 
   if (isLoading && isFetching) {
-    return (<div className="w-full">
+    return (<div className="w-full md:w-[calc(100vw-var(--sidebar-width))] max-w-full overflow-hidden">
     <div className="flex flex-col md:flex-row md:items-center items-start py-4 space-y-4 md:space-y-0 md:space-x-4">
       <Skeleton className="h-10 w-full md:max-w-sm" />
       <Skeleton className="h-10 w-[140px]" />
       <Skeleton className="h-10 w-[140px]" />
     </div>
-    <div className="rounded-md border">
-      <div className="p-4">
+    <div className="rounded-md border w-full max-w-full overflow-x-auto bg-white dark:bg-gray-900 p-2">
+      <div className="min-w-[80%] w-full max-w-[200%]">
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, rowIndex) => (
             <div key={`skeleton-row-${rowIndex}`} className="flex space-x-4">
               {columns.map((column, colIndex) => (
                 <Skeleton 
                   key={`skeleton-col-${rowIndex}-${colIndex}`} 
-                  className="h-6 w-[100px]" 
+                  className="h-6 w-[100px] whitespace-nowrap" 
                 />
               ))}
             </div>
@@ -185,7 +185,7 @@ export function DataTableUsers() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full md:w-[calc(100vw-var(--sidebar-width))] max-w-full overflow-hidden">
       <div className="flex flex-col md:flex-row md:items-center items-start py-4 space-y-4 md:space-y-0 md:space-x-4">
         <Input
           placeholder="Filter emails..."
@@ -366,14 +366,14 @@ export function DataTableUsers() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border w-full max-w-full overflow-x-auto bg-white dark:bg-gray-900 p-2">
+        <Table className="min-w-[80%] w-full max-w-[200%]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="whitespace-nowrap">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -394,7 +394,7 @@ export function DataTableUsers() {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="whitespace-nowrap">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -404,7 +404,7 @@ export function DataTableUsers() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center whitespace-nowrap"
                 >
                   No results.
                 </TableCell>

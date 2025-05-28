@@ -27,12 +27,12 @@ export default async function Layout({ children }) {
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
     <AuthStoreProvider>
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-screen min-h-0">
           <AppSidebar />
           <SidebarInset>
-            <div className="flex flex-col h-full w-full">
+            <div className="flex flex-col h-full w-full min-h-0">
               <AppHeader />
-              <main className="flex-1 overflow-y-auto">
+              <main className="flex-1 overflow-y-auto min-h-0">
                 {children}
               </main>
             </div>

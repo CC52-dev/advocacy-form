@@ -403,7 +403,7 @@ function MyForm() {
                         options={[
                           "Thapo Kshetra revival (Bharat)",
                           "Vedic Worship (USA)",
-                          "Virtual Knowledge Sessions",
+                          "Virtual Knowledge Sessions (USA)",
                           "Research (USA)",
                           "Print and Publications (USA)",
                           "Bharatheeyatha Annual Event (USA)",
@@ -411,7 +411,7 @@ function MyForm() {
                           "Marketing (Global Shared Services)",
                           "Technology (Global Shared Services)",
                           "Charity (USA and Bharat)",
-                          "Will participate in the near future",
+                          "Help me decide",
                         ]}
                         selected={field.value}
                         onChange={field.onChange}
