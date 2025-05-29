@@ -159,41 +159,43 @@ export function DataTableUsers() {
   }
 
   if (isLoading && isFetching) {
-    return (<div className="w-full md:w-[calc(100vw-var(--sidebar-width))] max-w-full overflow-hidden">
-    <div className="flex flex-col md:flex-row md:items-center items-start py-4 space-y-4 md:space-y-0 md:space-x-4">
-      <Skeleton className="h-10 w-full md:max-w-sm" />
-      <Skeleton className="h-10 w-[140px]" />
-      <Skeleton className="h-10 w-[140px]" />
-    </div>
-    <div className="rounded-md border w-full max-w-full overflow-x-auto bg-white dark:bg-gray-900 p-2">
-      <div className="min-w-[80%] w-full max-w-[200%]">
-        <div className="space-y-4">
-          {Array.from({ length: 5 }).map((_, rowIndex) => (
-            <div key={`skeleton-row-${rowIndex}`} className="flex space-x-4">
-              {columns.map((column, colIndex) => (
-                <Skeleton 
-                  key={`skeleton-col-${rowIndex}-${colIndex}`} 
-                  className="h-6 w-[100px] whitespace-nowrap" 
-                />
+    return (
+      <div className="w-full max-w-none overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center items-start py-4 space-y-4 sm:space-y-0 sm:space-x-4">
+          <Skeleton className="h-10 w-full sm:max-w-sm" />
+          <Skeleton className="h-10 w-full sm:w-[140px]" />
+          <Skeleton className="h-10 w-full sm:w-[140px]" />
+        </div>
+        <div className="rounded-md border w-full overflow-x-auto bg-white dark:bg-gray-900 p-2">
+          <div className="w-full min-w-[800px]">
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, rowIndex) => (
+                <div key={`skeleton-row-${rowIndex}`} className="flex space-x-4">
+                  {columns.map((column, colIndex) => (
+                    <Skeleton 
+                      key={`skeleton-col-${rowIndex}-${colIndex}`} 
+                      className="h-6 w-[100px] whitespace-nowrap" 
+                    />
+                  ))}
+                </div>
               ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
-    </div>
-  </div>);
+    );
   }
 
   return (
-    <div className="w-full md:w-[calc(100vw-var(--sidebar-width))] max-w-full overflow-hidden">
-      <div className="flex flex-col md:flex-row md:items-center items-start py-4 space-y-4 md:space-y-0 md:space-x-4">
+    <div className="w-full max-w-none overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center items-start py-4 space-y-4 sm:space-y-0 sm:space-x-4">
         <Input
           placeholder="Filter emails..."
           value={table.getColumn("email")?.getFilterValue() ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
-          className="w-full md:max-w-sm"
+          className="w-full sm:max-w-sm"
         />
         {interestColumn && (
           <Popover>
@@ -201,7 +203,7 @@ export function DataTableUsers() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full md:w-auto h-10 border-dashed"
+                className="w-full sm:w-auto h-10 border-dashed"
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Interest
@@ -317,7 +319,7 @@ export function DataTableUsers() {
           }}
           defaultValue="oldest"
         >
-          <SelectTrigger className="w-full md:w-[140px] border-dashed">
+          <SelectTrigger className="w-full sm:w-[140px] border-dashed">
             <SelectValue placeholder="Sort Date" />
           </SelectTrigger>
           <SelectContent>
@@ -328,12 +330,12 @@ export function DataTableUsers() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full md:w-auto">
+            <Button variant="outline" className="w-full sm:w-auto">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
           <Button
-            className="w-full md:w-auto border-dashed"
+            className="w-full sm:w-auto border-dashed"
             size="sm"
             onClick={() => {
               table.getColumn("location")?.toggleVisibility();
@@ -366,14 +368,14 @@ export function DataTableUsers() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border w-full max-w-full overflow-x-auto bg-white dark:bg-gray-900 p-2">
-        <Table className="min-w-[80%] w-full max-w-[200%]">
+      <div className="rounded-md border w-full overflow-x-auto bg-white dark:bg-gray-900 p-2">
+        <Table className="w-full min-w-[800px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="whitespace-nowrap">
+                    <TableHead key={header.id} className="whitespace-nowrap px-2 sm:px-4">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -394,7 +396,7 @@ export function DataTableUsers() {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="whitespace-nowrap">
+                    <TableCell key={cell.id} className="whitespace-nowrap px-2 sm:px-4">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -404,7 +406,7 @@ export function DataTableUsers() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center whitespace-nowrap"
+                  className="h-24 text-center whitespace-nowrap px-2 sm:px-4"
                 >
                   No results.
                 </TableCell>
@@ -413,12 +415,12 @@ export function DataTableUsers() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col md:flex-row items-center justify-between py-4 space-y-4 md:space-y-0">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between py-4 space-y-4 sm:space-y-0">
+        <div className="flex-1 text-sm text-muted-foreground text-center sm:text-left">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 lg:space-x-8">
+        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select
