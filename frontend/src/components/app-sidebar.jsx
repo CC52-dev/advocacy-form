@@ -227,7 +227,7 @@ export function AppSidebar({ ...props }) {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
-                {type === "Admin" ? (
+                {type === "Admin" || type === "Adminviewer" ? (
                   <>
                     <Link href="/app/applicants">
                       <SidebarMenuItem>

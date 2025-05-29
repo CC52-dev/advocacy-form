@@ -102,7 +102,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-export const columns = [
+import { useAuthStore } from "@/stores/authStore";
+
+export const getColumns = () => {
+  const type = useAuthStore.getState().type;
+  
+  const baseColumns = [
     {
       id: "select",
       header: ({ table }) => (
@@ -468,7 +473,11 @@ export const columns = [
         return <code className="whitespace-nowrap">{formattedDate}</code>;
       },
     },
-    {
+  ];
+
+  // Only add approve/deny actions for Admin users
+  if (type === "admin") {
+    baseColumns.push({
       id: "approve/deny",
       cell: ({ row }) => {
         const {toast} = useToast();
@@ -536,7 +545,9 @@ export const columns = [
             queryClient.invalidateQueries({ queryKey: ["allUsers"] });
             window.location.reload();
           }
-        });        return (
+        });        
+        
+        return (
           <div className="flex  gap-2 min-w-fit ">
             <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
               <ForcedDialogContent>
@@ -626,28 +637,11 @@ export const columns = [
           </div>
         );
       },
-    },
-    // {
-    //   id: "actions",
-    //   cell: ({ row }) => {
-    //     return (
-    //       <DropdownMenu>
-    //         <DropdownMenuTrigger asChild>
-    //           <Button variant="ghost" className="h-8 w-8 p-0">
-    //             <span className="sr-only">Open menu</span>
-    //             <MoreHorizontal className="h-4 w-4" />
-    //           </Button>
-    //         </DropdownMenuTrigger>
-    //         <DropdownMenuContent align="end">
-    //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-    //           <DropdownMenuItem
-    //             onClick={() => navigator.clipboard.writeText(row.original.id)}
-    //           >
-    //             Copy Applicant ID
-    //           </DropdownMenuItem>
-    //         </DropdownMenuContent>
-    //       </DropdownMenu>
-    //     );
-    //   },
-    // },
-  ];
+    });
+  }
+
+  return baseColumns;
+};
+
+// Export columns for backward compatibility
+export const columns = getColumns();

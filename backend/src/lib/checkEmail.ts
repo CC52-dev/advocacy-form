@@ -16,7 +16,7 @@ export async function checkEmail(email: string): Promise<checkEmail> {
   if (!type) {
     return true;
   }
-  if (type === "user" || type === "admin") {
+  if (type === "user" || type === "admin" || type === "adminviewer") {
 
     return "sign";
   }

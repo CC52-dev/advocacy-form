@@ -80,8 +80,9 @@ import api from "@/lib/axios";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { columns } from "./columns";
+import { getColumns } from "./columns";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
 
 export function DataTableApplicants() {
   const [sorting, setSorting] = React.useState([]);
@@ -90,6 +91,11 @@ export function DataTableApplicants() {
   const [rowSelection, setRowSelection] = React.useState({});
   const router = useRouter();
   const [filterValue, setFilterValue] = React.useState("");
+  const type = useAuthStore((state) => state.type);
+  
+  // Get columns based on user type
+  const columns = React.useMemo(() => getColumns(), [type]);
+  
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["applicants"],
     queryFn: async () => {

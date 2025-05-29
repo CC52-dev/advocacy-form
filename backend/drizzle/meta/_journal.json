@@ -8,6 +8,13 @@
       "when": 1746227136294,
       "tag": "0000_cynical_johnny_blaze",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1748473450547,
+      "tag": "0001_boring_tag",
+      "breakpoints": true
     }
   ]
 }

@@ -67,7 +67,7 @@ export function AuthStoreProvider({ children }) {
 
       if (!isLoggedIn && isAppRoute) {
         router.replace('/login');
-      } else if (isLoggedIn && type !== 'admin' && adminProtectedRoutes.includes(pathname)) {
+      } else if (isLoggedIn && type !== 'admin' && type !== 'adminviewer' && adminProtectedRoutes.includes(pathname)) {
         router.replace('/app/');
       } else if (isLoggedIn && isAuthRoute) {
         router.replace('/app/');

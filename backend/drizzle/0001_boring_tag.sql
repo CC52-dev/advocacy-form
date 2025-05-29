@@ -1,0 +1,1 @@
+ALTER TABLE `users` MODIFY COLUMN `type` enum('admin','user','applicant','disabled','adminviewer') DEFAULT 'applicant';

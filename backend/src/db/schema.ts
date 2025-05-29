@@ -10,7 +10,7 @@ import {
   json
 } from "drizzle-orm/mysql-core";
 
-export const userEnum = mysqlEnum("type", ["admin", "user", "applicant", "disabled"]);
+export const userEnum = mysqlEnum("type", ["admin", "user", "applicant", "disabled", "adminviewer"]);
 
 export const usersTable = mysqlTable("users", {
   id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),

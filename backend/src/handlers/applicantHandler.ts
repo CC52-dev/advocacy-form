@@ -15,7 +15,7 @@ export async function getAllApplicants(token: string, res: Response) {
     if (
       !sessionValidationResult.session ||
       !sessionValidationResult.user ||
-      sessionValidationResult.user["type"] !== "admin"
+      (sessionValidationResult.user["type"] !== "admin" && sessionValidationResult.user["type"] !== "adminviewer")
     ) {
       res.status(400).json({ message: "Token is Invalid Or Expired" });
       console.log({ message: "Token is Invalid Or Expired" });
