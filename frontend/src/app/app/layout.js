@@ -31,7 +31,7 @@ export default async function Layout({ children }) {
               <SidebarInset className="mr-2">
                 <div className="w-full absolute">
                   <AppHeader />
-                   <div className="max-h-screen overflow-hidden"> 
+                   <div className="min-h-screen overflow-hidden"> 
 
                   <main>{children}</main>
                   </div> 

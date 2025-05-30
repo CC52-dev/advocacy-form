@@ -121,6 +121,14 @@ export default function LoginPage() {
           duration: 10000,
           variant: "destructive",
         });
+      } else if (error.response?.status === 403) {
+        form.setError("email", { message: "Account Disabled" });
+        toast({
+          title: "Account Disabled",
+          description: error.response.data.message,
+          duration: 10000,
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Error",

@@ -19,16 +19,28 @@ import { emailService } from "../lib/emailService.js";
 
 export async function authenticate(email: string, res: Response) {
   try {
-    const user: User = await db
+    const users = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.email, email));
-    if (!user[0]) {
+    
+    if (!users[0]) {
       res.status(400).json({
         message: "User not found",
       });
       return;
     }
+
+    const user = users[0];
+
+    // Check if user is disabled
+    if (user.type === "disabled") {
+      res.status(403).json({
+        message: "Account has been disabled. Please contact support.",
+      });
+      return;
+    }
+
     const otp: Otp[] = await db
       .select()
       .from(otpTable)
@@ -52,14 +64,14 @@ export async function authenticate(email: string, res: Response) {
     const newOtp = await db
       .insert(otpTable)
       .values({
-        email: user[0].email,
-        userId: user[0].id,
+        email: user.email,
+        userId: user.id,
       });
     
     const insertedOtp = await db
       .select()
       .from(otpTable)
-      .where(eq(otpTable.email, user[0].email))
+      .where(eq(otpTable.email, user.email))
       .limit(1);
     
     await emailService.sendOTPEmail(email, insertedOtp[0].otp);
@@ -97,11 +109,11 @@ export async function verifyOTP(
       }
       await db.delete(otpTable).where(eq(otpTable.id, otp[0].id));
       const token = generateSessionToken();
-      const user: User = await db
+      const users = await db
         .select()
         .from(usersTable)
         .where(eq(usersTable.email, email));
-      const { expiresAt } = await createSession(token, user[0].id);
+      const { expiresAt } = await createSession(token, users[0].id);
 
       res
         .cookie("session_token", token, {

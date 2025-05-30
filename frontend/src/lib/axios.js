@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://services.satsankalpa.org',
+  baseURL: 'http://localhost:3001',
   withCredentials: true, // This is important for handling cookies
 });
 

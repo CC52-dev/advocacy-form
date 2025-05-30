@@ -96,12 +96,14 @@ import {
   AlertDialogTrigger,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
+import api from "@/lib/axios";
+
 export const columns = [
   {
     id: "select",
@@ -449,6 +451,51 @@ export const columns = [
     },
   },
   {
+    accessorKey: "type",
+    header: "User Type",
+    cell: ({ row }) => {
+      const type = row.original.type;
+      const getTypeColor = (type) => {
+        switch (type) {
+          case "admin":
+            return "bg-red-100 text-red-800 border-red-200";
+          case "adminviewer":
+            return "bg-blue-100 text-blue-800 border-blue-200";
+          case "user":
+            return "bg-green-100 text-green-800 border-green-200";
+          case "disabled":
+            return "bg-gray-100 text-gray-800 border-gray-200";
+          default:
+            return "bg-gray-100 text-gray-800 border-gray-200";
+        }
+      };
+      
+      const getTypeLabel = (type) => {
+        switch (type) {
+          case "admin":
+            return "Admin";
+          case "adminviewer":
+            return "Admin Viewer";
+          case "user":
+            return "User";
+          case "disabled":
+            return "Disabled";
+          default:
+            return type;
+        }
+      };
+
+      return (
+        <Badge 
+          variant="outline" 
+          className={`${getTypeColor(type)} whitespace-nowrap`}
+        >
+          {getTypeLabel(type)}
+        </Badge>
+      );
+    },
+  },
+  {
     accessorKey: "appliedAt",
     header: "Applied Date",
     cell: ({ row }) => {
@@ -510,188 +557,222 @@ export const columns = [
       return <code className="whitespace-nowrap">{formattedDate}</code>;
     },
   },
-  // {
-  //   id: "approve/deny",
-  //   cell: ({ row }) => {
-  //     const {toast} = useToast();
-  //     const router = useRouter();
-  //     const [intrest, setIntrest] = React.useState(row.original.interest);
-  //     const queryClient = useQueryClient();
-  //     const [isOpenDialog, setIsOpenDialog] = React.useState(false);
-  //     const [isOpenAlert, setIsOpenAlert] = React.useState(false);
-  //     const approve = useMutation({
-  //       mutationFn: async (applicantId) => {
-  //         const response = await axios.post(
-  //           `/api/applicants/approveApplicant/${applicantId}`,
-  //           {
-  //             interests: intrest,
-  //           }
-  //         );
-  //         return response.data;
-  //       },
-  //       mutationKey: ["approveApplicant"],
-  //       onSuccess: () => {
-  //         queryClient.invalidateQueries({ queryKey: ["applicants"] });
-  //         toast({
-  //           title: "Applicant approved successfully",
-  //           description: "Applicant approved successfully",
-  //           variant: "default",
-  //           duration: 3000,
-  //         })
-
-  //         // toast.success("Applicant approved successfully");
-  //       },
-  //       onError: () => {
-  //         toast({
-  //           title: "An error occurred",
-  //           description: "An error occurred",
-  //           variant: "destructive",
-  //           duration: 3000,
-  //         })
-  //         window.location.reload();
-  //         // toast.error("An error occurred");
-  //       }
-  //     });
-  //     const deny = useMutation({
-  //       mutationFn: async (applicantId) => {
-  //         const response = await axios.post(
-  //           `/api/applicants/denyApplicant/${applicantId}`
-  //         );
-  //         return response.data;
-  //       },
-  //       mutationKey: ["denyApplicant"],
-  //       onSuccess: () => {
-  //         queryClient.invalidateQueries({ queryKey: ["applicants"] });
-  //         toast({
-  //           title: "Applicant denied successfully",
-  //           description: "Applicant denied successfully",
-  //           variant: "default",
-  //           duration: 3000,
-  //         })
-  //         // toast.success("Applicant denied successfully");
-  //       },
-  //       onError: () => {
-  //         toast({
-  //           title: "An error occurred",
-  //           description: "An error occurred",
-  //           variant: "destructive",
-  //           duration: 3000,
-  //         })
-  //         window.location.reload();
-  //         // toast.error("An error occurred");
-  //       }
-  //     });        return (
-  //       <div className="flex  gap-2 min-w-fit ">
-  //         <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-  //           <ForcedDialogContent>
-  //             <DialogTitle>
-  //               Approve {row.original.firstname} {row.original.lastname}
-  //             </DialogTitle>
-  //             <DialogDescription>
-  //               Select the interests you would like to approve for{" "}
-  //               {row.original.firstname} {row.original.lastname}.
-  //             </DialogDescription>
-  //             <MultiSelect
-  //               options={[
-  //                 "Thapo Kshetra revival (Bharat)",
-  //                 "Vedic Worship (USA)",
-  //                 "Virtual Knowledge Sessions (USA)",
-  //                 "Research (USA)",
-  //                 "Print and Publications (USA)",
-  //                 "Bharatheeyatha Annual Event (USA)",
-  //                 "Content Management (Global Shared Services)",
-  //                 "Marketing (Global Shared Services)",
-  //                 "Technology (Global Shared Services)",
-  //                 "Charity (USA and Bharat)",
-  //                 "Help me decide",
-  //               ]}
-  //               selected={intrest}
-  //               onChange={setIntrest}
-  //               placeholder="Select Areas of Interest"
-  //               className="w-full h-24 overflow-y-auto"
-  //             />{" "}
-  //             <DialogFooter>
-  //               <DialogClose asChild>
-  //                 <Button variant="outline" className="">
-  //                   Cancel
-  //                 </Button>
-  //               </DialogClose>
-  //               <Button
-  //                 className=" "
-  //                 onClick={() => {
-  //                   approve.mutate(row.original.id);
-  //                   setIsOpenDialog(false);
-  //                 }}
-  //               >
-  //                 Confirm
-  //               </Button>
-  //             </DialogFooter>
-  //           </ForcedDialogContent>
-  //           <DialogTrigger asChild>
-  //             <Button
-  //               variant="primary"
-  //               size="sm"
-  //               className="bg-green-400 border-border text-white"
-  //             >
-  //               <Check />
-  //             </Button>
-  //           </DialogTrigger>
-  //         </Dialog>
-  //         <AlertDialog open={isOpenAlert} onOpenChange={setIsOpenAlert}>
-  //           <AlertDialogContent>
-  //             <AlertDialogTitle>
-  //               Deny {row.original.firstname} {row.original.lastname}
-  //             </AlertDialogTitle>
-  //             <AlertDialogDescription>
-  //               Are you sure you want to deny {row.original.firstname}{" "}
-  //               {row.original.lastname}?
-  //             </AlertDialogDescription>
-  //             <AlertDialogFooter>
-  //               <AlertDialogCancel asChild>
-  //                 <Button variant="outline">Cancel</Button>
-  //               </AlertDialogCancel>
-  //               <Button
-  //                 variant="destructive"
-  //                 onClick={() => {
-  //                   deny.mutate(row.original.id);
-  //                   setIsOpenAlert(false);
-  //                 }}
-  //               >
-  //                 Confirm
-  //               </Button>
-  //             </AlertDialogFooter>
-  //           </AlertDialogContent>
-
-  //           <AlertDialogTrigger asChild>
-  //             <Button variant="destructive" size="sm" className="">
-  //               <X />
-  //             </Button>
-  //           </AlertDialogTrigger>
-  //         </AlertDialog>
-  //       </div>
-  //     );
-  //   },
-  // },
   {
     id: "actions",
     cell: ({ row }) => {
+      const { toast } = useToast();
+      const queryClient = useQueryClient();
+      const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+      const [editFormData, setEditFormData] = React.useState({
+        firstname: row.original.firstname || "",
+        lastname: row.original.lastname || "",
+        email: row.original.email || "",
+        phone: row.original.phone || "",
+        addr: row.original.addr || "",
+        city: row.original.city || "",
+        zip: row.original.zip || "",
+        type: row.original.type || "",
+        interest: Array.isArray(row.original.interest) ? row.original.interest : JSON.parse(row.original.interest || '[]'),
+        location: Array.isArray(row.original.location) ? row.original.location : JSON.parse(row.original.location || '[]'),
+      });
+
+      const updateUser = useMutation({
+        mutationFn: async (userData) => {
+          const response = await api.post(`/api/user/updateUser/${row.original.id}`, userData);
+          return response.data;
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["allUsers"] });
+          toast({
+            title: "User updated successfully",
+            description: "User information has been updated",
+            variant: "default",
+            duration: 3000,
+          });
+          setIsEditDialogOpen(false);
+        },
+        onError: (error) => {
+          toast({
+            title: "Error updating user",
+            description: error.response?.data?.message || "An error occurred",
+            variant: "destructive",
+            duration: 3000,
+          });
+        }
+      });
+
+      const handleInputChange = (field, value) => {
+        setEditFormData(prev => ({
+          ...prev,
+          [field]: value
+        }));
+      };
+
+      const handleSubmit = () => {
+        updateUser.mutate(editFormData);
+      };
+
+      // Check if current user can edit this user
+      const currentUserType = useAuthStore((state) => state.type);
+      const canEdit = currentUserType === "admin" && row.original.type !== "admin";
+
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(row.original.id)}
-            >
-              Copy User ID
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(row.original.id)}
+              >
+                Copy User ID
+              </DropdownMenuItem>
+              {canEdit && (
+                <DropdownMenuItem
+                  onClick={() => setIsEditDialogOpen(true)}
+                >
+                  Edit User
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {canEdit && (
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+              <ForcedDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogTitle>
+                  Edit {row.original.firstname} {row.original.lastname}
+                </DialogTitle>
+                <DialogDescription>
+                  Update user information. Only admins can edit users, disabled users, and admin viewers.
+                </DialogDescription>
+                
+                <div className="grid grid-cols-2 gap-4 py-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">First Name</label>
+                    <Input
+                      value={editFormData.firstname}
+                      onChange={(e) => handleInputChange('firstname', e.target.value)}
+                      placeholder="First Name"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Last Name</label>
+                    <Input
+                      value={editFormData.lastname}
+                      onChange={(e) => handleInputChange('lastname', e.target.value)}
+                      placeholder="Last Name"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Email</label>
+                    <Input
+                      value={editFormData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="Email"
+                      type="email"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Phone</label>
+                    <Input
+                      value={editFormData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      placeholder="Phone"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Address</label>
+                    <Input
+                      value={editFormData.addr}
+                      onChange={(e) => handleInputChange('addr', e.target.value)}
+                      placeholder="Address"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">City</label>
+                    <Input
+                      value={editFormData.city}
+                      onChange={(e) => handleInputChange('city', e.target.value)}
+                      placeholder="City"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">ZIP Code</label>
+                    <Input
+                      value={editFormData.zip}
+                      onChange={(e) => handleInputChange('zip', e.target.value)}
+                      placeholder="ZIP Code"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">User Type</label>
+                    <Select
+                      value={editFormData.type}
+                      onValueChange={(value) => handleInputChange('type', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select user type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="adminviewer">Admin Viewer</SelectItem>
+                        <SelectItem value="disabled">Disabled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="col-span-2 space-y-2">
+                    <label className="text-sm font-medium">Interests</label>
+                    <MultiSelect
+                      options={[
+                        "Thapo Kshetra revival (Bharat)",
+                        "Vedic Worship (USA)",
+                        "Virtual Knowledge Sessions (USA)",
+                        "Research (USA)",
+                        "Print and Publications (USA)",
+                        "Bharatheeyatha Annual Event (USA)",
+                        "Content Management (Global Shared Services)",
+                        "Marketing (Global Shared Services)",
+                        "Technology (Global Shared Services)",
+                        "Charity (USA and Bharat)",
+                        "Help me decide",
+                      ]}
+                      selected={editFormData.interest}
+                      onChange={(value) => handleInputChange('interest', value)}
+                      placeholder="Select Areas of Interest"
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <Button 
+                    onClick={handleSubmit}
+                    disabled={updateUser.isPending}
+                  >
+                    {updateUser.isPending ? "Updating..." : "Update User"}
+                  </Button>
+                </DialogFooter>
+              </ForcedDialogContent>
+            </Dialog>
+          )}
+        </div>
       );
     },
   },

@@ -63,8 +63,8 @@ export const helpTable = mysqlTable("help", {
 
 export type Help = typeof helpTable.$inferSelect;
 export type Otp = typeof otpTable.$inferSelect;
-export type User = typeof usersTable.$inferInsert;
-export type Session = typeof sessionTable.$inferInsert;
+export type User = typeof usersTable.$inferSelect;
+export type Session = typeof sessionTable.$inferSelect;
 // {
 //     firstname: 'Balaji',
 //     lastname: 'Yogesh',

@@ -3,7 +3,7 @@ import { eq, and } from "drizzle-orm";
 
 import { usersTable } from "../db/schema.js";
 import type { User } from "../db/schema.js";
-import { validateSessionToken, invalidateSession } from "../lib/session.js";
+import { validateSessionToken, invalidateSession, invalidateAllUserSessions } from "../lib/session.js";
 import type { SessionValidationResult } from "../lib/session.js";
 import type { Response } from "express";
 import { emailService } from "../lib/emailService.js";
@@ -124,6 +124,9 @@ export async function denyApplicant(token: string, id: string, res: Response) {
       .update(usersTable)
       .set({ type: "disabled" })
       .where(and(eq(usersTable.id, id), eq(usersTable.type, "applicant")));
+
+    // Revoke all sessions for the denied applicant
+    await invalidateAllUserSessions(id);
 
     // Send rejection email
     await emailService.sendRejectionEmail(

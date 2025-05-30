@@ -62,6 +62,10 @@ export async function invalidateSession(sessionId: string): Promise<void> {
   await db.delete(sessionTable).where(eq(sessionTable.id, sessionId));
 }
 
+export async function invalidateAllUserSessions(userId: string): Promise<void> {
+  await db.delete(sessionTable).where(eq(sessionTable.userId, userId));
+}
+
 export type SessionValidationResult =
   | { session: Session; user: User }
   | { session: null; user: null };

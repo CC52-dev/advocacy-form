@@ -7,12 +7,12 @@ type checkEmail = boolean | string;
 
 export async function checkEmail(email: string): Promise<checkEmail> {
 
-  const result: User = await db
+  const users = await db
     .select()
     .from(usersTable)
     .where(eq(usersTable.email, email));
 
-  const type: string | null = result[0]?.type ?? null;
+  const type: string | null = users[0]?.type ?? null;
   if (!type) {
     return true;
   }
