@@ -2,8 +2,11 @@
 import { useAuthStore } from "@/stores/authStore";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import ApplicantStatus from "@/components/applicant-status";
+
 export default function Page() {
   const firstname = useAuthStore((state) => state.firstname);
+  const type = useAuthStore((state) => state.type);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -20,6 +23,13 @@ export default function Page() {
           )}
         </code>{" "}
       </div>
+      
+      {/* Show applicant status for applicants */}
+      {type === "applicant" && (
+        <div className="mt-4">
+          <ApplicantStatus />
+        </div>
+      )}
     </div>
   );
 }

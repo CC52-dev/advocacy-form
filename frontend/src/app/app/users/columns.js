@@ -29,6 +29,9 @@ import {
   PlusCircle,
 } from "lucide-react";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { PhoneInput } from "@/components/ui/phone-input";
+import LocationSelector from "@/components/ui/location-input";
+import { parsePhoneNumber } from "react-phone-number-input";
 import { Separator } from "@/components/ui/separator";
 import {
   Command,
@@ -103,6 +106,50 @@ import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import api from "@/lib/axios";
+
+// Import location data
+import countries from "@/data/countries.json";
+import states from "@/data/states.json";
+
+// Helper functions for safe data conversion
+const safeString = (value) => {
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+};
+
+const safeArray = (value) => {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    if (value.trim() === "") return [];
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [value];
+    } catch {
+      return [value];
+    }
+  }
+  return [];
+};
+
+const safeLocationArray = (value) => {
+  const arr = safeArray(value);
+  // Ensure we always have exactly 2 elements for location [country, state]
+  return [
+    safeString(arr[0] || ""),
+    safeString(arr[1] || "")
+  ];
+};
+
+// Helper function to get country from phone number
+const getCountryFromPhone = (phoneNumber) => {
+  if (!phoneNumber) return "US"; // Default fallback
+  try {
+    const parsed = parsePhoneNumber(phoneNumber);
+    return parsed?.country || "US";
+  } catch {
+    return "US"; // Fallback if parsing fails
+  }
+};
 
 export const columns = [
   {
@@ -563,17 +610,22 @@ export const columns = [
       const { toast } = useToast();
       const queryClient = useQueryClient();
       const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+      const [locationSelectorKey, setLocationSelectorKey] = React.useState(0);
+      
+      // Safely convert location data
+      const safeLocationData = safeLocationArray(row.original.location);
+      
       const [editFormData, setEditFormData] = React.useState({
-        firstname: row.original.firstname || "",
-        lastname: row.original.lastname || "",
-        email: row.original.email || "",
-        phone: row.original.phone || "",
-        addr: row.original.addr || "",
-        city: row.original.city || "",
-        zip: row.original.zip || "",
+        firstname: safeString(row.original.firstname),
+        lastname: safeString(row.original.lastname),
+        email: safeString(row.original.email),
+        phone: safeString(row.original.phone),
+        addr: safeString(row.original.addr),
+        city: safeString(row.original.city),
+        zip: safeString(row.original.zip),
         type: row.original.type || "",
-        interest: Array.isArray(row.original.interest) ? row.original.interest : JSON.parse(row.original.interest || '[]'),
-        location: Array.isArray(row.original.location) ? row.original.location : JSON.parse(row.original.location || '[]'),
+        interest: safeArray(row.original.interest),
+        location: safeLocationData,
       });
 
       const updateUser = useMutation({
@@ -612,6 +664,15 @@ export const columns = [
         updateUser.mutate(editFormData);
       };
 
+      // Handle dialog open/close
+      const handleDialogChange = (open) => {
+        setIsEditDialogOpen(open);
+        if (open) {
+          // Reset LocationSelector when dialog opens
+          setLocationSelectorKey(prev => prev + 1);
+        }
+      };
+
       // Check if current user can edit this user
       const currentUserType = useAuthStore((state) => state.type);
       const canEdit = currentUserType === "admin" && row.original.type !== "admin";
@@ -643,7 +704,7 @@ export const columns = [
           </DropdownMenu>
 
           {canEdit && (
-            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <Dialog open={isEditDialogOpen} onOpenChange={handleDialogChange}>
               <ForcedDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogTitle>
                   Edit {row.original.firstname} {row.original.lastname}
@@ -683,10 +744,10 @@ export const columns = [
                   
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Phone</label>
-                    <Input
+                    <PhoneInput
                       value={editFormData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      placeholder="Phone"
+                      onChange={(value) => handleInputChange('phone', value)}
+                      defaultCountry={getCountryFromPhone(editFormData.phone)}
                     />
                   </div>
                   
@@ -714,6 +775,14 @@ export const columns = [
                       value={editFormData.zip}
                       onChange={(e) => handleInputChange('zip', e.target.value)}
                       placeholder="ZIP Code"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Location</label>
+                    <LocationSelector
+                      value={editFormData.location}
+                      onChange={(val) => handleInputChange('location', val)}
                     />
                   </div>
                   

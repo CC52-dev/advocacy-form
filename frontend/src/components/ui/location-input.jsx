@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -21,38 +21,36 @@ import { cn } from '@/lib/utils'
 import countries from '@/data/countries.json'
 import states from '@/data/states.json'
 
-
 const LocationSelector = ({
   disabled,
-  onCountryChange,
-  onStateChange,
+  value = ["", ""],
+  onChange,
 }) => {
-  const [selectedCountry, setSelectedCountry] = useState(
-    null,
-  )
-  const [selectedState, setSelectedState] = useState(null)
-  const [openCountryDropdown, setOpenCountryDropdown] = useState(false)
-  const [openStateDropdown, setOpenStateDropdown] = useState(false)
+  const [openCountryDropdown, setOpenCountryDropdown] = React.useState(false)
+  const [openStateDropdown, setOpenStateDropdown] = React.useState(false)
 
-  // Cast imported JSON data to their respective types
-  const countriesData = countries 
-  const statesData = states 
+  const countriesData = countries
+  const statesData = states
 
-  // Filter states for selected country
-  const availableStates = statesData.filter(
-    (state) => state.country_id === selectedCountry?.id,
-  )
+  // Find selected country/state objects from value
+  const selectedCountry = countriesData.find(c => c.name === value[0]) || null
+  const availableStates = selectedCountry
+    ? statesData.filter(s => s.country_id === selectedCountry.id)
+    : []
+  const selectedState = availableStates.find(s => s.name === value[1]) || null
 
   const handleCountrySelect = (country) => {
-    setSelectedCountry(country)
-    setSelectedState(null) // Reset state when country changes
-    onCountryChange?.(country)
-    onStateChange?.(null)
+    if (onChange) {
+      onChange([country.name, ""])
+    }
+    setOpenCountryDropdown(false)
   }
 
   const handleStateSelect = (state) => {
-    setSelectedState(state)
-    onStateChange?.(state)
+    if (onChange) {
+      onChange([selectedCountry?.name || "", state.name])
+    }
+    setOpenStateDropdown(false)
   }
 
   return (
@@ -89,10 +87,7 @@ const LocationSelector = ({
                     <CommandItem
                       key={country.id}
                       value={country.name}
-                      onSelect={() => {
-                        handleCountrySelect(country)
-                        setOpenCountryDropdown(false)
-                      }}
+                      onSelect={() => handleCountrySelect(country)}
                       className="flex cursor-pointer items-center justify-between text-sm"
                     >
                       <div className="flex items-center gap-2">
@@ -147,10 +142,7 @@ const LocationSelector = ({
                       <CommandItem
                         key={state.id}
                         value={state.name}
-                        onSelect={() => {
-                          handleStateSelect(state)
-                          setOpenStateDropdown(false)
-                        }}
+                        onSelect={() => handleStateSelect(state)}
                         className="flex cursor-pointer items-center justify-between text-sm"
                       >
                         <span>{state.name}</span>

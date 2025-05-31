@@ -6,6 +6,7 @@ import {
   getAllApplicants,
   approveApplicant,
   denyApplicant,
+  updateApplicantSelf,
 } from "../handlers/applicantHandler.js";
 
 router.post("/getAllApplicants", async (req: Request, res: Response) => {
@@ -24,4 +25,11 @@ router.post("/denyApplicant/:id", async (req: Request, res: Response) => {
   const id = req.params.id;
   await denyApplicant(token, id, res);
 });
+
+router.post("/updateApplication", async (req: Request, res: Response) => {
+  const token = req.headers.cookie?.split("session_token=")[1]?.split(";")[0];
+  const updateData = req.body;
+  await updateApplicantSelf(token, updateData, res);
+});
+
 export default router;

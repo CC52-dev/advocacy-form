@@ -35,8 +35,8 @@ export const useAuthStore = create(
       phone: "",
       city: "",
       zip: "",
-      applied_at: "",
-      accepted_at: "",
+      appliedAt: "",
+      acceptedAt: "",
       setUserData: (userData, isLoggedIn) => {
         if (!userData?.message) {
           console.error('Invalid user data structure:', userData);
@@ -57,8 +57,8 @@ export const useAuthStore = create(
           phone: user.phone || "",
           city: user.city || "",
           zip: user.zip || "",
-          applied_at: user.applied_at || "",
-          accepted_at: user.accepted_at || "",
+          appliedAt: user.appliedAt || "",
+          acceptedAt: user.acceptedAt || "",
         });
       },
       logout: async() => {
@@ -78,8 +78,8 @@ export const useAuthStore = create(
           phone: "",
           city: "",
           zip: "",
-          applied_at: "",
-          accepted_at: "",
+          appliedAt: "",
+          acceptedAt: "",
         });
       },
     }),
@@ -99,8 +99,8 @@ export const useAuthStore = create(
           phone: state.phone,
           city: state.city,
           zip: state.zip,
-          applied_at: state.applied_at,
-          accepted_at: state.accepted_at,
+          appliedAt: state.appliedAt,
+          acceptedAt: state.acceptedAt,
       }),
     }
   )

@@ -45,8 +45,8 @@ export function AuthStoreProvider({ children }) {
               phone: "",
               city: "",
               zip: "",
-              applied_at: "",
-              accepted_at: "",
+              appliedAt: "",
+              acceptedAt: "",
             }
           },
           false

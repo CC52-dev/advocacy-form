@@ -142,3 +142,72 @@ export async function denyApplicant(token: string, id: string, res: Response) {
     console.error(error);
   }
 }
+
+export async function updateApplicantSelf(
+  token: string,
+  updateData: any,
+  res: Response
+) {
+  try {
+    const sessionValidationResult: SessionValidationResult =
+      await validateSessionToken(token);
+    
+    if (
+      !sessionValidationResult.session ||
+      !sessionValidationResult.user ||
+      sessionValidationResult.user["type"] !== "applicant"
+    ) {
+      res.status(400).json({ message: "Token is Invalid Or Expired" });
+      return;
+    }
+
+    const userId = sessionValidationResult.user.id;
+
+    // Validate that the user exists and is an applicant
+    const applicant = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
+
+    if (!applicant[0] || applicant[0].type !== "applicant") {
+      res.status(400).json({ message: "Applicant not found or invalid status" });
+      return;
+    }
+
+    // Only allow updating certain fields for applicants
+    const allowedFields = {
+      firstname: updateData.firstname,
+      lastname: updateData.lastname,
+      phone: updateData.phone,
+      location: updateData.location,
+      addr: updateData.addr,
+      city: updateData.city,
+      zip: updateData.zip,
+      interest: updateData.interest,
+    };
+
+    // Remove undefined fields
+    const filteredUpdateData = Object.fromEntries(
+      Object.entries(allowedFields).filter(([_, value]) => value !== undefined)
+    );
+
+    if (Object.keys(filteredUpdateData).length === 0) {
+      res.status(400).json({ message: "No valid fields to update" });
+      return;
+    }
+
+    // Update the applicant
+    await db
+      .update(usersTable)
+      .set(filteredUpdateData)
+      .where(eq(usersTable.id, userId));
+
+    res.status(200).json({
+      message: "Application updated successfully",
+    });
+  } catch (error) {
+    res.status(400).json({ message: "An error occurred" });
+    console.error(error);
+  }
+}
