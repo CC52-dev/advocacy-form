@@ -32,7 +32,7 @@ class EmailService {
       // Send verification email on startup
       console.log('Sending startup verification email...');
       await this.transporter.sendMail({
-        from: '"Advocacy Form" <admin@satsankalpa.org>',
+        from: '"Satsankalpa Advocacy Membership" <admin@satsankalpa.org>',
         to: 'eshwarbalajiyogesh@gmail.com',
         subject: 'Email Service Verification',
         html: `
@@ -42,7 +42,7 @@ class EmailService {
             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <p style="margin: 0;">This is an automated verification email sent on service startup.</p>
             </div>
-            <p>Best regards,<br>The Advocacy Form Team</p>
+            <p>Best regards,<br>Satsankalpa Advocacy Team</p>
           </div>
         `
       });
@@ -57,7 +57,7 @@ class EmailService {
     console.log('Sending email to:', to);
     try {
       const info = await this.transporter.sendMail({
-        from: '"Advocacy Form" <noreply@advocacyform.com>',
+        from: '"Satsankalpa Advocacy Membership" <admin@satsankalpa.org>',
         to,
         subject,
         html,
@@ -75,14 +75,14 @@ class EmailService {
   private getSignupTemplate(name: string): string {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2c3e50;">Welcome to Advocacy Form!</h2>
+        <h2 style="color: #2c3e50;">Welcome to Satsankalpa Advocacy Membership!</h2>
         <p>Dear ${name},</p>
-        <p>Thank you for signing up with us. We're excited to have you on board!</p>
-        <p>Your account has been successfully created.</p>
+        <p>Thank you for signing up with us. We're thrilled to welcome you to our community. </p>
+        <p>We have received your application and it is currently under review. We will notify you of its status via email.</p>
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <p style="margin: 0;">If you have any questions, feel free to reach out to our support team.</p>
+          <p style="margin: 0;">Should you have any questions in the meantime, please do not hesitate to contact us at engage@satsankalpa.org.</p>
         </div>
-        <p>Best regards,<br>The Advocacy Form Team</p>
+        <p>Best regards,<br>Satsankalpa Advocacy Team</p>
       </div>
     `;
   }
@@ -95,13 +95,13 @@ class EmailService {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #2c3e50;">New User Signup Notification</h2>
-        <p>A new user has signed up for the Advocacy Form platform.</p>
+        <p>A new user has signed up for the Advocacy membership.</p>
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
           <p style="margin: 0;"><strong>New User:</strong> ${newUserName}</p>
           <p style="margin: 10px 0 0 0;"><strong>Email:</strong> ${newUserEmail}</p>
           <p style="margin: 10px 0 0 0;"><strong>Location:</strong> ${locationStr}</p>
         </div>
-        <p>Best regards,<br>The Advocacy Form Team</p>
+        <p>Best regards,<br>Satsankalpa Advocacy Team</p>
       </div>
     `;
   }
@@ -109,14 +109,14 @@ class EmailService {
   private getOTPTemplate(otp: string): string {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2c3e50;">Your Verification Code</h2>
+        <h2 style="color: #2c3e50;">Your Satsankalpa Advocacy Verification Code</h2>
         <p>Here is your verification code:</p>
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: center;">
           <h1 style="color: #2c3e50; margin: 0;">${otp}</h1>
         </div>
         <p>This code will expire in 10 minutes.</p>
         <p>If you didn't request this code, please ignore this email.</p>
-        <p>Best regards,<br>The Advocacy Form Team</p>
+        <p>Best regards,<br>Satsankalpa Advocacy Team</p>
       </div>
     `;
   }
@@ -124,13 +124,13 @@ class EmailService {
   private getApprovalTemplate(name: string): string {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #27ae60;">Application Approved!</h2>
+        <h2 style="color: #27ae60;">Satasankalpa Membership Application Approved!</h2>
         <p>Dear ${name},</p>
         <p>We are pleased to inform you that your application has been approved!</p>
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <p style="margin: 0;">You can now proceed with the next steps in your application process.</p>
+          <p style="margin: 0;">Our advocacy team administrators will be in touch to discuss the next steps and how you can get involved.</p>
         </div>
-        <p>Best regards,<br>The Advocacy Form Team</p>
+        <p>Best regards,<br>Satsankalpa Advocacy Team</p>
       </div>
     `;
   }
@@ -140,14 +140,15 @@ class EmailService {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #e74c3c;">Application Status Update</h2>
         <p>Dear ${name},</p>
-        <p>We regret to inform you that your application has not been approved at this time.</p>
+        <p>Thank you for your interest in Satsankalpa Advocacy Membership program.</p>
+        <p>We regret to inform you that your application was not approved at this time.</p>
         ${reason ? `
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
           <p style="margin: 0;"><strong>Reason:</strong> ${reason}</p>
         </div>
         ` : ''}
-        <p>We encourage you to review the feedback and consider applying again in the future.</p>
-        <p>Best regards,<br>The Advocacy Form Team</p>
+        <p>We encourage you to reach out to us at engage@satsankalpa.org to receive feedback on your application before you consider applying again in the future.</p>
+        <p>Best regards,<br>Satsankalpa Advocacy Team</p>
       </div>
     `;
   }
