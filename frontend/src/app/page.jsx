@@ -40,7 +40,9 @@ function MyForm() {
   const [step, setStep] = useState(1);
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(false);
-  // REMINDER: Update the Schema in the bakcend as well and in the DB schema
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  // All other hooks must be declared before the early return
   const formSchema = z.object({
     firstname: z.string().min(1, "First name is required"),
     lastname: z.string().min(1, "Last name is required"),
@@ -79,7 +81,34 @@ function MyForm() {
           });
         }
       }}),
-    location: z.array(z.string()).min(2, "Both country and state are required"),
+    location: z
+      .array(z.string())
+      .min(1, "Country is required")
+      .refine(
+        (arr) => {
+          const country = arr[0];
+          const state = arr[1];
+          // Placeholder: list of countries that have states (replace with your actual list or logic)
+          const countriesWithStates = [
+            "United States",
+            "India",
+            "Australia",
+            "Canada",
+            "Brazil",
+            "Germany",
+            "Mexico",
+            "Russia",
+            "China",
+            "Argentina"
+          ];
+          if (!country || country.trim() === "") return false;
+          if (countriesWithStates.includes(country)) {
+            return state && state.trim() !== "";
+          }
+          return true; // If country doesn't have states, only country is required
+        },
+        { message: "State is required for the selected country" }
+      ),
     addr: z.string().min(1, "Street address is required"),
     city: z.string().min(1, "City is required"),
     zip: z.string().min(1, "ZIP code is required").max(10, "ZIP code must be 10 characters or less"),
@@ -128,6 +157,8 @@ function MyForm() {
     },
     mode: "onSubmit",
   });
+
+  if (!mounted) return null;
 
   async function onSubmit(values) {
     try {
