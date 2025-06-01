@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import LocationSelector from "@/components/ui/location-input";
+import LocationSelector from "@/components/form-location-input";
 import { MultiSelect } from "@/components/ui/multi-select";
 import api from "@/lib/axios";
 import {
