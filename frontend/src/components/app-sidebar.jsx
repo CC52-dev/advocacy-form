@@ -1,0 +1,509 @@
+"use client";
+
+import * as React from "react";
+import {
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  LogOut,
+  Settings,
+  User,
+  ChevronsUpDown,
+  MapIcon,
+  PieChart,
+  Settings2,
+  SquareTerminal,
+  ChevronRight,
+  Home,
+  CircleHelp,
+  FileUser,
+  AppWindow,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { Link } from "next-view-transitions";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { User2, Users } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "./ui/skeleton";
+import { cn } from "@/lib/utils";
+import api from "@/lib/axios";
+import Image from "next/image";
+import { useHasPermission } from "@/lib/permissions";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { ExternalLink, Loader2 } from "lucide-react";
+
+// Component for launching an application
+function AppLaunchButton({ app }) {
+  const { toast } = useToast();
+  
+  const launchMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.post(`/api/app-roles/launch/${app.id}/generate`);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.redirectUrl) {
+        if (data.reused) {
+          toast({
+            title: "Launching Application",
+            description: "Reusing existing session...",
+            duration: 2000,
+          });
+        } else {
+          toast({
+            title: "Launching Application",
+            description: "Redirecting to the application...",
+            duration: 2000,
+          });
+        }
+        window.open(data.redirectUrl, "_blank");
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to launch application",
+        variant: "destructive",
+        duration: 3000,
+      });
+    },
+  });
+
+  return (
+    <SidebarMenuSubButton
+      onClick={() => launchMutation.mutate()}
+      disabled={launchMutation.isPending}
+      className="cursor-pointer"
+    >
+      {launchMutation.isPending ? (
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <ExternalLink className="h-4 w-4 mr-2" />
+      )}
+      <span>Launch - {app.name}</span>
+    </SidebarMenuSubButton>
+  );
+}
+
+export function AppSidebar({ ...props }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
+  const logout = useAuthStore((state) => state.logout);
+  const firstname = useAuthStore((state) => state.firstname);
+  const lastname = useAuthStore((state) => state.lastname);
+  const email = useAuthStore((state) => state.email);
+  const roles = useAuthStore((state) => state.roles) || [];
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  
+  // Debug logging
+  console.log('Sidebar - Current state:', {
+    roles,
+    permissions,
+    firstRole: roles[0],
+    rolesLength: roles.length,
+    permissionsLength: permissions.length,
+  });
+  
+  // Get role display name from roles array (use first role's title, or fallback to permissions)
+  let roleDisplayName = "User";
+  
+  if (roles && roles.length > 0) {
+    const firstRole = roles[0];
+    roleDisplayName = firstRole?.roleTitle || firstRole?.name || firstRole?.id || "User";
+    console.log('Sidebar - Using role from roles array:', roleDisplayName, firstRole);
+  } else if (permissions && permissions.length > 0) {
+    if (permissions.includes("admin")) {
+      roleDisplayName = "Admin";
+    } else if (permissions.includes("applicant")) {
+      roleDisplayName = "Applicant";
+    } else if (permissions.includes("disabled")) {
+      roleDisplayName = "Disabled";
+    }
+    console.log('Sidebar - Using role from permissions:', roleDisplayName);
+  } else {
+    console.warn('Sidebar - No roles or permissions found, defaulting to "User"');
+  }
+  
+  const { isMobile, open } = useSidebar();
+  
+  // Permission checks
+  const canViewApplicants = useHasPermission("applicants.read");
+  const canViewUsers = useHasPermission("users.read");
+  const canViewApplications = useHasPermission("dev");
+
+  // Fetch applications where user has any access
+  const { data: accessibleAppsData } = useQuery({
+    queryKey: ["accessibleApplications"],
+    queryFn: async () => {
+      const response = await api.post("/api/app-roles/accessible");
+      return response.data;
+    },
+    enabled: !!(roles?.length > 0 || permissions?.length > 0),
+    staleTime: 60000,
+  });
+
+  const accessibleApplications = accessibleAppsData?.message || [];
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/api/auth/logout");
+      logout();
+      toast({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account.",
+        duration: 3000,
+      });
+      router.push("/login");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to logout. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
+  const InfoDisplay = ({ data, className }) => {
+    if (
+      !data ||
+      data === "" ||
+      (Array.isArray(data) && data.length === 0) ||
+      data === " "
+    ) {
+      return (
+        <Skeleton className={cn("h-full w-full bg-gray-300", className)} />
+      );
+    }
+    return data;
+  };
+
+  return (
+    <Sidebar collapsible="icon" {...props} variant="floating">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-secondary text-sidebar-primary-foreground">
+              <Image
+            src="https://satsankalpa.org/wp-content/uploads/2025/01/cropped-SatSankalpa_Logo_retina_0523.png"
+            alt="Satsankalpa Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">
+                  Satsankalpa Advocacy
+                </span>
+                <span className="truncate text-xs h-4 w-16 ">
+                  <InfoDisplay data={roleDisplayName} />
+                </span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
+          <SidebarMenu>
+            {/* <Collapsible
+              key="Playground"
+              asChild
+              className="group/collapsible"
+            > */}
+            {/* <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip="Playground">
+                    <SquareTerminal />
+                    <span>Playground</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem key="History">
+                      <SidebarMenuSubButton asChild>
+                        <a href="/app">
+                          <span>History</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem key="Starred">
+                      <SidebarMenuSubButton asChild>
+                        <a href="/app">
+                          <span>Starred</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem key="Settings">
+                      <SidebarMenuSubButton asChild>
+                        <a href="/app">
+                          <span>Settings</span>
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible> */}
+            {(!roles || roles.length === 0) && (!permissions || permissions.length === 0) ? (
+              <>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    {open && (
+                      <Skeleton className="h-full w-full rounded-md bg-gray-300" />
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    {open && (
+                      <Skeleton className="h-full w-3/4 rounded-md bg-gray-300" />
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Skeleton className="h-full w-4 rounded-md bg-gray-300" />
+                    {open && (
+                      <Skeleton className="h-full w-1/2 rounded-md bg-gray-300" />
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </>
+            ) : (
+              <>
+                <Link href="/app">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Home"
+                      isActive={pathname === "/app"}
+                    >
+                      <Home />
+                      <span>Home</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
+                {canViewApplicants && (
+                  <Link href="/app/applicants">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Applicants"
+                        isActive={pathname === "/app/applicants"}
+                      >
+                        <FileUser />
+                        <span>Applicants</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
+                {canViewUsers && (
+                  <Link href="/app/users">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Users"
+                        isActive={pathname === "/app/users"}
+                      >
+                        <User2 />
+                        <span>Users</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
+                {canViewApplications && (
+                  <Link href="/app/applications">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Applications"
+                        isActive={pathname === "/app/applications"}
+                      >
+                        <AppWindow />
+                        <span>Applications</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
+                {/* My Applications - Show apps user has access to */}
+                {accessibleApplications.length > 0 && accessibleApplications.map((app) => (
+                  <Collapsible
+                    key={`app-${app.id}`}
+                    asChild
+                    className="group/collapsible"
+                    defaultOpen={pathname.includes(`/app/applications/${app.id}`)}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={app.name}>
+                          <AppWindow />
+                          <span className="truncate">{app.name}</span>
+                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {app.status === "active" && app.url && (
+                            <SidebarMenuSubItem key={`${app.id}-launch`}>
+                              <AppLaunchButton app={app} />
+                            </SidebarMenuSubItem>
+                          )}
+                          {app.isAdmin && (
+                            <SidebarMenuSubItem key={`${app.id}-rbac`}>
+                              <SidebarMenuSubButton asChild>
+                                <Link href={`/app/applications/${app.id}/rbac`}>
+                                  <Users className="h-4 w-4 mr-2" />
+                                  <span>{app.name} RBAC</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          )}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                ))}
+                {/*<Link href="/app/help">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="Help"
+                      isActive={pathname === "/app/help"}
+                    >
+                      <CircleHelp />
+                      <span>Help</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>*/}
+              </>
+            )}
+          </SidebarMenu>{" "}
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage
+                      src={`https://avatar.vercel.sh/${firstname?.[0]}${lastname?.[0]}`}
+                      alt="Avatar"
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      {firstname?.[0] && lastname?.[0]
+                        ? `${firstname[0]}${lastname[0]}`
+                        : "EB"}
+                    </AvatarFallback>{" "}
+                  </Avatar>{" "}
+                  <div className="grid flex-1 text-left text-sm leading-tight gap-1">
+                    <span className="truncate font-semibold h-4 w-full ">
+                      <InfoDisplay data={`${firstname} ${lastname}`} />
+                    </span>
+                    <span className="truncate text-xs h-4">
+                      <InfoDisplay data={email} className="w-1/2" />
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
+              >
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage
+                        src={`https://avatar.vercel.sh/${firstname?.[0]}${lastname?.[0]}`}
+                        alt="Avatar"
+                      />
+                      <AvatarFallback className="rounded-lg">
+                        {firstname?.[0] && lastname?.[0]
+                          ? `${firstname[0]}${lastname[0]}`
+                          : "EB"}
+                      </AvatarFallback>{" "}
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-sm leading-tight">
+                      <span className="truncate font-semibold h-4 w-full ">
+                        <InfoDisplay data={`${firstname} ${lastname}`} />
+                      </span>
+                      <span className="truncate text-xs h-4">
+                        <InfoDisplay data={email} className="w-1/2" />
+                      </span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Settings />
+                    Settings
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <button 
+                    onClick={handleLogout} 
+                    className="w-full flex items-center cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
+  );
+}

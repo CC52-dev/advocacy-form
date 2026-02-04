@@ -1,0 +1,23 @@
+{
+  "name": "advocacy-form",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "node dev.js",
+    "build": "node build.js",
+    "start": "node start.js",
+    "runbuild": "node runbuild.js",
+    "db:studio": "cd backend && npx drizzle-kit studio"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.2",
+    "js-cookie": "^3.0.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.27.2",
+    "@babel/core": "^7.27.1",
+    "@babel/plugin-transform-modules-commonjs": "^7.27.1"
+  }
+}
