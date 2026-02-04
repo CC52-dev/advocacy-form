@@ -105,6 +105,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
+import { PermissionSelector } from "@/components/permission-selector";
+import { isAdmin } from "@/lib/permissions";
 import api from "@/lib/axios";
 
 // Import location data
@@ -498,47 +500,101 @@ export const columns = [
     },
   },
   {
-    accessorKey: "type",
-    header: "User Type",
+    accessorKey: "roles",
+    header: "Roles",
     cell: ({ row }) => {
-      const type = row.original.type;
-      const getTypeColor = (type) => {
-        switch (type) {
-          case "admin":
-            return "bg-red-100 text-red-800 border-red-200";
-          case "adminviewer":
-            return "bg-blue-100 text-blue-800 border-blue-200";
-          case "user":
-            return "bg-green-100 text-green-800 border-green-200";
-          case "disabled":
-            return "bg-gray-100 text-gray-800 border-gray-200";
-          default:
-            return "bg-gray-100 text-gray-800 border-gray-200";
-        }
+      const roles = row.original.roles || [];
+      const permissions = row.original.permissions || [];
+      
+      // Helper function to safely extract all permissions
+      const extractAllPerms = () => {
+        const allPerms = [...permissions];
+        
+        // Extract from roles
+        roles.forEach(role => {
+          let rolePerms = role.permissions;
+          
+          // If it's a JSON string, parse it
+          if (typeof rolePerms === 'string') {
+            try {
+              rolePerms = JSON.parse(rolePerms);
+            } catch (e) {
+              return;
+            }
+          }
+          
+          // Add to allPerms if it's an array
+          if (Array.isArray(rolePerms)) {
+            allPerms.push(...rolePerms);
+          }
+        });
+        
+        // Remove duplicates and filter out any JSON strings
+        return [...new Set(allPerms)].filter(p => typeof p === 'string' && !p.startsWith('['));
       };
       
-      const getTypeLabel = (type) => {
-        switch (type) {
-          case "admin":
-            return "Admin";
-          case "adminviewer":
-            return "Admin Viewer";
-          case "user":
-            return "User";
-          case "disabled":
-            return "Disabled";
-          default:
-            return type;
-        }
-      };
-
+      const allPerms = extractAllPerms();
+      
+      // Show admin badge if user has exact "admin" permission
+      if (allPerms.includes("admin")) {
+        return (
+          <Badge variant="default" className="bg-red-100 text-red-800 border-red-200">
+            Admin
+          </Badge>
+        );
+      }
+      
+      // Show disabled badge if user has disabled permission
+      const hasDisabledPermission = allPerms.includes("disabled");
+      if (hasDisabledPermission) {
+        return (
+          <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200">
+            Disabled
+          </Badge>
+        );
+      }
+      
+      // Show protected badge if user has users.protected permission
+      const isProtected = allPerms.includes("users.protected");
+      
+      // Show role badges - only the role title, no "App Admin" badge
+      if (roles.length === 0) {
+        return (
+          <div className="flex items-center gap-1 flex-wrap">
+            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+              User
+            </Badge>
+            {isProtected && (
+              <Badge variant="secondary" className="text-xs">
+                Protected
+              </Badge>
+            )}
+          </div>
+        );
+      }
+      
       return (
-        <Badge 
-          variant="outline" 
-          className={`${getTypeColor(type)} whitespace-nowrap`}
-        >
-          {getTypeLabel(type)}
-        </Badge>
+        <div className="flex flex-wrap gap-1">
+          {roles.slice(0, 2).map((role) => (
+            <Badge 
+              key={role.id || role.roleTitle} 
+              variant="outline" 
+              className="whitespace-nowrap"
+            >
+              {role.roleTitle || role.name || role.id}
+            </Badge>
+          ))}
+          {roles.length > 2 && (
+            <Badge variant="outline" className="text-xs">
+              +{roles.length - 2} more
+            </Badge>
+          )}
+          {isProtected && (
+            <Badge variant="secondary" className="text-xs">
+              Protected
+            </Badge>
+          )}
+        </div>
       );
     },
   },
@@ -612,9 +668,54 @@ export const columns = [
       const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
       const [locationSelectorKey, setLocationSelectorKey] = React.useState(0);
       
+      // Get user's current roles (new structure: {id, roleTitle, permissions})
+      const userRoles = row.original.roles || [];
+      const initialRoles = userRoles.map((r) => ({
+        roleTitle: r.roleTitle || r.name || r.id,
+        permissions: r.permissions || [],
+      }));
+      
       // Safely convert location data
       const safeLocationData = safeLocationArray(row.original.location);
       
+      // Helper function to safely extract permissions from roles and handle JSON strings
+      const extractAllPermissions = (directPerms, roles) => {
+        const allPerms = [...(directPerms || [])];
+        
+        // Extract from roles
+        if (roles && Array.isArray(roles)) {
+          roles.forEach(role => {
+            let rolePerms = role.permissions;
+            
+            // If it's a JSON string, parse it
+            if (typeof rolePerms === 'string') {
+              try {
+                rolePerms = JSON.parse(rolePerms);
+              } catch (e) {
+                // If parsing fails, skip this role's permissions
+                return;
+              }
+            }
+            
+            // Add to allPerms if it's an array
+            if (Array.isArray(rolePerms)) {
+              allPerms.push(...rolePerms);
+            }
+          });
+        }
+        
+        // Remove duplicates and filter out any remaining JSON strings
+        return [...new Set(allPerms)].filter(p => typeof p === 'string' && !p.startsWith('['));
+      };
+      
+      // Extract all permissions from both direct permissions and roles
+      const initialPermissions = extractAllPermissions(row.original.permissions, userRoles);
+      
+      // Get role title from first role (or empty)
+      const initialRoleTitle = userRoles.length > 0 
+        ? (userRoles[0].roleTitle || userRoles[0].name || "")
+        : "";
+
       const [editFormData, setEditFormData] = React.useState({
         firstname: safeString(row.original.firstname),
         lastname: safeString(row.original.lastname),
@@ -623,10 +724,13 @@ export const columns = [
         addr: safeString(row.original.addr),
         city: safeString(row.original.city),
         zip: safeString(row.original.zip),
-        type: row.original.type || "",
         interest: safeArray(row.original.interest),
         location: safeLocationData,
+        roleTitle: initialRoleTitle,
+        permissions: initialPermissions, // Already deduplicated in extractAllPermissions
       });
+
+      const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
 
       const updateUser = useMutation({
         mutationFn: async (userData) => {
@@ -661,7 +765,69 @@ export const columns = [
       };
 
       const handleSubmit = () => {
-        updateUser.mutate(editFormData);
+        // Check if role title or permissions changed
+        const currentPermissions = [...new Set(editFormData.permissions || [])].sort();
+        const initialPerms = [...new Set(initialPermissions)].sort();
+        const permissionsChanged = JSON.stringify(currentPermissions) !== JSON.stringify(initialPerms);
+        const roleTitleChanged = editFormData.roleTitle !== initialRoleTitle;
+        
+        // Prepare update data
+        const updateData = {
+          firstname: editFormData.firstname,
+          lastname: editFormData.lastname,
+          phone: editFormData.phone,
+          addr: editFormData.addr,
+          city: editFormData.city,
+          zip: editFormData.zip,
+          interest: editFormData.interest,
+          location: editFormData.location,
+        };
+        
+        // If permissions changed, include roles
+        // Note: We always use a single role with all permissions combined
+        if (permissionsChanged || roleTitleChanged) {
+          // Use existing role title if available, otherwise require one
+          const roleTitle = editFormData.roleTitle?.trim() || initialRoleTitle?.trim();
+          
+          if (!roleTitle) {
+            toast({
+              title: "Role title required",
+              description: "Please enter a role title when assigning permissions",
+              variant: "destructive",
+              duration: 3000,
+            });
+            return;
+          }
+          
+          updateData.roles = [{
+            roleTitle: roleTitle,
+            permissions: currentPermissions,
+          }];
+          
+          setShowConfirmDialog(true);
+        } else {
+          updateUser.mutate(updateData);
+        }
+      };
+
+      const confirmRoleChange = () => {
+        setShowConfirmDialog(false);
+        const roleTitle = editFormData.roleTitle?.trim() || initialRoleTitle?.trim() || "User";
+        const updateData = {
+          firstname: editFormData.firstname,
+          lastname: editFormData.lastname,
+          phone: editFormData.phone,
+          addr: editFormData.addr,
+          city: editFormData.city,
+          zip: editFormData.zip,
+          interest: editFormData.interest,
+          location: editFormData.location,
+          roles: [{
+            roleTitle: roleTitle,
+            permissions: [...new Set(editFormData.permissions || [])],
+          }],
+        };
+        updateUser.mutate(updateData);
       };
 
       // Handle dialog open/close
@@ -670,12 +836,85 @@ export const columns = [
         if (open) {
           // Reset LocationSelector when dialog opens
           setLocationSelectorKey(prev => prev + 1);
+          // Re-extract permissions in case user data has changed
+          const currentPermissions = extractAllPermissions(row.original.permissions, userRoles);
+          // Reset to initial values
+          setEditFormData({
+            firstname: safeString(row.original.firstname),
+            lastname: safeString(row.original.lastname),
+            email: safeString(row.original.email),
+            phone: safeString(row.original.phone),
+            addr: safeString(row.original.addr),
+            city: safeString(row.original.city),
+            zip: safeString(row.original.zip),
+            interest: safeArray(row.original.interest),
+            location: safeLocationData,
+            roleTitle: initialRoleTitle,
+            permissions: currentPermissions,
+          });
         }
       };
 
-      // Check if current user can edit this user
-      const currentUserType = useAuthStore((state) => state.type);
-      const canEdit = currentUserType === "admin" && row.original.type !== "admin";
+      // Check if current user can view/edit this user
+      const currentUserPermissions = useAuthStore((state) => state.permissions) || [];
+      const currentUserRoles = useAuthStore((state) => state.roles) || [];
+      // Combine all permissions from direct permissions and role permissions
+      const allCurrentUserPerms = [
+        ...currentUserPermissions,
+        ...currentUserRoles.flatMap(r => r.permissions || [])
+      ];
+      // Check admin in both direct permissions AND role permissions
+      const isCurrentUserAdmin = allCurrentUserPerms.includes("admin");
+      const canViewUsers = allCurrentUserPerms.includes("users.read") || allCurrentUserPerms.includes("users.*") || isCurrentUserAdmin;
+      const canEditUsers = allCurrentUserPerms.includes("users.updateinfo") || allCurrentUserPerms.includes("users.*") || isCurrentUserAdmin;
+      
+      const allTargetUserPerms = extractAllPermissions(row.original.permissions, row.original.roles);
+      
+      // Check for exact "admin" permission (not substring match)
+      const targetUserIsAdmin = allTargetUserPerms.includes("admin");
+      const targetUserIsProtected = allTargetUserPerms.includes("users.protected");
+      
+      // Check if target user is an application admin (has any app.*.admin permission)
+      const targetUserIsAppAdmin = allTargetUserPerms.some(p => /^app\.[^.]+\.admin$/.test(p));
+      
+      // Debug logging
+      if (targetUserIsAppAdmin || targetUserIsAdmin) {
+        console.log('User Check:', {
+          email: row.original.email,
+          directPermissions: row.original.permissions,
+          roles: row.original.roles,
+          allTargetUserPerms,
+          targetUserIsAdmin,
+          targetUserIsAppAdmin,
+        });
+      }
+      
+      // Determine if current user can edit this user:
+      // 1. Must have basic edit permission (users.updateinfo or admin)
+      // 2. Cannot edit system admins (no one can)
+      // 3. System admins can edit everyone (including app admins and protected users)
+      // 4. Protected users can only be edited by system admins
+      // 5. App admins CAN be edited by anyone with users.updateinfo
+      const canEdit = (() => {
+        if (!canEditUsers) return false; // Must have edit permission
+        if (targetUserIsAdmin) return false; // No one can edit system admins
+        if (isCurrentUserAdmin) return true; // System admins can edit everyone else
+        if (targetUserIsProtected) return false; // Only system admins can edit protected users
+        // Anyone with users.updateinfo can edit app admins and regular users
+        return true;
+      })();
+      
+      // Determine if current user can edit this user's PERMISSIONS:
+      // Requires users.roles permission
+      const canEditPermissions = (() => {
+        if (targetUserIsAdmin) return false; // Cannot edit system admin permissions
+        if (!allCurrentUserPerms.includes("users.roles") && !isCurrentUserAdmin) return false; // Must have users.roles
+        if (targetUserIsProtected && !isCurrentUserAdmin) return false; // Only admins can edit protected user permissions
+        // Anyone with users.roles can edit app admin permissions and regular user permissions
+        return true;
+      })();
+
+      // No need to fetch roles anymore - we're using direct permission selection
 
       return (
         <div className="flex gap-2">
@@ -693,7 +932,7 @@ export const columns = [
               >
                 Copy User ID
               </DropdownMenuItem>
-              {canEdit && (
+              {canViewUsers && (
                 <DropdownMenuItem
                   onClick={() => setIsEditDialogOpen(true)}
                 >
@@ -703,143 +942,185 @@ export const columns = [
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {canEdit && (
-            <Dialog open={isEditDialogOpen} onOpenChange={handleDialogChange}>
-              <ForcedDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                <DialogTitle>
-                  Edit {row.original.firstname} {row.original.lastname}
-                </DialogTitle>
-                <DialogDescription>
-                  Update user information. Only admins can edit users, disabled users, and admin viewers.
-                </DialogDescription>
-                
-                <div className="grid grid-cols-2 gap-4 py-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">First Name</label>
-                    <Input
-                      value={editFormData.firstname}
-                      onChange={(e) => handleInputChange('firstname', e.target.value)}
-                      placeholder="First Name"
-                    />
-                  </div>
+          {canViewUsers && (
+            <>
+              <Dialog open={isEditDialogOpen} onOpenChange={handleDialogChange}>
+                <ForcedDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogTitle>
+                    Edit {row.original.firstname} {row.original.lastname}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Update user information. System admins can edit all users except other system admins. Application admins can only be edited by system admins.
+                  </DialogDescription>
                   
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Last Name</label>
-                    <Input
-                      value={editFormData.lastname}
-                      onChange={(e) => handleInputChange('lastname', e.target.value)}
-                      placeholder="Last Name"
-                    />
+                  <div className="grid grid-cols-2 gap-4 py-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">First Name</label>
+                      <Input
+                        value={editFormData.firstname}
+                        onChange={(e) => handleInputChange('firstname', e.target.value)}
+                        placeholder="First Name"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Last Name</label>
+                      <Input
+                        value={editFormData.lastname}
+                        onChange={(e) => handleInputChange('lastname', e.target.value)}
+                        placeholder="Last Name"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Email</label>
+                      <Input
+                        value={editFormData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        placeholder="Email"
+                        type="email"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Phone</label>
+                      <PhoneInput
+                        value={editFormData.phone}
+                        onChange={(value) => handleInputChange('phone', value)}
+                        defaultCountry={getCountryFromPhone(editFormData.phone)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Address</label>
+                      <Input
+                        value={editFormData.addr}
+                        onChange={(e) => handleInputChange('addr', e.target.value)}
+                        placeholder="Address"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">City</label>
+                      <Input
+                        value={editFormData.city}
+                        onChange={(e) => handleInputChange('city', e.target.value)}
+                        placeholder="City"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">ZIP Code</label>
+                      <Input
+                        value={editFormData.zip}
+                        onChange={(e) => handleInputChange('zip', e.target.value)}
+                        placeholder="ZIP Code"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Location</label>
+                      <LocationSelector
+                        value={editFormData.location}
+                        onChange={(val) => handleInputChange('location', val)}
+                      />
+                    </div>
+                    
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-sm font-medium">Role Title</label>
+                      <Input
+                        value={editFormData.roleTitle || ""}
+                        onChange={(e) => {
+                          setEditFormData(prev => ({
+                            ...prev,
+                            roleTitle: e.target.value,
+                          }));
+                        }}
+                        placeholder="e.g., Manager, Editor, Viewer"
+                      />
+                    </div>
+                    
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-sm font-medium">Permissions</label>
+                      {!canEditPermissions && !targetUserIsAdmin && (
+                        <p className="text-xs text-amber-600 mb-2">
+                          You need the "Manage User Roles" permission to edit permissions.
+                        </p>
+                      )}
+                      {targetUserIsAdmin && (
+                        <p className="text-xs text-red-600 mb-2">
+                          System admin permissions cannot be modified.
+                        </p>
+                      )}
+                      <PermissionSelector
+                        permissions={editFormData.permissions || []}
+                        onChange={(selectedPermissions) => {
+                          setEditFormData(prev => ({
+                            ...prev,
+                            permissions: selectedPermissions,
+                          }));
+                        }}
+                        disabled={!canEditPermissions}
+                        showWarnings={false}
+                      />
+                    </div>
+                    
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-sm font-medium">Interests</label>
+                      <MultiSelect
+                        options={[
+                          "Thapo Kshetra revival (Bharat)",
+                          "Vedic Worship (USA)",
+                          "Virtual Knowledge Sessions (USA)",
+                          "Research (USA)",
+                          "Print and Publications (USA)",
+                          "Bharatheeyatha Annual Event (USA)",
+                          "Content Management (Global Shared Services)",
+                          "Marketing (Global Shared Services)",
+                          "Technology (Global Shared Services)",
+                          "Charity (USA and Bharat)",
+                          "Help me decide",
+                        ]}
+                        selected={editFormData.interest}
+                        onChange={(value) => handleInputChange('interest', value)}
+                        placeholder="Select Areas of Interest"
+                        className="w-full"
+                      />
+                    </div>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
-                    <Input
-                      value={editFormData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="Email"
-                      type="email"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Phone</label>
-                    <PhoneInput
-                      value={editFormData.phone}
-                      onChange={(value) => handleInputChange('phone', value)}
-                      defaultCountry={getCountryFromPhone(editFormData.phone)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Address</label>
-                    <Input
-                      value={editFormData.addr}
-                      onChange={(e) => handleInputChange('addr', e.target.value)}
-                      placeholder="Address"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">City</label>
-                    <Input
-                      value={editFormData.city}
-                      onChange={(e) => handleInputChange('city', e.target.value)}
-                      placeholder="City"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">ZIP Code</label>
-                    <Input
-                      value={editFormData.zip}
-                      onChange={(e) => handleInputChange('zip', e.target.value)}
-                      placeholder="ZIP Code"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Location</label>
-                    <LocationSelector
-                      value={editFormData.location}
-                      onChange={(val) => handleInputChange('location', val)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">User Type</label>
-                    <Select
-                      value={editFormData.type}
-                      onValueChange={(value) => handleInputChange('type', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select user type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="adminviewer">Admin Viewer</SelectItem>
-                        <SelectItem value="disabled">Disabled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="col-span-2 space-y-2">
-                    <label className="text-sm font-medium">Interests</label>
-                    <MultiSelect
-                      options={[
-                        "Thapo Kshetra revival (Bharat)",
-                        "Vedic Worship (USA)",
-                        "Virtual Knowledge Sessions (USA)",
-                        "Research (USA)",
-                        "Print and Publications (USA)",
-                        "Bharatheeyatha Annual Event (USA)",
-                        "Content Management (Global Shared Services)",
-                        "Marketing (Global Shared Services)",
-                        "Technology (Global Shared Services)",
-                        "Charity (USA and Bharat)",
-                        "Help me decide",
-                      ]}
-                      selected={editFormData.interest}
-                      onChange={(value) => handleInputChange('interest', value)}
-                      placeholder="Select Areas of Interest"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
 
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button 
-                    onClick={handleSubmit}
-                    disabled={updateUser.isPending}
-                  >
-                    {updateUser.isPending ? "Updating..." : "Update User"}
-                  </Button>
-                </DialogFooter>
-              </ForcedDialogContent>
-            </Dialog>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button 
+                      onClick={handleSubmit}
+                      disabled={updateUser.isPending || !canEdit}
+                    >
+                      {updateUser.isPending ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </DialogFooter>
+                </ForcedDialogContent>
+              </Dialog>
+
+              {/* Confirmation Dialog for Role Changes */}
+              <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+                <AlertDialogContent>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You are about to modify this user's roles. This action cannot be undone. Are you sure you want to continue?
+                  </AlertDialogDescription>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setShowConfirmDialog(false)}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <Button onClick={confirmRoleChange}>
+                      Confirm
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
           )}
         </div>
       );

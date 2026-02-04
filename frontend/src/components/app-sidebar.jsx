@@ -20,6 +20,7 @@ import {
   Home,
   CircleHelp,
   FileUser,
+  AppWindow,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -54,7 +55,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { User2 } from "lucide-react";
+import { User2, Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { useToast } from "@/hooks/use-toast";
@@ -62,6 +63,62 @@ import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import Image from "next/image";
+import { useHasPermission } from "@/lib/permissions";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { ExternalLink, Loader2 } from "lucide-react";
+
+// Component for launching an application
+function AppLaunchButton({ app }) {
+  const { toast } = useToast();
+  
+  const launchMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.post(`/api/app-roles/launch/${app.id}/generate`);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.redirectUrl) {
+        if (data.reused) {
+          toast({
+            title: "Launching Application",
+            description: "Reusing existing session...",
+            duration: 2000,
+          });
+        } else {
+          toast({
+            title: "Launching Application",
+            description: "Redirecting to the application...",
+            duration: 2000,
+          });
+        }
+        window.open(data.redirectUrl, "_blank");
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to launch application",
+        variant: "destructive",
+        duration: 3000,
+      });
+    },
+  });
+
+  return (
+    <SidebarMenuSubButton
+      onClick={() => launchMutation.mutate()}
+      disabled={launchMutation.isPending}
+      className="cursor-pointer"
+    >
+      {launchMutation.isPending ? (
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <ExternalLink className="h-4 w-4 mr-2" />
+      )}
+      <span>Launch - {app.name}</span>
+    </SidebarMenuSubButton>
+  );
+}
 
 export function AppSidebar({ ...props }) {
   const pathname = usePathname();
@@ -71,11 +128,57 @@ export function AppSidebar({ ...props }) {
   const firstname = useAuthStore((state) => state.firstname);
   const lastname = useAuthStore((state) => state.lastname);
   const email = useAuthStore((state) => state.email);
-  const typelowercase = useAuthStore((state) => state.type);
-  const type =
-    String(typelowercase)?.charAt(0)?.toUpperCase() +
-    String(typelowercase)?.slice(1);
+  const roles = useAuthStore((state) => state.roles) || [];
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  
+  // Debug logging
+  console.log('Sidebar - Current state:', {
+    roles,
+    permissions,
+    firstRole: roles[0],
+    rolesLength: roles.length,
+    permissionsLength: permissions.length,
+  });
+  
+  // Get role display name from roles array (use first role's title, or fallback to permissions)
+  let roleDisplayName = "User";
+  
+  if (roles && roles.length > 0) {
+    const firstRole = roles[0];
+    roleDisplayName = firstRole?.roleTitle || firstRole?.name || firstRole?.id || "User";
+    console.log('Sidebar - Using role from roles array:', roleDisplayName, firstRole);
+  } else if (permissions && permissions.length > 0) {
+    if (permissions.includes("admin")) {
+      roleDisplayName = "Admin";
+    } else if (permissions.includes("applicant")) {
+      roleDisplayName = "Applicant";
+    } else if (permissions.includes("disabled")) {
+      roleDisplayName = "Disabled";
+    }
+    console.log('Sidebar - Using role from permissions:', roleDisplayName);
+  } else {
+    console.warn('Sidebar - No roles or permissions found, defaulting to "User"');
+  }
+  
   const { isMobile, open } = useSidebar();
+  
+  // Permission checks
+  const canViewApplicants = useHasPermission("applicants.read");
+  const canViewUsers = useHasPermission("users.read");
+  const canViewApplications = useHasPermission("dev");
+
+  // Fetch applications where user has any access
+  const { data: accessibleAppsData } = useQuery({
+    queryKey: ["accessibleApplications"],
+    queryFn: async () => {
+      const response = await api.post("/api/app-roles/accessible");
+      return response.data;
+    },
+    enabled: !!(roles?.length > 0 || permissions?.length > 0),
+    staleTime: 60000,
+  });
+
+  const accessibleApplications = accessibleAppsData?.message || [];
 
   const handleLogout = async () => {
     try {
@@ -133,7 +236,7 @@ export function AppSidebar({ ...props }) {
                   Satsankalpa Advocacy
                 </span>
                 <span className="truncate text-xs h-4 w-16 ">
-                  <InfoDisplay data={type} />
+                  <InfoDisplay data={roleDisplayName} />
                 </span>
               </div>
             </SidebarMenuButton>
@@ -184,10 +287,7 @@ export function AppSidebar({ ...props }) {
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible> */}
-            {!type ||
-            type === "" ||
-            (Array.isArray(type) && type.length === 0) ||
-            type === " " ? (
+            {(!roles || roles.length === 0) && (!permissions || permissions.length === 0) ? (
               <>
                 <SidebarMenuItem>
                   <SidebarMenuButton>
@@ -227,45 +327,83 @@ export function AppSidebar({ ...props }) {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
-                {type === "Admin" || type === "Adminviewer" ? (
-                  <>
-                    <Link href="/app/applicants">
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          tooltip="Applicants"
-                          isActive={pathname === "/app/applicants"}
-                        >
-                          <FileUser />
-                          <span>Applicants</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </Link>
-                    <Link href="/app/users">
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          tooltip="Users"
-                          isActive={pathname === "/app/users"}
-                        >
-                          <User2 />
-                          <span>Users</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                  {/* <Link href="/app/chat">
+                {canViewApplicants && (
+                  <Link href="/app/applicants">
                     <SidebarMenuItem>
                       <SidebarMenuButton
-                        tooltip="Chat"
-                        isActive={pathname === "/app/chat"}
+                        tooltip="Applicants"
+                        isActive={pathname === "/app/applicants"}
                       >
-                        <span>Chat</span>
+                        <FileUser />
+                        <span>Applicants</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                  </Link> */}
-                    </>
+                  </Link>
                 )}
+                {canViewUsers && (
+                  <Link href="/app/users">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Users"
+                        isActive={pathname === "/app/users"}
+                      >
+                        <User2 />
+                        <span>Users</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
+                {canViewApplications && (
+                  <Link href="/app/applications">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Applications"
+                        isActive={pathname === "/app/applications"}
+                      >
+                        <AppWindow />
+                        <span>Applications</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
+                {/* My Applications - Show apps user has access to */}
+                {accessibleApplications.length > 0 && accessibleApplications.map((app) => (
+                  <Collapsible
+                    key={`app-${app.id}`}
+                    asChild
+                    className="group/collapsible"
+                    defaultOpen={pathname.includes(`/app/applications/${app.id}`)}
+                  >
+                    <SidebarMenuItem>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton tooltip={app.name}>
+                          <AppWindow />
+                          <span className="truncate">{app.name}</span>
+                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {app.status === "active" && app.url && (
+                            <SidebarMenuSubItem key={`${app.id}-launch`}>
+                              <AppLaunchButton app={app} />
+                            </SidebarMenuSubItem>
+                          )}
+                          {app.isAdmin && (
+                            <SidebarMenuSubItem key={`${app.id}-rbac`}>
+                              <SidebarMenuSubButton asChild>
+                                <Link href={`/app/applications/${app.id}/rbac`}>
+                                  <Users className="h-4 w-4 mr-2" />
+                                  <span>{app.name} RBAC</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          )}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                ))}
                 {/*<Link href="/app/help">
                   <SidebarMenuItem>
                     <SidebarMenuButton

@@ -31,11 +31,17 @@ import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
 import applicantRouter from './routes/applicant.js';
 import helpRouter from './routes/help.js';
+import roleRouter from './routes/role.js';
+import applicationRouter from './routes/application.js';
+import applicationRolesRouter from './routes/applicationRoles.js';
 app.use('/api/form', formRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/applicants', applicantRouter);
 app.use('/api/help', helpRouter);
+app.use('/api/role', roleRouter);
+app.use('/api/applications', applicationRouter);
+app.use('/api/app-roles', applicationRolesRouter);
 
 
 app.use(notFound);

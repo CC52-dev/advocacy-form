@@ -5,7 +5,7 @@ import {
   encodeHexLowerCase,
 } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
-import { sessionTable, usersTable, otpTable } from "../db/schema.js";
+import { sessionTable, usersTable, otpTable, userRolesTable } from "../db/schema.js";
 import type { User, Session, Otp } from "../db/schema.js";
 import {
   createSession,
@@ -16,6 +16,7 @@ import {
 import type { SessionValidationResult } from "../lib/session.js";
 import type { Response } from "express";
 import { emailService } from "../lib/emailService.js";
+import { getUserPermissions } from "../lib/permissions.js";
 
 export async function authenticate(email: string, res: Response) {
   try {
@@ -33,10 +34,33 @@ export async function authenticate(email: string, res: Response) {
 
     const user = users[0];
 
-    // Check if user is disabled
-    if (user.type === "disabled") {
+    // Check if user has "disabled" permission (exclusive permission)
+    const userRoles = await db
+      .select()
+      .from(userRolesTable)
+      .where(eq(userRolesTable.userId, user.id));
+
+    const parsePermissions = (perms: any): string[] => {
+      if (Array.isArray(perms)) return perms;
+      if (typeof perms === 'string') {
+        try {
+          const parsed = JSON.parse(perms);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    };
+    
+    const hasDisabledPermission = userRoles.some((userRole) => {
+      const permissions = parsePermissions(userRole.permissions);
+      return permissions.includes("disabled");
+    });
+
+    if (hasDisabledPermission || user.type === "disabled") {
       res.status(403).json({
-        message: "Account has been disabled. Please contact support.",
+        message: "Account Disabled",
       });
       return;
     }
@@ -113,7 +137,44 @@ export async function verifyOTP(
         .select()
         .from(usersTable)
         .where(eq(usersTable.email, email));
-      const { expiresAt } = await createSession(token, users[0].id);
+      
+      const user = users[0];
+
+      // Check if user has "disabled" permission (exclusive permission)
+      const userRoles = await db
+        .select()
+        .from(userRolesTable)
+        .where(eq(userRolesTable.userId, user.id));
+
+      const parsePermissions = (perms: any): string[] => {
+        if (Array.isArray(perms)) return perms;
+        if (typeof perms === 'string') {
+          try {
+            const parsed = JSON.parse(perms);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (e) {
+            return [];
+          }
+        }
+        return [];
+      };
+      
+      const hasDisabledPermission = userRoles.some((userRole) => {
+        const permissions = parsePermissions(userRole.permissions);
+        return permissions.includes("disabled");
+      });
+
+      if (hasDisabledPermission) {
+        res.status(403).json({
+          message: "Account Disabled",
+        });
+        return;
+      }
+
+      // Get user's permissions
+      const permissions = await getUserPermissions(user.id);
+
+      const { expiresAt } = await createSession(token, user.id);
 
       res
         .cookie("session_token", token, {
@@ -126,6 +187,15 @@ export async function verifyOTP(
         .json({
           message: "OTP verified",
           token: token,
+          user: {
+            ...user,
+            roles: userRoles.map(ur => ({
+              id: ur.id,
+              roleTitle: ur.roleTitle,
+              permissions: ur.permissions,
+            })),
+            permissions: permissions,
+          },
         });
       console.log({ message: token });
       return;

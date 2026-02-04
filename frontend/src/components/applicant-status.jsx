@@ -98,7 +98,8 @@ export default function ApplicantStatus() {
     city: safeString(authData.city),
     zip: safeString(authData.zip),
     interest: safeArray(authData.interest),
-    type: authData.type,
+    // type is deprecated, use permissions/roles instead
+    // type: authData.type,
     appliedAt: authData.appliedAt,
     acceptedAt: authData.acceptedAt,
   };
@@ -181,21 +182,35 @@ export default function ApplicantStatus() {
   };
 
   const getStatusInfo = () => {
-    if (userData.type === "applicant") {
+    const permissions = userData.permissions || [];
+    const roles = userData.roles || [];
+    
+    // Check permissions from roles if not directly available
+    const allPermissions = permissions.length > 0 
+      ? permissions 
+      : roles.reduce((acc, role) => {
+          if (role.permissions && Array.isArray(role.permissions)) {
+            return [...acc, ...role.permissions];
+          }
+          return acc;
+        }, []);
+    
+    if (allPermissions.includes("applicant")) {
       return {
         status: "Under Review",
         icon: <Clock className="h-5 w-5" />,
         color: "bg-yellow-100 text-yellow-800 border-yellow-200",
         description: "Your application is currently being reviewed by our team.",
       };
-    } else if (userData.type === "user") {
+    } else if (allPermissions.includes("admin") || allPermissions.some(p => p.startsWith("applicants.") || p.startsWith("users."))) {
+      // User has been approved (has permissions other than applicant/disabled)
       return {
         status: "Approved",
         icon: <CheckCircle className="h-5 w-5" />,
         color: "bg-green-100 text-green-800 border-green-200",
         description: "Congratulations! Your application has been approved.",
       };
-    } else if (userData.type === "disabled") {
+    } else if (allPermissions.includes("disabled")) {
       return {
         status: "Not Approved",
         icon: <XCircle className="h-5 w-5" />,
@@ -249,7 +264,18 @@ export default function ApplicantStatus() {
   };
 
   // Only show for applicants
-  if (userData.type !== "applicant") {
+  const permissions = userData.permissions || [];
+  const roles = userData.roles || [];
+  const allPermissions = permissions.length > 0 
+    ? permissions 
+    : roles.reduce((acc, role) => {
+        if (role.permissions && Array.isArray(role.permissions)) {
+          return [...acc, ...role.permissions];
+        }
+        return acc;
+      }, []);
+  
+  if (!allPermissions.includes("applicant")) {
     return null;
   }
 

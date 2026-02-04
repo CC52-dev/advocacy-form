@@ -27,6 +27,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   PlusCircle,
+  RefreshCw,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -91,12 +92,11 @@ export function DataTableApplicants() {
   const [rowSelection, setRowSelection] = React.useState({});
   const router = useRouter();
   const [filterValue, setFilterValue] = React.useState("");
-  const type = useAuthStore((state) => state.type);
   
-  // Get columns based on user type
-  const columns = React.useMemo(() => getColumns(), [type]);
+  // Get columns (no longer depends on type)
+  const columns = React.useMemo(() => getColumns(), []);
   
-  const { data, isLoading, isFetching, error } = useQuery({
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
     queryKey: ["applicants"],
     queryFn: async () => {
       const response = await api.post("/api/applicants/getAllApplicants");
@@ -324,6 +324,16 @@ export function DataTableApplicants() {
             <SelectItem value="newest">Newest First</SelectItem>
           </SelectContent>
         </Select>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="w-full sm:w-auto h-10"
+        >
+          <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

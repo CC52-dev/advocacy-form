@@ -103,9 +103,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
+import { hasPermission } from "@/lib/permissions";
 
 export const getColumns = () => {
-  const type = useAuthStore.getState().type;
+  // Check permissions instead of type
+  const canApprove = hasPermission("applicants.approve");
   
   const baseColumns = [
     {
@@ -475,8 +477,8 @@ export const getColumns = () => {
     },
   ];
 
-  // Only add approve/deny actions for Admin users
-  if (type === "admin") {
+  // Only add approve/deny actions for users with applicants.approve permission
+  if (canApprove) {
     baseColumns.push({
       id: "approve/deny",
       cell: ({ row }) => {

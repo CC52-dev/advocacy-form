@@ -69,7 +69,7 @@ export default function LoginPage() {
     const router = useRouter();
     useEffect(() => {
       if (isLogggedIn) {
-        router.push("/app");
+        router.replace("/app");
       }
     }, [isLogggedIn, router]);
   const [step, setStep] = useState(0);
@@ -150,33 +150,64 @@ export default function LoginPage() {
   const onOtpSubmit = async (data) => {
     try {
       const response = await otpMutate.mutateAsync(data);
+      
+      // Fetch user details after successful login
+      const userResponse = await api.post("/api/user/getuser");
+      console.log("Login Page Activating");
+      console.log("User response:", userResponse.data);
+      console.log("User message:", userResponse.data.message);
+      
+      // Check if permissions are missing - if so, clear cache
+      const user = userResponse.data?.message;
+      if (user && (!user.permissions || user.permissions.length === 0) && (!user.roles || user.roles.length === 0)) {
+        console.warn("No permissions found in user data, clearing cache and retrying...");
+        // Clear cache and retry
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth-storage');
+        }
+        // Retry getting user data
+        const retryResponse = await api.post("/api/user/getuser");
+        setIsLoggedIn(retryResponse.data, true);
+      } else {
+        // Set user data in the store with the correct structure
+        setIsLoggedIn(userResponse.data, true);
+      }
+      
       toast({
         title: "Login successful",
         description: response.message,
         duration: 3000,
       });
       
-
-      
-      // Fetch user details after successful login
-      const userResponse = await api.post("/api/user/getuser");
-      console.log("Login Page Activating");
-      console.log(userResponse.data.message);
-      
-      // Set user data in the store with the correct structure
-      setIsLoggedIn(userResponse.data, true);
-      
-      // Force a small delay to ensure store is updated
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Navigate to app
-      router.push("/app");
+      // Wait for store to update properly before redirect
+      // Use replace instead of push for better UX (no back button to login)
+      setTimeout(() => {
+        router.replace("/app");
+      }, 50);
     } catch (error) {
       if (error.response?.status === 400) {
         otpForm.setError("otp", { message: error.response.data.message });
         toast({
           title: "Invalid OTP",
           description: error.response.data.message,
+          duration: 3000,
+          variant: "destructive",
+        });
+      } else if (error.response?.status === 401) {
+        // Handle 401 - auto logout and redirect
+        setIsLoggedIn({ message: {} }, false);
+        router.replace("/login");
+        toast({
+          title: "Session expired",
+          description: "Please login again",
+          duration: 3000,
+          variant: "destructive",
+        });
+      } else if (error.response?.status === 403) {
+        otpForm.setError("otp", { message: "Account Disabled" });
+        toast({
+          title: "Account Disabled",
+          description: error.response.data.message || "Your account has been disabled",
           duration: 3000,
           variant: "destructive",
         });

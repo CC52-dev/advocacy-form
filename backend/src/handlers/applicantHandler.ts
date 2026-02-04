@@ -1,12 +1,13 @@
 import db from "../db/db.js";
 import { eq, and } from "drizzle-orm";
 
-import { usersTable } from "../db/schema.js";
+import { usersTable, userRolesTable } from "../db/schema.js";
 import type { User } from "../db/schema.js";
 import { validateSessionToken, invalidateSession, invalidateAllUserSessions } from "../lib/session.js";
 import type { SessionValidationResult } from "../lib/session.js";
 import type { Response } from "express";
 import { emailService } from "../lib/emailService.js";
+import { hasPermission } from "../lib/permissions.js";
 
 export async function getAllApplicants(token: string, res: Response) {
   try {
@@ -14,26 +15,27 @@ export async function getAllApplicants(token: string, res: Response) {
       await validateSessionToken(token);
     if (
       !sessionValidationResult.session ||
-      !sessionValidationResult.user ||
-      (sessionValidationResult.user["type"] !== "admin" && sessionValidationResult.user["type"] !== "adminviewer")
+      !sessionValidationResult.user
     ) {
-      res.status(400).json({ message: "Token is Invalid Or Expired" });
-      console.log({ message: "Token is Invalid Or Expired" });
+      res.status(401).json({ message: "Token is Invalid Or Expired" });
       return;
     }
-    console.log({ message: sessionValidationResult.user });
+
+    const userId = sessionValidationResult.user.id;
+
+    // Check if user has applicants.read permission
+    if (!(await hasPermission(userId, "applicants.read"))) {
+      res.status(403).json({ message: "Insufficient permissions" });
+      return;
+    }
+
     const applicants = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.type, "applicant"));
-    if (applicants) {
-      res.status(200).json({
-        message: applicants,
-      });
-      return;
-    }
+    
     res.status(200).json({
-      message: [],
+      message: applicants || [],
     });
   } catch (error) {
     res.status(400).json({ message: "An error occurred" });
@@ -52,14 +54,19 @@ export async function approveApplicant(
       await validateSessionToken(token);
     if (
       !sessionValidationResult.session ||
-      !sessionValidationResult.user ||
-      sessionValidationResult.user["type"] !== "admin"
+      !sessionValidationResult.user
     ) {
-      res.status(400).json({ message: "Token is Invalid Or Expired" });
-      console.log({ message: "Token is Invalid Or Expired" });
+      res.status(401).json({ message: "Token is Invalid Or Expired" });
       return;
     }
-    console.log({ message: sessionValidationResult.user });
+
+    const userId = sessionValidationResult.user.id;
+
+    // Check if user has applicants.approve permission (which requires applicants.read)
+    if (!(await hasPermission(userId, "applicants.approve"))) {
+      res.status(403).json({ message: "Insufficient permissions" });
+      return;
+    }
 
     // Get applicant details before updating
     const applicant = await db
@@ -69,14 +76,50 @@ export async function approveApplicant(
       .limit(1);
 
     if (!applicant[0]) {
-      res.status(400).json({ message: "Applicant not found" });
+      res.status(404).json({ message: "Applicant not found" });
       return;
     }
 
+    if (applicant[0].type !== "applicant") {
+      res.status(400).json({ message: "User is not an applicant" });
+      return;
+    }
+
+    // Remove "Applicant" role (exclusive permission removal)
+    // Find and remove any role with "applicant" permission
+    const userRoles = await db
+      .select()
+      .from(userRolesTable)
+      .where(eq(userRolesTable.userId, id));
+
+    const parsePermissions = (perms: any): string[] => {
+      if (Array.isArray(perms)) return perms;
+      if (typeof perms === 'string') {
+        try {
+          const parsed = JSON.parse(perms);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    };
+    
+    for (const userRole of userRoles) {
+      const permissions = parsePermissions(userRole.permissions);
+      if (permissions.includes("applicant")) {
+        await db.delete(userRolesTable).where(eq(userRolesTable.id, userRole.id));
+      }
+    }
+
+    // Update user type and set accepted date
     await db
       .update(usersTable)
       .set({ type: "user", interest: interests, acceptedAt: new Date() })
-      .where(and(eq(usersTable.id, id), eq(usersTable.type, "applicant")));
+      .where(eq(usersTable.id, id));
+
+    // Do NOT assign default roles (user has no roles but can still log in and do basic things)
+    // Admin can assign roles later if needed
 
     // Send approval email
     await emailService.sendApprovalEmail(
@@ -99,14 +142,19 @@ export async function denyApplicant(token: string, id: string, res: Response) {
       await validateSessionToken(token);
     if (
       !sessionValidationResult.session ||
-      !sessionValidationResult.user ||
-      sessionValidationResult.user["type"] !== "admin"
+      !sessionValidationResult.user
     ) {
-      res.status(400).json({ message: "Token is Invalid Or Expired" });
-      console.log({ message: "Token is Invalid Or Expired" });
+      res.status(401).json({ message: "Token is Invalid Or Expired" });
       return;
     }
-    console.log({ message: sessionValidationResult.user });
+
+    const userId = sessionValidationResult.user.id;
+
+    // Check if user has applicants.reject permission (which requires applicants.read)
+    if (!(await hasPermission(userId, "applicants.reject"))) {
+      res.status(403).json({ message: "Insufficient permissions" });
+      return;
+    }
 
     // Get applicant details before updating
     const applicant = await db
@@ -116,14 +164,28 @@ export async function denyApplicant(token: string, id: string, res: Response) {
       .limit(1);
 
     if (!applicant[0]) {
-      res.status(400).json({ message: "Applicant not found" });
+      res.status(404).json({ message: "Applicant not found" });
       return;
     }
 
+    // Assign "Disabled" role (exclusive permission, removes all other roles)
+    // Remove all existing roles first
+    await db.delete(userRolesTable).where(eq(userRolesTable.userId, id));
+    
+    // Assign Disabled role with disabled permission
+    const disabledPermissions = ["disabled"]; // Already an array
+    
+    await db.insert(userRolesTable).values({
+      userId: id,
+      roleTitle: "Disabled",
+      permissions: disabledPermissions,
+    } as any);
+
+    // Update user type to disabled
     await db
       .update(usersTable)
       .set({ type: "disabled" })
-      .where(and(eq(usersTable.id, id), eq(usersTable.type, "applicant")));
+      .where(eq(usersTable.id, id));
 
     // Revoke all sessions for the denied applicant
     await invalidateAllUserSessions(id);

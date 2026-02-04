@@ -6,6 +6,7 @@ import db from "../db/db.js";
 import { eq } from "drizzle-orm";
 import { authenticate, verifyOTP, resendOTP } from "../handlers/authHandler.js";
 import { validateSessionToken, invalidateSession } from "../lib/session.js";
+import { applicationSessionsTable } from "../db/schema.js";
 import "dotenv/config";
 
 
@@ -35,7 +36,15 @@ router.post("/logout", async (req: Request, res: Response) => {
 
   const sessionValidationResult = await validateSessionToken(token);
   if (sessionValidationResult.session) {
+    // Invalidate the main session
     await invalidateSession(sessionValidationResult.session.id);
+    
+    // Also invalidate all application sessions created by this user session
+    await db
+      .delete(applicationSessionsTable)
+      .where(eq(applicationSessionsTable.userSessionId, sessionValidationResult.session.id));
+    
+    console.log(`Logged out user and invalidated all application sessions for session ${sessionValidationResult.session.id}`);
   }
 
   res.clearCookie("session_token").status(200).json({ message: "Logged out successfully" });

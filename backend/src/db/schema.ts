@@ -7,7 +7,8 @@ import {
   timestamp,
   text,
   mysqlEnum,
-  json
+  json,
+  unique
 } from "drizzle-orm/mysql-core";
 
 export const userEnum = mysqlEnum("type", ["admin", "user", "applicant", "disabled", "adminviewer"]);
@@ -61,10 +62,100 @@ export const helpTable = mysqlTable("help", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+// Single user_roles table - stores role title, permissions, and is_protected as a permission
+export const userRolesTable = mysqlTable("user_roles", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  userId: char("user_id", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id),
+  roleTitle: varchar("role_title", { length: 255 }).notNull(),
+  permissions: json("permissions").notNull().default(sql`JSON_ARRAY()`),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+}, (table) => ({
+  userRoleUnique: unique().on(table.userId, table.roleTitle),
+}));
+
+// External applications table for dev permission
+// rolesDefinition JSON structure (now called permissionsDefinition):
+// {
+//   permissions: [
+//     {
+//       code: "content.edit",
+//       name: "Edit Content",
+//       category: "content",
+//       constraints: {
+//         exclusive: false,           // User can only have this permission (no others)
+//         onlyOneInCategory: true,    // User can only have one permission from this category
+//         prerequisites: ["content.read"]  // Permissions required before this one can be assigned
+//       }
+//     }
+//   ]
+// }
+export const applicationsTable = mysqlTable("applications", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  url: varchar("url", { length: 500 }),
+  apiKey: varchar("api_key", { length: 255 }),
+  status: mysqlEnum("status", ["active", "inactive", "pending"]).default("pending"),
+  // Stores permission definitions (kept as roles_definition for DB compatibility)
+  rolesDefinition: json("roles_definition").notNull().default(sql`JSON_OBJECT('permissions', JSON_ARRAY())`),
+  createdBy: char("created_by", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+});
+
+// Application user permissions - assigns users to application-specific permissions
+// roleCode column stores permission codes (kept as role_code for DB compatibility)
+export const applicationUserRolesTable = mysqlTable("application_user_roles", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  userId: char("user_id", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id),
+  applicationId: char("application_id", { length: 36 })
+    .notNull()
+    .references(() => applicationsTable.id),
+  // Stores permission code (e.g., "content.edit", "admin")
+  roleCode: varchar("role_code", { length: 100 }).notNull(),
+  title: varchar("title", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+}, (table) => ({
+  userAppRoleUnique: unique().on(table.userId, table.applicationId, table.roleCode),
+}));
+
+// Application sessions for SSO-style launch tokens
+// The "used" boolean was originally for one-time token verification.
+// Now we reuse sessions if the same user session creates a new launch request
+// and there's more than 1 hour left on the existing app session.
+export const applicationSessionsTable = mysqlTable("application_sessions", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  userId: char("user_id", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id),
+  applicationId: char("application_id", { length: 36 })
+    .notNull()
+    .references(() => applicationsTable.id),
+  // The user's main session ID that created this app session (for reuse logic)
+  userSessionId: varchar("user_session_id", { length: 255 }),
+  expiresAt: timestamp("expires_at").notNull(),
+  // Tracks if token has been verified by the external app at least once
+  used: boolean("used").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
 export type Help = typeof helpTable.$inferSelect;
 export type Otp = typeof otpTable.$inferSelect;
 export type User = typeof usersTable.$inferSelect;
 export type Session = typeof sessionTable.$inferSelect;
+export type UserRole = typeof userRolesTable.$inferSelect;
+export type Application = typeof applicationsTable.$inferSelect;
+export type ApplicationUserRole = typeof applicationUserRolesTable.$inferSelect;
+export type ApplicationSession = typeof applicationSessionsTable.$inferSelect;
 // {
 //     firstname: 'Balaji',
 //     lastname: 'Yogesh',

@@ -3,10 +3,12 @@ import { useAuthStore } from "@/stores/authStore";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import ApplicantStatus from "@/components/applicant-status";
+import { useHasPermission } from "@/lib/permissions";
 
 export default function Page() {
   const firstname = useAuthStore((state) => state.firstname);
-  const type = useAuthStore((state) => state.type);
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  const isApplicant = permissions.includes("applicant");
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -25,7 +27,7 @@ export default function Page() {
       </div>
       
       {/* Show applicant status for applicants */}
-      {type === "applicant" && (
+      {isApplicant && (
         <div className="mt-4">
           <ApplicantStatus />
         </div>
