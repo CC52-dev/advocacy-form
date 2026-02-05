@@ -16,11 +16,13 @@ export default function Page() {
   const lastname = useAuthStore((state) => state.lastname);
   const email = useAuthStore((state) => state.email);
   const phone = useAuthStore((state) => state.phone);
-  const location = useAuthStore((state) => state.location) || [];
+  const locationRaw = useAuthStore((state) => state.location);
+  const location = Array.isArray(locationRaw) ? locationRaw : [];
   const addr = useAuthStore((state) => state.addr);
   const city = useAuthStore((state) => state.city);
   const zip = useAuthStore((state) => state.zip);
-  const interest = useAuthStore((state) => state.interest) || [];
+  const interestRaw = useAuthStore((state) => state.interest);
+  const interest = Array.isArray(interestRaw) ? interestRaw : [];
   const permissions = useAuthStore((state) => state.permissions) || [];
   const roles = useAuthStore((state) => state.roles) || [];
   const isApplicant = permissions.includes("applicant");
@@ -38,7 +40,10 @@ export default function Page() {
     staleTime: 60000,
   });
 
-  const accessibleApplications = accessibleAppsData?.message || [];
+  // Ensure accessibleApplications is always an array
+  const accessibleApplications = Array.isArray(accessibleAppsData?.message) 
+    ? accessibleAppsData.message 
+    : [];
 
   // Launch application mutation
   const launchMutation = useMutation({
@@ -133,9 +138,9 @@ export default function Page() {
                 <Skeleton className="h-4 w-full" />
               </CardContent>
             </Card>
-          ) : (
+          ) : Array.isArray(accessibleApplications) ? (
             accessibleApplications
-              .filter(app => app.status === "active")
+              .filter(app => app && app.status === "active")
               .map((app) => (
                 <Card
                   key={app.id}
@@ -163,7 +168,7 @@ export default function Page() {
                   </CardContent>
                 </Card>
               ))
-          )}
+          ) : null}
         </div>
       </div>
 
