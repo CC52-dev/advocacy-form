@@ -87,6 +87,10 @@ export default function ApplicantStatus() {
   
   const authData = useAuthStore();
   
+  // Permissions/roles from auth store (used for visibility and status)
+  const storePermissions = Array.isArray(authData.permissions) ? authData.permissions : [];
+  const storeRoles = Array.isArray(authData.roles) ? authData.roles : [];
+
   // Extract and safely convert all data
   const userData = {
     firstname: safeString(authData.firstname),
@@ -98,10 +102,10 @@ export default function ApplicantStatus() {
     city: safeString(authData.city),
     zip: safeString(authData.zip),
     interest: safeArray(authData.interest),
-    // type is deprecated, use permissions/roles instead
-    // type: authData.type,
     appliedAt: authData.appliedAt,
     acceptedAt: authData.acceptedAt,
+    permissions: storePermissions,
+    roles: storeRoles,
   };
 
   // Create form with default values
@@ -182,18 +186,17 @@ export default function ApplicantStatus() {
   };
 
   const getStatusInfo = () => {
-    const permissions = userData.permissions || [];
-    const roles = userData.roles || [];
-    
-    // Check permissions from roles if not directly available
-    const allPermissions = permissions.length > 0 
-      ? permissions 
-      : roles.reduce((acc, role) => {
-          if (role.permissions && Array.isArray(role.permissions)) {
-            return [...acc, ...role.permissions];
-          }
-          return acc;
-        }, []);
+    const permissions = userData.permissions ?? [];
+    const roles = userData.roles ?? [];
+    const allPermissions =
+      permissions.length > 0
+        ? permissions
+        : roles.reduce((acc, role) => {
+            if (role.permissions && Array.isArray(role.permissions)) {
+              return [...acc, ...role.permissions];
+            }
+            return acc;
+          }, []);
     
     if (allPermissions.includes("applicant")) {
       return {
@@ -263,18 +266,17 @@ export default function ApplicantStatus() {
     }
   };
 
-  // Only show for applicants
-  const permissions = userData.permissions || [];
-  const roles = userData.roles || [];
-  const allPermissions = permissions.length > 0 
-    ? permissions 
-    : roles.reduce((acc, role) => {
-        if (role.permissions && Array.isArray(role.permissions)) {
-          return [...acc, ...role.permissions];
-        }
-        return acc;
-      }, []);
-  
+  // Only show for applicants (use same permissions/roles from userData, now sourced from auth store)
+  const allPermissions =
+    userData.permissions?.length > 0
+      ? userData.permissions
+      : (userData.roles || []).reduce((acc, role) => {
+          if (role.permissions && Array.isArray(role.permissions)) {
+            return [...acc, ...role.permissions];
+          }
+          return acc;
+        }, []);
+
   if (!allPermissions.includes("applicant")) {
     return null;
   }

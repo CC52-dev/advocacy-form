@@ -29,14 +29,14 @@ export default function Page() {
   const { toast } = useToast();
   const [myAdvocacyOpen, setMyAdvocacyOpen] = useState(false);
 
-  // Fetch applications where user has any access
+  // Fetch applications where user has any access (applicants do not get assigned apps)
   const { data: accessibleAppsData, isLoading: appsLoading } = useQuery({
     queryKey: ["accessibleApplications"],
     queryFn: async () => {
       const response = await api.post("/api/app-roles/accessible");
       return response.data;
     },
-    enabled: !!(roles?.length > 0 || permissions?.length > 0),
+    enabled: !isApplicant && !!(roles?.length > 0 || permissions?.length > 0),
     staleTime: 60000,
   });
 
@@ -128,47 +128,51 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          {/* Accessible Applications Cards */}
-          {appsLoading ? (
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-full" />
-              </CardContent>
-            </Card>
-          ) : Array.isArray(accessibleApplications) ? (
-            accessibleApplications
-              .filter(app => app && app.status === "active")
-              .map((app) => (
-                <Card
-                  key={app.id}
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleLaunchApp(app.id)}
-                >
+          {/* Assigned applications - only for non-applicants */}
+          {!isApplicant && (
+            <>
+              {appsLoading ? (
+                <Card>
                   <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <ExternalLink className="h-5 w-5" />
-                      <CardTitle>{app.name}</CardTitle>
-                    </div>
-                    <CardDescription>
-                      {app.description || "Launch this application"}
-                    </CardDescription>
+                    <Skeleton className="h-6 w-32" />
                   </CardHeader>
                   <CardContent>
-                    {launchMutation.isPending ? (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Launching...</span>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">Click to launch</p>
-                    )}
+                    <Skeleton className="h-4 w-full" />
                   </CardContent>
                 </Card>
-              ))
-          ) : null}
+              ) : Array.isArray(accessibleApplications) ? (
+                accessibleApplications
+                  .filter(app => app && app.status === "active")
+                  .map((app) => (
+                    <Card
+                      key={app.id}
+                      className="cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => handleLaunchApp(app.id)}
+                    >
+                      <CardHeader>
+                        <div className="flex items-center gap-2">
+                          <ExternalLink className="h-5 w-5" />
+                          <CardTitle>{app.name}</CardTitle>
+                        </div>
+                        <CardDescription>
+                          {app.description || "Launch this application"}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {launchMutation.isPending ? (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Launching...</span>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Click to launch</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+              ) : null}
+            </>
+          )}
         </div>
       </div>
 
