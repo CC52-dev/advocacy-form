@@ -25,7 +25,13 @@ export default function Page() {
   const interest = Array.isArray(interestRaw) ? interestRaw : [];
   const permissions = useAuthStore((state) => state.permissions) || [];
   const roles = useAuthStore((state) => state.roles) || [];
-  const isApplicant = permissions.includes("applicant");
+  const allPerms = permissions.length > 0
+    ? permissions
+    : (roles || []).flatMap((r) => r.permissions || []);
+  const hasApplicant = allPerms.includes("applicant");
+  const hasAdminOrApproved = allPerms.includes("admin") ||
+    allPerms.some((p) => p.startsWith("users.") || p.startsWith("applicants."));
+  const isApplicant = hasApplicant && !hasAdminOrApproved;
   const { toast } = useToast();
   const [myAdvocacyOpen, setMyAdvocacyOpen] = useState(false);
 

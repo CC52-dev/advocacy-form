@@ -8,6 +8,8 @@ const PERMISSION_PREREQUISITES: Record<string, string[]> = {
   "applicants.reject": ["applicants.read"],
   "users.updateinfo": ["users.read"],
   "users.roles": ["users.read"],
+  "events.update": ["events.read"],
+  "events.delete": ["events.read"],
 };
 
 /**
@@ -38,6 +40,10 @@ const ALL_PERMISSIONS = [
   "users.updateinfo",
   "users.roles",
   "users.protected",
+  "events.read",
+  "events.create",
+  "events.update",
+  "events.delete",
   "dev",
   "admin",
   "applicant",
@@ -48,6 +54,7 @@ const ALL_PERMISSIONS = [
 const WILDCARD_EXPANSIONS: Record<string, string[]> = {
   "applicants.*": ["applicants.read", "applicants.approve", "applicants.reject"],
   "users.*": ["users.read", "users.updateinfo", "users.roles"],
+  "events.*": ["events.read", "events.create", "events.update", "events.delete"],
   "dev": ["dev"], // dev provides full access to applications tab
   "admin": ALL_PERMISSIONS,
 };
@@ -99,7 +106,8 @@ export function validatePermissionSet(
       const hasPrereq = permissionSet.has(prereq) || 
                        permissionSet.has("admin") ||
                        (prereq.startsWith("applicants.") && permissionSet.has("applicants.*")) ||
-                       (prereq.startsWith("users.") && permissionSet.has("users.*"));
+                       (prereq.startsWith("users.") && permissionSet.has("users.*")) ||
+                       (prereq.startsWith("events.") && permissionSet.has("events.*"));
       
       if (!hasPrereq) {
         missing.push(prereq);
@@ -211,6 +219,9 @@ export async function hasPermission(
   if (permission.startsWith("users.") && userPermissions.includes("users.*")) {
     return true;
   }
+  if (permission.startsWith("events.") && userPermissions.includes("events.*")) {
+    return true;
+  }
   // dev permission grants access to applications management
   if (permission === "dev" && userPermissions.includes("dev")) {
     return true;
@@ -260,6 +271,7 @@ export async function hasAnyPermission(
     // Wildcard checks
     if (perm.startsWith("applicants.") && userPermissions.includes("applicants.*")) return true;
     if (perm.startsWith("users.") && userPermissions.includes("users.*")) return true;
+    if (perm.startsWith("events.") && userPermissions.includes("events.*")) return true;
     // dev permission check
     if (perm === "dev" && userPermissions.includes("dev")) return true;
     return false;
@@ -286,10 +298,27 @@ export async function hasAllPermissions(
     // Wildcard checks
     if (perm.startsWith("applicants.") && userPermissions.includes("applicants.*")) return true;
     if (perm.startsWith("users.") && userPermissions.includes("users.*")) return true;
+    if (perm.startsWith("events.") && userPermissions.includes("events.*")) return true;
     // dev permission check
     if (perm === "dev" && userPermissions.includes("dev")) return true;
     return false;
   });
+}
+
+/**
+ * Check if user can access events (view/RSVP). Applicants and disabled users cannot.
+ * Users with admin, users.*, applicants.*, events.*, or dev can access.
+ */
+export async function canAccessEvents(userId: string): Promise<boolean> {
+  const permissions = await getUserPermissions(userId);
+  if (permissions.includes("disabled")) return false;
+  if (permissions.includes("admin") || permissions.includes("users.read") || 
+      permissions.includes("users.*") || permissions.includes("applicants.read") ||
+      permissions.includes("applicants.*") || permissions.includes("events.read") ||
+      permissions.includes("events.*") || permissions.includes("dev")) {
+    return true;
+  }
+  return false; // applicant-only or no permissions
 }
 
 /**
@@ -310,6 +339,7 @@ export function checkPermissions(
     // Wildcard checks
     if (perm.startsWith("applicants.") && userPermissions.includes("applicants.*")) return true;
     if (perm.startsWith("users.") && userPermissions.includes("users.*")) return true;
+    if (perm.startsWith("events.") && userPermissions.includes("events.*")) return true;
     // dev permission check
     if (perm === "dev" && userPermissions.includes("dev")) return true;
     return false;

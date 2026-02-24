@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { useAuthStore } from "@/stores/authStore";
 import { usePathname } from "next/navigation";
-import { hasPermission } from "@/lib/permissions.js";
+import { hasPermission, canAccessEvents, canManageEvents } from "@/lib/permissions.js";
 
 // Force import to ensure store is available
 const getStoreState = () => useAuthStore.getState();
@@ -121,6 +121,14 @@ export function AuthStoreProvider({ children }) {
             return;
           }
           if (pathname === '/app/users' && !hasPermission('users.read')) {
+            router.replace('/app/');
+            return;
+          }
+          if (pathname === '/app/events' && !canAccessEvents()) {
+            router.replace('/app/');
+            return;
+          }
+          if (pathname === '/app/event-admin' && !canManageEvents()) {
             router.replace('/app/');
             return;
           }

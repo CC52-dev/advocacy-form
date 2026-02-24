@@ -148,9 +148,43 @@ export const applicationSessionsTable = mysqlTable("application_sessions", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+// Events table - admins create/manage events
+export const eventStatusEnum = mysqlEnum("status", ["active", "disabled"]);
+export const eventsTable = mysqlTable("events", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  location: varchar("location", { length: 500 }),
+  eventDate: timestamp("event_date").notNull(),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  status: eventStatusEnum.default("active"),
+  createdBy: char("created_by", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`),
+});
+
+// Event RSVPs - any non-applicant user can RSVP
+export const eventRsvpsTable = mysqlTable("event_rsvps", {
+  id: char("id", { length: 36 }).primaryKey().default(sql`(UUID())`),
+  eventId: char("event_id", { length: 36 })
+    .notNull()
+    .references(() => eventsTable.id, { onDelete: "cascade" }),
+  userId: char("user_id", { length: 36 })
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  eventUserUnique: unique().on(table.eventId, table.userId),
+}));
+
 export type Help = typeof helpTable.$inferSelect;
 export type Otp = typeof otpTable.$inferSelect;
 export type User = typeof usersTable.$inferSelect;
+export type Event = typeof eventsTable.$inferSelect;
+export type EventRsvp = typeof eventRsvpsTable.$inferSelect;
 export type Session = typeof sessionTable.$inferSelect;
 export type UserRole = typeof userRolesTable.$inferSelect;
 export type Application = typeof applicationsTable.$inferSelect;

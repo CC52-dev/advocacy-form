@@ -55,7 +55,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { User2, Users } from "lucide-react";
+import { User2, Users, Calendar, CalendarClock } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { useToast } from "@/hooks/use-toast";
@@ -63,7 +63,7 @@ import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import Image from "next/image";
-import { useHasPermission } from "@/lib/permissions";
+import { useHasPermission, useCanAccessEvents, useCanManageEvents } from "@/lib/permissions";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ExternalLink, Loader2 } from "lucide-react";
 
@@ -165,6 +165,8 @@ export function AppSidebar({ ...props }) {
   // Permission checks
   const canViewApplicants = useHasPermission("applicants.read");
   const canViewUsers = useHasPermission("users.read");
+  const canViewEvents = useCanAccessEvents();
+  const canManageEventsPanel = useCanManageEvents();
   const canViewApplications = useHasPermission("dev");
 
   // Fetch applications where user has any access
@@ -349,6 +351,32 @@ export function AppSidebar({ ...props }) {
                       >
                         <User2 />
                         <span>Users</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
+                {canViewEvents && (
+                  <Link href="/app/events">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Events"
+                        isActive={pathname === "/app/events"}
+                      >
+                        <Calendar />
+                        <span>Events</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
+                {canManageEventsPanel && (
+                  <Link href="/app/event-admin">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Event Admin"
+                        isActive={pathname === "/app/event-admin"}
+                      >
+                        <CalendarClock />
+                        <span>Event Admin</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   </Link>

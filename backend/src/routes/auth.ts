@@ -1,11 +1,11 @@
 import express from "express";
-import type { Response, Request, NextFunction } from "express";
+import type { Response, Request } from "express";
 const router = express.Router();
-import { z } from "zod";
 import db from "../db/db.js";
 import { eq } from "drizzle-orm";
 import { authenticate, verifyOTP, resendOTP } from "../handlers/authHandler.js";
 import { validateSessionToken, invalidateSession } from "../lib/session.js";
+import { getSessionToken } from "../lib/getSessionToken.js";
 import { applicationSessionsTable } from "../db/schema.js";
 import "dotenv/config";
 
@@ -13,7 +13,6 @@ import "dotenv/config";
 router.post("/login/:email", async (req: Request, res: Response) => {
   const email: string = req.params.email;
   await authenticate(email, res);
-  // res.status(200).json({ message: message});
 });
 
 router.post("/verify/otp", async (req: Request, res: Response) => {
@@ -28,7 +27,7 @@ router.post("/verify/otp/resend/:email", async (req: Request, res: Response) => 
 });
 
 router.post("/logout", async (req: Request, res: Response) => {
-  const token = req.headers.cookie?.split('session_token=')[1]?.split(';')[0];
+  const token = getSessionToken(req);
   if (!token) {
     res.status(200).json({ message: "No session to logout" });
     return;

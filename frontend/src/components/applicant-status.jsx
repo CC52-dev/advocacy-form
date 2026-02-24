@@ -277,7 +277,13 @@ export default function ApplicantStatus() {
           return acc;
         }, []);
 
-  if (!allPermissions.includes("applicant")) {
+  // Only show for pending applicants - not for admins or approved users
+  const hasApplicant = allPermissions.includes("applicant");
+  const hasAdminOrApproved = allPermissions.includes("admin") ||
+    allPermissions.some(p => p.startsWith("users.") || p.startsWith("applicants."));
+  const isPendingApplicant = hasApplicant && !hasAdminOrApproved;
+
+  if (!isPendingApplicant) {
     return null;
   }
 
@@ -356,15 +362,16 @@ export default function ApplicantStatus() {
         </CardContent>
       </Card>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - only show Update for pending applicants */}
       <div className="flex gap-4">
-        <Dialog open={isUpdateDialogOpen} onOpenChange={handleDialogChange}>
-          <DialogTrigger asChild>
-            <Button>
-              <Edit className="h-4 w-4 mr-2" />
-              Update Application
-            </Button>
-          </DialogTrigger>
+        {isPendingApplicant && (
+          <Dialog open={isUpdateDialogOpen} onOpenChange={handleDialogChange}>
+            <DialogTrigger asChild>
+              <Button>
+                <Edit className="h-4 w-4 mr-2" />
+                Update Application
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Update Your Application</DialogTitle>
@@ -550,7 +557,8 @@ export default function ApplicantStatus() {
               </form>
             </Form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        )}
 
         <Button
           variant="outline"

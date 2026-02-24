@@ -211,29 +211,58 @@ export async function updateApplicantSelf(
   res: Response
 ) {
   try {
+    if (!token) {
+      res.status(401).json({ message: "Token is Invalid Or Expired" });
+      return;
+    }
+
     const sessionValidationResult: SessionValidationResult =
       await validateSessionToken(token);
     
-    if (
-      !sessionValidationResult.session ||
-      !sessionValidationResult.user ||
-      sessionValidationResult.user["type"] !== "applicant"
-    ) {
-      res.status(400).json({ message: "Token is Invalid Or Expired" });
+    if (!sessionValidationResult.session || !sessionValidationResult.user) {
+      res.status(401).json({ message: "Token is Invalid Or Expired" });
       return;
     }
 
     const userId = sessionValidationResult.user.id;
 
-    // Validate that the user exists and is an applicant
+    // Validate that the user exists and is an applicant (check both type and role)
     const applicant = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.id, userId))
       .limit(1);
 
-    if (!applicant[0] || applicant[0].type !== "applicant") {
-      res.status(400).json({ message: "Applicant not found or invalid status" });
+    if (!applicant[0]) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const userRoles = await db
+      .select()
+      .from(userRolesTable)
+      .where(eq(userRolesTable.userId, userId));
+
+    const parsePermissions = (perms: any): string[] => {
+      if (Array.isArray(perms)) return perms;
+      if (typeof perms === "string") {
+        try {
+          const parsed = JSON.parse(perms);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+      return [];
+    };
+
+    const hasApplicantPermission = userRoles.some((r) =>
+      parsePermissions(r.permissions).includes("applicant")
+    );
+    const isApplicantByType = applicant[0].type === "applicant";
+
+    if (!isApplicantByType && !hasApplicantPermission) {
+      res.status(403).json({ message: "Only applicants can update their application" });
       return;
     }
 

@@ -7,6 +7,8 @@ const PERMISSION_PREREQUISITES = {
   "applicants.reject": ["applicants.read"],
   "users.updateinfo": ["users.read"],
   "users.roles": ["users.read"],
+  "events.update": ["events.read"],
+  "events.delete": ["events.read"],
 };
 
 /**
@@ -53,6 +55,9 @@ export function hasPermission(permission) {
   if (permission.startsWith("users.") && permissions.includes("users.*")) {
     return true;
   }
+  if (permission.startsWith("events.") && permissions.includes("events.*")) {
+    return true;
+  }
   // dev permission grants access to applications management
   if (permission === "dev" && permissions.includes("dev")) {
     return true;
@@ -84,10 +89,72 @@ export function hasAnyPermission(permissions) {
     // Wildcard checks
     if (perm.startsWith("applicants.") && userPermissions.includes("applicants.*")) return true;
     if (perm.startsWith("users.") && userPermissions.includes("users.*")) return true;
+    if (perm.startsWith("events.") && userPermissions.includes("events.*")) return true;
     // dev permission check
     if (perm === "dev" && userPermissions.includes("dev")) return true;
     return false;
   });
+}
+
+/**
+ * Check if user can manage events (admin panel: CRUD, view RSVPs).
+ * Requires admin or any event permission (events.read, events.create, etc.).
+ */
+export function canManageEvents() {
+  const permissions = useAuthStore.getState().permissions || [];
+  if (permissions.includes("disabled") && !permissions.includes("admin")) return false;
+  if (permissions.includes("admin")) return true;
+  return (
+    permissions.includes("events.read") ||
+    permissions.includes("events.create") ||
+    permissions.includes("events.update") ||
+    permissions.includes("events.delete") ||
+    permissions.includes("events.*")
+  );
+}
+
+/**
+ * Check if user can access events (view/RSVP). Everyone can access including applicants.
+ */
+export function canAccessEvents() {
+  const permissions = useAuthStore.getState().permissions || [];
+  if (permissions.includes("disabled") && !permissions.includes("admin")) return false;
+  if (permissions.includes("admin") || permissions.includes("users.read") ||
+      permissions.includes("users.*") || permissions.includes("applicants.read") ||
+      permissions.includes("applicants.*") || permissions.includes("events.read") ||
+      permissions.includes("events.*") || permissions.includes("dev") ||
+      permissions.includes("applicant")) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * React hooks that subscribe to store - use these in components so they re-render when permissions change.
+ */
+export function useCanAccessEvents() {
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  if (permissions.includes("disabled") && !permissions.includes("admin")) return false;
+  return !!(
+    permissions.includes("admin") || permissions.includes("users.read") ||
+    permissions.includes("users.*") || permissions.includes("applicants.read") ||
+    permissions.includes("applicants.*") || permissions.includes("events.read") ||
+    permissions.includes("events.*") || permissions.includes("dev") ||
+    permissions.includes("applicant")
+  );
+}
+
+export function useCanManageEvents() {
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  if (permissions.includes("disabled") && !permissions.includes("admin")) return false;
+  if (permissions.includes("admin")) return true;
+  return !!(
+    permissions.includes("events.read") ||
+    permissions.includes("events.create") ||
+    permissions.includes("events.update") ||
+    permissions.includes("events.delete") ||
+    permissions.includes("events.*")
+  );
 }
 
 /**
@@ -107,6 +174,7 @@ export function hasAllPermissions(permissions) {
     // Wildcard checks
     if (perm.startsWith("applicants.") && userPermissions.includes("applicants.*")) return true;
     if (perm.startsWith("users.") && userPermissions.includes("users.*")) return true;
+    if (perm.startsWith("events.") && userPermissions.includes("events.*")) return true;
     // dev permission check
     if (perm === "dev" && userPermissions.includes("dev")) return true;
     return false;
@@ -125,8 +193,9 @@ export function isAdmin() {
 const WILDCARD_EXPANSIONS = {
   "applicants.*": ["applicants.read", "applicants.approve", "applicants.reject"],
   "users.*": ["users.read", "users.updateinfo", "users.roles"],
+  "events.*": ["events.read", "events.create", "events.update", "events.delete"],
   "dev": ["dev"], // dev provides full access to applications tab
-  "admin": ["applicants.read", "applicants.approve", "applicants.reject", "users.read", "users.updateinfo", "users.roles", "users.protected", "dev", "admin", "applicant", "disabled"],
+  "admin": ["applicants.read", "applicants.approve", "applicants.reject", "users.read", "users.updateinfo", "users.roles", "users.protected", "events.read", "events.create", "events.update", "events.delete", "dev", "admin", "applicant", "disabled"],
 };
 
 /**
@@ -202,6 +271,9 @@ export function useHasPermission(permission) {
     return true;
   }
   if (permission.startsWith("users.") && permissions.includes("users.*")) {
+    return true;
+  }
+  if (permission.startsWith("events.") && permissions.includes("events.*")) {
     return true;
   }
   // dev permission grants access to applications management

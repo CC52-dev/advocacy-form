@@ -34,6 +34,7 @@ import helpRouter from './routes/help.js';
 import roleRouter from './routes/role.js';
 import applicationRouter from './routes/application.js';
 import applicationRolesRouter from './routes/applicationRoles.js';
+import eventRouter from './routes/event.js';
 app.use('/api/form', formRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
@@ -42,7 +43,7 @@ app.use('/api/help', helpRouter);
 app.use('/api/role', roleRouter);
 app.use('/api/applications', applicationRouter);
 app.use('/api/app-roles', applicationRolesRouter);
-
+app.use('/api/events', eventRouter);
 
 app.use(notFound);
 app.use(error);

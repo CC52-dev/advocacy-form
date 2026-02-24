@@ -15,6 +15,7 @@
     "db:migrate:users": "npx ts-node --esm src/scripts/runUserMigration.ts",
     "db:migrate:simplify": "npx ts-node --esm src/scripts/runSimplifiedMigration.ts",
     "db:migrate:rbac": "npx ts-node --esm src/scripts/runApplicationRbacMigration.ts",
+    "db:migrate:events": "npx ts-node --esm src/scripts/runEventsMigration.ts",
     "db:seed:simplified": "npx ts-node --esm src/scripts/runSeedSimplified.ts",
     "db:fix:permissions": "npx ts-node --esm src/scripts/runFixPermissions.ts",
     "db:drop:roles": "npx ts-node --esm src/scripts/dropRolesTable.ts",

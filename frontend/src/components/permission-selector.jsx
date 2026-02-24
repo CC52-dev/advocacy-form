@@ -23,6 +23,13 @@ const PERMISSION_GROUPS = {
     { value: "users.roles", label: "Manage User Roles" },
     { value: "users.*", label: "All User Permissions (Full Access)" },
   ],
+  events: [
+    { value: "events.read", label: "Read Events" },
+    { value: "events.create", label: "Create Events" },
+    { value: "events.update", label: "Update Events" },
+    { value: "events.delete", label: "Delete Events" },
+    { value: "events.*", label: "All Event Permissions (Full Access)" },
+  ],
   special: [
     { value: "dev", label: "Developer (Full Applications Access)" },
     { value: "users.protected", label: "Protected User" },
@@ -102,8 +109,11 @@ export function PermissionSelector({
       if (permission.startsWith("applicants.") && permission !== "applicants.*") {
         newPermissions = newPermissions.filter(p => p !== "applicants.*");
       }
-      if (permission.startsWith("users.") && permission !== "users.*" && permission !== "users.protected") {
-        newPermissions = newPermissions.filter(p => p !== "users.*");
+    if (permission.startsWith("users.") && permission !== "users.*" && permission !== "users.protected") {
+      newPermissions = newPermissions.filter(p => p !== "users.*");
+      }
+      if (permission.startsWith("events.") && permission !== "events.*") {
+        newPermissions = newPermissions.filter(p => p !== "events.*");
       }
     } else {
       // Remove permission
@@ -153,6 +163,9 @@ export function PermissionSelector({
     }
     if (permission.startsWith("users.") && permission !== "users.*" && permission !== "users.protected") {
       return localPermissions.includes("users.*") || localPermissions.includes("admin");
+    }
+    if (permission.startsWith("events.") && permission !== "events.*") {
+      return localPermissions.includes("events.*") || localPermissions.includes("admin");
     }
     // Disable everything if admin, applicant, or disabled is selected
     if (permission !== "admin" && permission !== "applicant" && permission !== "disabled") {
@@ -219,6 +232,54 @@ export function PermissionSelector({
           <h4 className="text-sm font-semibold">Users</h4>
           <div className="space-y-2 ml-4">
             {PERMISSION_GROUPS.users.map((perm) => {
+              const isSelected = localPermissions.includes(perm.value);
+              const isDisabled = isPermissionDisabled(perm.value);
+              const isWildcard = perm.value.endsWith(".*");
+              
+              return (
+                <div
+                  key={perm.value}
+                  className={cn("flex items-start space-x-2", {
+                    "opacity-50": isDisabled,
+                  })}
+                >
+                  <Checkbox
+                    id={perm.value}
+                    checked={isSelected}
+                    onCheckedChange={(checked) =>
+                      handlePermissionToggle(perm.value, checked)
+                    }
+                    disabled={isDisabled}
+                    className="mt-1"
+                  />
+                  <label
+                    htmlFor={perm.value}
+                    className={cn(
+                      "text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2",
+                      {
+                        "cursor-pointer": !isDisabled,
+                        "cursor-not-allowed": isDisabled,
+                      }
+                    )}
+                  >
+                    {perm.label}
+                    {isWildcard && (
+                      <Badge variant="outline" className="text-xs">
+                        Wildcard
+                      </Badge>
+                    )}
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Events Permissions */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">Events</h4>
+          <div className="space-y-2 ml-4">
+            {PERMISSION_GROUPS.events.map((perm) => {
               const isSelected = localPermissions.includes(perm.value);
               const isDisabled = isPermissionDisabled(perm.value);
               const isWildcard = perm.value.endsWith(".*");
