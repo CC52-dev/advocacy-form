@@ -19,7 +19,7 @@ app.use(cors({
 app.use(request);
 
 app.get('/', (req, res) => {
-    res.json({'message': 'Hello World!'});
+    res.json({'message': 'Hello World! v2'});
 });
 app.get('/api/clear', (req, res) => {
     console.clear();
