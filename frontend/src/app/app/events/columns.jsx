@@ -13,6 +13,7 @@ import {
   UserCheck,
   CalendarCheck,
   CalendarX,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -131,11 +132,23 @@ export function getEventColumns(showAdminActions = false) {
         {
           accessorKey: "status",
           header: "Status",
-          cell: ({ row }) => (
-            <Badge variant={row.original.status === "disabled" ? "destructive" : "default"}>
-              {row.original.status || "active"}
-            </Badge>
-          ),
+          cell: ({ row }) => {
+            const end = row.original.endDate ?? row.original.eventDate;
+            const isPast = new Date(end) < new Date();
+            return (
+              <Badge
+                variant={
+                  isPast
+                    ? "secondary"
+                    : row.original.status === "disabled"
+                      ? "destructive"
+                      : "default"
+                }
+              >
+                {isPast ? "Expired" : row.original.status || "active"}
+              </Badge>
+            );
+          },
         },
         {
           accessorKey: "rsvpCount",
@@ -266,20 +279,33 @@ export function getEventColumns(showAdminActions = false) {
         }
       };
 
+      const exportRsvps = () => {
+        const headers = ["First Name", "Last Name", "Email"];
+        const rows = rsvps.map((r) => [r.firstname || "", r.lastname || "", r.email || ""]);
+        const csv = [headers.join(","), ...rows.map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))].join("\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `rsvps-${event.title.replace(/[^a-z0-9]/gi, "-")}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
       return (
         <div className="flex gap-2 items-center">
-          {!isPast && !userRsvped && (
+          {!showAdminActions && !isPast && !userRsvped && (
             <Button
               size="sm"
-              variant="outline"
+              variant="default"
               onClick={() => rsvpMutation.mutate()}
               disabled={rsvpMutation.isPending}
             >
               <CalendarCheck className="h-4 w-4 mr-1" />
-              RSVP
+              Confirm
             </Button>
           )}
-          {!isPast && userRsvped && (
+          {!showAdminActions && !isPast && userRsvped && (
             <Button
               size="sm"
               variant="ghost"
@@ -403,15 +429,21 @@ export function getEventColumns(showAdminActions = false) {
                   Cancel
                 </Button>
                 <Button
-                  onClick={() =>
+                  onClick={() => {
+                    const start = editForm.startDate || editForm.eventDate;
+                    const end = editForm.endDate || start;
+                    if (start && end && new Date(start) >= new Date(end)) {
+                      toast({ title: "Invalid dates", description: "Start date must be before end date", variant: "destructive" });
+                      return;
+                    }
                     updateMutation.mutate({
                       ...editForm,
                       eventDate: new Date(editForm.startDate || editForm.eventDate).toISOString(),
                       startDate: new Date(editForm.startDate || editForm.eventDate).toISOString(),
                       endDate: new Date(editForm.endDate || editForm.startDate || editForm.eventDate).toISOString(),
                       status: editForm.status,
-                    })
-                  }
+                    });
+                  }}
                   disabled={updateMutation.isPending}
                 >
                   Save
@@ -469,6 +501,14 @@ export function getEventColumns(showAdminActions = false) {
                   ))
                 )}
               </div>
+              {canViewRsvps && rsvps.length > 0 && (
+                <div className="pt-4">
+                  <Button variant="outline" size="sm" onClick={exportRsvps}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export RSVPs
+                  </Button>
+                </div>
+              )}
             </DialogContent>
           </Dialog>
         </div>

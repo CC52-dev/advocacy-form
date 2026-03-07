@@ -35,7 +35,7 @@ export default function Home() {
         // Verify token with the API (using the application's API key)
         const API_KEY = 'app_b77b11ea2059efbfdfcf6f8741eafb75bdde213de7639ac3b3506b4e164f5dc9';
         
-        const response = await fetch('http://localhost:3001/api/applications/verify-launch', {
+        const response = await fetch('https://services.satsankalpa.org/api/applications/verify-launch', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

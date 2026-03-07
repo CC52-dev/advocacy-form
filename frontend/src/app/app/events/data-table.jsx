@@ -119,6 +119,19 @@ export function DataTableEvents({ canCreateEvents = false, showAdminActions = fa
     status: "active",
   });
 
+  const validateEventDates = (formData, isCreate = false) => {
+    const startDate = formData.startDate || formData.eventDate;
+    const endDate = formData.endDate || startDate;
+    if (!startDate) return null;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+    if (start >= end) return "Start date must be before end date";
+    if (isCreate && start < now) return "Start date must be in the future";
+    if (isCreate && end < now) return "End date must be in the future";
+    return null;
+  };
+
   const createMutation = useMutation({
     mutationFn: async (formData) => {
       const startDate = formData.startDate || formData.eventDate;
@@ -236,7 +249,14 @@ export function DataTableEvents({ canCreateEvents = false, showAdminActions = fa
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="whitespace-nowrap px-2 sm:px-4">
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      "whitespace-nowrap px-2 sm:px-4",
+                      header.column.id === "actions" &&
+                        "sticky right-0 bg-white dark:bg-gray-900 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.1)] z-10"
+                    )}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -256,7 +276,14 @@ export function DataTableEvents({ canCreateEvents = false, showAdminActions = fa
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="whitespace-nowrap px-2 sm:px-4">
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        "whitespace-nowrap px-2 sm:px-4",
+                        cell.column.id === "actions" &&
+                          "sticky right-0 bg-white dark:bg-gray-900 shadow-[-4px_0_8px_-2px_rgba(0,0,0,0.1)] z-10"
+                      )}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -389,6 +416,7 @@ export function DataTableEvents({ canCreateEvents = false, showAdminActions = fa
               <label className="text-sm font-medium">Start Date & Time</label>
               <Input
                 type="datetime-local"
+                min={new Date().toISOString().slice(0, 16)}
                 value={createForm.startDate || createForm.eventDate}
                 onChange={(e) =>
                   setCreateForm((p) => ({ ...p, startDate: e.target.value, eventDate: e.target.value }))
@@ -399,6 +427,7 @@ export function DataTableEvents({ canCreateEvents = false, showAdminActions = fa
               <label className="text-sm font-medium">End Date & Time</label>
               <Input
                 type="datetime-local"
+                min={createForm.startDate || createForm.eventDate || new Date().toISOString().slice(0, 16)}
                 value={createForm.endDate || createForm.startDate || createForm.eventDate}
                 onChange={(e) =>
                   setCreateForm((p) => ({ ...p, endDate: e.target.value }))
@@ -424,7 +453,14 @@ export function DataTableEvents({ canCreateEvents = false, showAdminActions = fa
               Cancel
             </Button>
             <Button
-              onClick={() => createMutation.mutate(createForm)}
+              onClick={() => {
+                const err = validateEventDates(createForm, true);
+                if (err) {
+                  toast({ title: "Invalid dates", description: err, variant: "destructive" });
+                  return;
+                }
+                createMutation.mutate(createForm);
+              }}
               disabled={
                 createMutation.isPending ||
                 !createForm.title ||

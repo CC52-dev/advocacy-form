@@ -59,12 +59,20 @@ function EventCard({ event, onRsvp, onCancelRsvp }) {
   const isUpcoming = event.isUpcoming ?? new Date(startDate) >= new Date();
 
   return (
-    <Card className="overflow-hidden">
+    <Card className={cn("overflow-hidden", isPast && "opacity-70")}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start gap-2">
           <CardTitle className="text-lg">{event.title}</CardTitle>
-          <Badge variant={event.status === "disabled" ? "destructive" : "default"}>
-            {event.status || "active"}
+          <Badge
+            variant={
+              isPast
+                ? "secondary"
+                : event.status === "disabled"
+                  ? "destructive"
+                  : "default"
+            }
+          >
+            {isPast ? "Expired" : event.status || "active"}
           </Badge>
         </div>
         <CardDescription className="line-clamp-2">{event.description || "No description"}</CardDescription>
@@ -110,7 +118,7 @@ function EventCard({ event, onRsvp, onCancelRsvp }) {
           ) : (
             <Button size="sm" onClick={() => onRsvp(event)}>
               <CalendarCheck className="h-4 w-4 mr-1" />
-              RSVP
+              Confirm
             </Button>
           )
         )}

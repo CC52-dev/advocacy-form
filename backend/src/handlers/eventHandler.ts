@@ -120,6 +120,21 @@ export async function createEvent(token: string, data: EventCreateData, res: Res
     const eventId = randomUUID();
     const startDate = data.startDate ? new Date(data.startDate) : new Date(data.eventDate);
     const endDate = data.endDate ? new Date(data.endDate) : startDate;
+    const now = new Date();
+
+    if (startDate >= endDate) {
+      res.status(400).json({ message: "Start date must be before end date" });
+      return;
+    }
+    if (startDate < now) {
+      res.status(400).json({ message: "Start date must be in the future" });
+      return;
+    }
+    if (endDate < now) {
+      res.status(400).json({ message: "End date must be in the future" });
+      return;
+    }
+
     await db.insert(eventsTable).values({
       id: eventId,
       title: data.title,
@@ -177,6 +192,24 @@ export async function updateEvent(token: string, eventId: string, data: EventUpd
 
     if (Object.keys(updatePayload).length === 0) {
       res.status(400).json({ message: "No valid fields to update" });
+      return;
+    }
+
+    const [existing] = await db.select().from(eventsTable).where(eq(eventsTable.id, eventId)).limit(1);
+    const effectiveStart = updatePayload.startDate
+      ? new Date(updatePayload.startDate as string)
+      : updatePayload.eventDate
+        ? new Date(updatePayload.eventDate as string)
+        : existing
+          ? new Date((existing.startDate ?? existing.eventDate) as Date)
+          : null;
+    const effectiveEnd = updatePayload.endDate
+      ? new Date(updatePayload.endDate as string)
+      : existing
+        ? new Date((existing.endDate ?? existing.eventDate) as Date)
+        : effectiveStart;
+    if (effectiveStart && effectiveEnd && effectiveStart >= effectiveEnd) {
+      res.status(400).json({ message: "Start date must be before end date" });
       return;
     }
 
