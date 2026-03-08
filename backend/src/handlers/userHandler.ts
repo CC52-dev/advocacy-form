@@ -292,3 +292,53 @@ export async function updateUser(
     console.error(error);
   }
 }
+
+/** Update own advocacy info - any logged-in user. Only allows firstname, lastname, addr, city, zip, location. */
+export async function updateMyAdvocacy(
+  token: string,
+  updateData: any,
+  res: Response
+) {
+  try {
+    if (!token) {
+      res.status(401).json({ message: "Token is Invalid Or Expired" });
+      return;
+    }
+
+    const sessionValidationResult: SessionValidationResult =
+      await validateSessionToken(token);
+
+    if (!sessionValidationResult.session || !sessionValidationResult.user) {
+      res.status(401).json({ message: "Token is Invalid Or Expired" });
+      return;
+    }
+
+    const userId = sessionValidationResult.user.id;
+
+    // Only allow updating these fields (NOT email, phone, interest, dates)
+    const allowedFields: Record<string, any> = {};
+    if (updateData.firstname !== undefined) allowedFields.firstname = updateData.firstname;
+    if (updateData.lastname !== undefined) allowedFields.lastname = updateData.lastname;
+    if (updateData.addr !== undefined) allowedFields.addr = updateData.addr;
+    if (updateData.city !== undefined) allowedFields.city = updateData.city;
+    if (updateData.zip !== undefined) allowedFields.zip = updateData.zip;
+    if (updateData.location !== undefined) allowedFields.location = updateData.location;
+
+    if (Object.keys(allowedFields).length === 0) {
+      res.status(400).json({ message: "No valid fields to update" });
+      return;
+    }
+
+    await db
+      .update(usersTable)
+      .set(allowedFields)
+      .where(eq(usersTable.id, userId));
+
+    res.status(200).json({
+      message: "Advocacy information updated successfully",
+    });
+  } catch (error) {
+    res.status(400).json({ message: "An error occurred" });
+    console.error(error);
+  }
+}

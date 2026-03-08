@@ -6,23 +6,13 @@ import ApplicantStatus from "@/components/applicant-status";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ExternalLink, User, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { ExternalLink, User, Loader2, Calendar } from "lucide-react";
+import Link from "next/link";
+import { useCanAccessEvents } from "@/lib/permissions";
 
 export default function Page() {
   const firstname = useAuthStore((state) => state.firstname);
-  const lastname = useAuthStore((state) => state.lastname);
-  const email = useAuthStore((state) => state.email);
-  const phone = useAuthStore((state) => state.phone);
-  const locationRaw = useAuthStore((state) => state.location);
-  const location = Array.isArray(locationRaw) ? locationRaw : [];
-  const addr = useAuthStore((state) => state.addr);
-  const city = useAuthStore((state) => state.city);
-  const zip = useAuthStore((state) => state.zip);
-  const interestRaw = useAuthStore((state) => state.interest);
-  const interest = Array.isArray(interestRaw) ? interestRaw : [];
   const permissions = useAuthStore((state) => state.permissions) || [];
   const roles = useAuthStore((state) => state.roles) || [];
   const allPerms = permissions.length > 0
@@ -33,7 +23,7 @@ export default function Page() {
     allPerms.some((p) => p.startsWith("users.") || p.startsWith("applicants."));
   const isApplicant = hasApplicant && !hasAdminOrApproved;
   const { toast } = useToast();
-  const [myAdvocacyOpen, setMyAdvocacyOpen] = useState(false);
+  const canViewEvents = useCanAccessEvents();
 
   // Fetch applications where user has any access (applicants do not get assigned apps)
   const { data: accessibleAppsData, isLoading: appsLoading } = useQuery({
@@ -118,21 +108,38 @@ export default function Page() {
         <h2 className="text-xl font-semibold mb-4">Applications</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* My Advocacy Card - Available to everyone */}
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => setMyAdvocacyOpen(true)}
-          >
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                <CardTitle>My Advocacy</CardTitle>
-              </div>
-              <CardDescription>View your personal information and advocacy details</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Click to view your profile</p>
-            </CardContent>
-          </Card>
+          <Link href="/app/myadvocacy">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  <CardTitle>My Advocacy</CardTitle>
+                </div>
+                <CardDescription>View your personal information and advocacy details</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">Click to view your profile</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Events - link to events page (not Event Admin) */}
+          {canViewEvents && (
+            <Link href="/app/events">
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    <CardTitle>Events</CardTitle>
+                  </div>
+                  <CardDescription>View and RSVP to upcoming events</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Click to view events</p>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
 
           {/* Assigned applications - only for non-applicants */}
           {!isApplicant && (
@@ -181,100 +188,6 @@ export default function Page() {
           )}
         </div>
       </div>
-
-      {/* My Advocacy Dialog */}
-      <Dialog open={myAdvocacyOpen} onOpenChange={setMyAdvocacyOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>My Advocacy Information</DialogTitle>
-            <DialogDescription>
-              Your personal information and advocacy details
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            {/* Personal Information */}
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Personal Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">First Name</p>
-                  <p className="text-base">{firstname || "Not provided"}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Last Name</p>
-                  <p className="text-base">{lastname || "Not provided"}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Email</p>
-                  <p className="text-base">{email || "Not provided"}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Phone</p>
-                  <p className="text-base">{phone || "Not provided"}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Address Information */}
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Address</h3>
-              <div className="space-y-2">
-                {addr && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Street Address</p>
-                    <p className="text-base">{addr}</p>
-                  </div>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {city && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">City</p>
-                      <p className="text-base">{city}</p>
-                    </div>
-                  )}
-                  {location.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">
-                        {location.length > 1 ? "State" : "Country"}
-                      </p>
-                      <p className="text-base">{location[location.length - 1] || location[0]}</p>
-                    </div>
-                  )}
-                  {location.length > 1 && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Country</p>
-                      <p className="text-base">{location[0]}</p>
-                    </div>
-                  )}
-                  {zip && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">ZIP Code</p>
-                      <p className="text-base">{zip}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Interests */}
-            {interest && interest.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Areas of Interest</h3>
-                <div className="flex flex-wrap gap-2">
-                  {interest.map((item, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

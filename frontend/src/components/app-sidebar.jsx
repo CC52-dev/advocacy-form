@@ -329,6 +329,17 @@ export function AppSidebar({ ...props }) {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
+                <Link href="/app/myadvocacy">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      tooltip="My Advocacy"
+                      isActive={pathname === "/app/myadvocacy"}
+                    >
+                      <User />
+                      <span>My Advocacy</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </Link>
                 {canViewApplicants && (
                   <Link href="/app/applicants">
                     <SidebarMenuItem>
