@@ -189,6 +189,85 @@ export function isAdmin() {
   return permissions.includes("admin");
 }
 
+/**
+ * True if user can open the analytics dashboard (any "read" area or dev).
+ */
+export function canViewDashboard() {
+  const permissions = useAuthStore.getState().permissions || [];
+  if (permissions.includes("admin")) return true;
+  if (permissions.includes("users.read") || permissions.includes("users.*")) return true;
+  if (permissions.includes("applicants.read") || permissions.includes("applicants.*")) return true;
+  if (
+    permissions.includes("events.read") ||
+    permissions.includes("events.create") ||
+    permissions.includes("events.update") ||
+    permissions.includes("events.delete") ||
+    permissions.includes("events.*")
+  ) {
+    return true;
+  }
+  if (permissions.includes("applications.read") || permissions.includes("dev")) return true;
+  return false;
+}
+
+export function useCanViewDashboard() {
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  if (permissions.includes("admin")) return true;
+  if (permissions.includes("users.read") || permissions.includes("users.*")) return true;
+  if (permissions.includes("applicants.read") || permissions.includes("applicants.*")) return true;
+  if (
+    permissions.includes("events.read") ||
+    permissions.includes("events.create") ||
+    permissions.includes("events.update") ||
+    permissions.includes("events.delete") ||
+    permissions.includes("events.*")
+  ) {
+    return true;
+  }
+  if (permissions.includes("applications.read") || permissions.includes("dev")) return true;
+  return false;
+}
+
+/** Matches backend stats: users section */
+export function useHasUsersStats() {
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  return (
+    permissions.includes("admin") ||
+    permissions.includes("users.read") ||
+    permissions.includes("users.*")
+  );
+}
+
+export function useHasApplicantsStats() {
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  return (
+    permissions.includes("admin") ||
+    permissions.includes("applicants.read") ||
+    permissions.includes("applicants.*")
+  );
+}
+
+export function useHasEventStats() {
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  if (permissions.includes("admin")) return true;
+  if (permissions.includes("events.*")) return true;
+  return (
+    permissions.includes("events.read") ||
+    permissions.includes("events.create") ||
+    permissions.includes("events.update") ||
+    permissions.includes("events.delete")
+  );
+}
+
+export function useHasApplicationsStats() {
+  const permissions = useAuthStore((state) => state.permissions) || [];
+  return (
+    permissions.includes("admin") ||
+    permissions.includes("dev") ||
+    permissions.includes("applications.read")
+  );
+}
+
 // Wildcard permission expansions
 const WILDCARD_EXPANSIONS = {
   "applicants.*": ["applicants.read", "applicants.approve", "applicants.reject"],

@@ -55,7 +55,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { User2, Users, Calendar, CalendarClock } from "lucide-react";
+import { User2, Users, Calendar, CalendarClock, LayoutDashboard } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { useToast } from "@/hooks/use-toast";
@@ -63,7 +63,7 @@ import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import api from "@/lib/axios";
 import Image from "next/image";
-import { useHasPermission, useCanAccessEvents, useCanManageEvents } from "@/lib/permissions";
+import { useHasPermission, useCanAccessEvents, useCanManageEvents, useCanViewDashboard } from "@/lib/permissions";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ExternalLink, Loader2 } from "lucide-react";
 
@@ -168,6 +168,7 @@ export function AppSidebar({ ...props }) {
   const canViewEvents = useCanAccessEvents();
   const canManageEventsPanel = useCanManageEvents();
   const canViewApplications = useHasPermission("dev");
+  const canViewAnalytics = useCanViewDashboard();
 
   // Fetch applications where user has any access
   const { data: accessibleAppsData } = useQuery({
@@ -329,6 +330,19 @@ export function AppSidebar({ ...props }) {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </Link>
+                {canViewAnalytics && (
+                  <Link href="/app/dashboard">
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        tooltip="Dashboard"
+                        isActive={pathname === "/app/dashboard"}
+                      >
+                        <LayoutDashboard />
+                        <span>Dashboard</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </Link>
+                )}
                 <Link href="/app/myadvocacy">
                   <SidebarMenuItem>
                     <SidebarMenuButton

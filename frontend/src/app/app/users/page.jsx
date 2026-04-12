@@ -1,8 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTableUsers } from "./data-table";
+import { PageStatsRow } from "@/components/page-stats-row";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Page() {
   // const queryClient = useQueryClient();
@@ -17,6 +18,8 @@ export default function Page() {
             User Management
           </code>
 
+          <PageStatsRow section="users" />
+
           <DataTableUsers />
 
           <Button
@@ -25,6 +28,7 @@ export default function Page() {
               queryClient.invalidateQueries({
                 queryKey: ["allUsers"],
               });
+              queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
             }}
           >
             Refresh

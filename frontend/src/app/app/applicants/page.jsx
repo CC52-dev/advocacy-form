@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTableApplicants } from "./data-table";
+import { PageStatsRow } from "@/components/page-stats-row";
 
 // const data = [
 //   {
@@ -36,6 +37,8 @@ export default function Page() {
             Applicant Management
           </code>
 
+          <PageStatsRow section="applicants" />
+
           <DataTableApplicants />
 
           <Button
@@ -44,6 +47,7 @@ export default function Page() {
               queryClient.invalidateQueries({
                 queryKey: ["applicants"],
               });
+              queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
             }}
           >
             Refresh

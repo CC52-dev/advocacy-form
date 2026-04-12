@@ -7,9 +7,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ExternalLink, User, Loader2, Calendar } from "lucide-react";
+import { ExternalLink, User, Loader2, Calendar, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
-import { useCanAccessEvents } from "@/lib/permissions";
+import { useCanAccessEvents, useCanViewDashboard } from "@/lib/permissions";
 
 export default function Page() {
   const firstname = useAuthStore((state) => state.firstname);
@@ -24,6 +24,7 @@ export default function Page() {
   const isApplicant = hasApplicant && !hasAdminOrApproved;
   const { toast } = useToast();
   const canViewEvents = useCanAccessEvents();
+  const canViewAnalytics = useCanViewDashboard();
 
   // Fetch applications where user has any access (applicants do not get assigned apps)
   const { data: accessibleAppsData, isLoading: appsLoading } = useQuery({
@@ -122,6 +123,23 @@ export default function Page() {
               </CardContent>
             </Card>
           </Link>
+
+          {canViewAnalytics && (
+            <Link href="/app/dashboard">
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <LayoutDashboard className="h-5 w-5" />
+                    <CardTitle>Dashboard</CardTitle>
+                  </div>
+                  <CardDescription>Statistics and charts for areas you can access</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Open analytics</p>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
 
           {/* Events - link to events page (not Event Admin) */}
           {canViewEvents && (

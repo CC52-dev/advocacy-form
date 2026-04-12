@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { DataTableEvents } from "../events/data-table";
+import { PageStatsRow } from "@/components/page-stats-row";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function Page() {
@@ -14,6 +15,8 @@ export default function Page() {
             Event Admin
           </code>
 
+          <PageStatsRow section="events" />
+
           <DataTableEvents canCreateEvents={true} showAdminActions={true} />
 
           <Button
@@ -22,6 +25,7 @@ export default function Page() {
               queryClient.invalidateQueries({
                 queryKey: ["allEvents"],
               });
+              queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
             }}
           >
             Refresh

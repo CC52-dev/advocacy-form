@@ -1,5 +1,6 @@
 "use client";
 import { EventsCardsView } from "./events-cards";
+import { PageStatsRow } from "@/components/page-stats-row";
 
 export default function Page() {
   return (
@@ -8,6 +9,8 @@ export default function Page() {
         <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-left py-2 sm:py-4 md:py-6 lg:py-8">
           Events
         </h1>
+
+        <PageStatsRow section="events" />
 
         <EventsCardsView />
       </div>
