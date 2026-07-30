@@ -128,7 +128,8 @@ export function DataTableApplications() {
   const queryClient = useQueryClient();
   
   // Permission check
-  const canCreate = useHasPermission("applications.create");
+  const canCreate =
+    useHasPermission("applications.create") || useHasPermission("dev");
 
   // Category management functions
   const addCategory = () => {

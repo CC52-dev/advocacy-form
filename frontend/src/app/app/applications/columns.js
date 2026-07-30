@@ -62,6 +62,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
 import { useHasPermission } from "@/lib/permissions";
+import { parsePermissionsDefinition } from "@/lib/parsePermissionsDefinition";
 import api from "@/lib/axios";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -257,19 +258,19 @@ export const columns = [
       const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
       const [showApiKey, setShowApiKey] = React.useState(false);
       
-      // Parse existing permissions definition
-      const existingPermsDef = row.original.rolesDefinition || row.original.permissionsDefinition || {};
-      const existingCategories = existingPermsDef.categories || [];
-      const existingPermissions = existingPermsDef.permissions || existingPermsDef.roles || [];
-      
+      // Parse existing permissions definition (handles JSON strings from API/DB)
+      const initialParsed = parsePermissionsDefinition(
+        row.original.rolesDefinition || row.original.permissionsDefinition
+      );
+
       const [editFormData, setEditFormData] = React.useState({
         name: row.original.name || "",
         description: row.original.description || "",
         url: row.original.url || "",
         status: row.original.status || "pending",
         permissionsDefinition: {
-          categories: existingCategories,
-          permissions: existingPermissions,
+          categories: initialParsed.categories,
+          permissions: initialParsed.permissions,
         },
       });
       
@@ -289,15 +290,17 @@ export const columns = [
       // Reset form data when dialog opens
       React.useEffect(() => {
         if (isEditDialogOpen) {
-          const permsDef = row.original.rolesDefinition || row.original.permissionsDefinition || {};
+          const parsed = parsePermissionsDefinition(
+            row.original.rolesDefinition || row.original.permissionsDefinition
+          );
           setEditFormData({
             name: row.original.name || "",
             description: row.original.description || "",
             url: row.original.url || "",
             status: row.original.status || "pending",
             permissionsDefinition: {
-              categories: permsDef.categories || [],
-              permissions: permsDef.permissions || permsDef.roles || [],
+              categories: parsed.categories,
+              permissions: parsed.permissions,
             },
           });
           setNewCategoryName("");
@@ -444,8 +447,10 @@ export const columns = [
       };
 
       // Permission checks
-      const canUpdate = useHasPermission("applications.update");
-      const canDelete = useHasPermission("applications.delete");
+      const canUpdate =
+        useHasPermission("applications.update") || useHasPermission("dev");
+      const canDelete =
+        useHasPermission("applications.delete") || useHasPermission("dev");
 
       const updateApplication = useMutation({
         mutationFn: async (data) => {
@@ -549,6 +554,20 @@ export const columns = [
       };
 
       const handleSubmit = () => {
+        const stored = parsePermissionsDefinition(
+          row.original.rolesDefinition || row.original.permissionsDefinition
+        );
+        const submittingCount = editFormData.permissionsDefinition?.permissions?.length ?? 0;
+        if (stored.permissions.length > 0 && submittingCount === 0) {
+          toast({
+            title: "Cannot save",
+            description:
+              "Permissions did not load correctly. Refresh the page before saving so existing permissions are not cleared.",
+            variant: "destructive",
+            duration: 5000,
+          });
+          return;
+        }
         updateApplication.mutate(editFormData);
       };
 

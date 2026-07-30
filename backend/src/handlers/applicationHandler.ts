@@ -34,9 +34,47 @@ interface PermissionsDefinition {
   categories?: CategoryDefinition[];
 }
 
+// Parse permissions definition from database (handles JSON strings and old "roles" format)
+function parsePermissionsDefinition(data: any): PermissionsDefinition {
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return { permissions: [], categories: [] };
+    }
+  }
+
+  const categories = Array.isArray(data?.categories) ? data.categories : [];
+
+  if (Array.isArray(data?.permissions)) {
+    return { permissions: data.permissions, categories };
+  }
+  if (Array.isArray(data?.roles)) {
+    return { permissions: data.roles, categories };
+  }
+  return { permissions: [], categories: [] };
+}
+
+function formatApplicationForResponse<T extends { rolesDefinition?: unknown }>(app: T) {
+  const permissionsDefinition = parsePermissionsDefinition(app.rolesDefinition);
+  return {
+    ...app,
+    rolesDefinition: permissionsDefinition,
+    permissionsDefinition,
+  };
+}
+
 // Validate permissions definition structure (supports both old "roles" and new "permissions" format)
 function validatePermissionsDefinition(data: any): { valid: boolean; error?: string } {
-  if (!data || typeof data !== 'object') {
+  if (typeof data === "string") {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      return { valid: false, error: "Permissions definition must be valid JSON" };
+    }
+  }
+
+  if (!data || typeof data !== "object") {
     return { valid: false, error: "Permissions definition must be an object" };
   }
 
@@ -196,9 +234,9 @@ export async function getAllApplications(token: string, res: Response) {
       }
     }
 
-    // Add isCurrentUserAdmin flag to each application
+    // Add isCurrentUserAdmin flag and normalize rolesDefinition JSON for clients
     const applicationsWithAdminFlag = applications.map(app => ({
-      ...app,
+      ...formatApplicationForResponse(app),
       isCurrentUserAdmin: isSysAdmin || adminAppIds.has(app.id),
     }));
 
@@ -263,7 +301,7 @@ export async function getApplication(token: string, applicationId: string, res: 
     }
 
     res.status(200).json({
-      message: application[0],
+      message: formatApplicationForResponse(application[0]),
     });
   } catch (error) {
     res.status(400).json({ message: "An error occurred" });
